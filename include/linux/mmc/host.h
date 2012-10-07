@@ -302,6 +302,7 @@ struct mmc_host {
 #define MMC_CAP2_STROBE_ENHANCED	(1 << 17)	/* enhanced strobe */
 #define MMC_CAP2_CMDQ		(MMC_CAP2_CACHE_CTRL | \
 				(1 << 18))	/* Allow command queuing */
+#define MMC_CAP2_PACKED_WR_CONTROL (1 << 19)	/* Allow write packing control */
 
 	mmc_pm_flag_t		pm_caps;	/* supported pm features */
 

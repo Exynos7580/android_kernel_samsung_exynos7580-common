@@ -60,6 +60,9 @@ struct mmc_queue {
 	struct mmc_queue_req	mqrq[EMMC_MAX_QUEUE_DEPTH];
 	struct mmc_queue_req	*mqrq_cur;
 	struct mmc_queue_req	*mqrq_prev;
+	bool			wr_packing_enabled;
+	int			num_of_potential_packed_wr_reqs;
+	int			num_wr_reqs_to_start_packing;
 };
 
 #define IS_RT_CLASS_REQ(x)	\
