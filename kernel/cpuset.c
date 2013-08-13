@@ -62,10 +62,6 @@
 
 struct static_key cpusets_enabled_key __read_mostly = STATIC_KEY_INIT_FALSE;
 
-/* Forward declare cgroup structures */
-struct cgroup_subsys cpuset_subsys;
-struct cpuset;
-
 /* See "Frequency meter" comments, below. */
 
 struct fmeter {
