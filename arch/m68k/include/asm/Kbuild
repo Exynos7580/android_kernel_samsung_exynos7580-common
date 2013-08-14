@@ -19,6 +19,7 @@ generic-y += mcs_spinlock.h
 generic-y += mman.h
 generic-y += mutex.h
 generic-y += percpu.h
+generic-y += preempt.h
 generic-y += resource.h
 generic-y += scatterlist.h
 generic-y += sections.h
