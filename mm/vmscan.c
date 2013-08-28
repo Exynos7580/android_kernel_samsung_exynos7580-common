@@ -251,58 +251,42 @@ static inline int do_shrinker_shrink(struct shrinker *shrinker,
  *
  * Returns the number of slab objects which we shrunk.
  */
-unsigned long shrink_slab(struct shrink_control *shrink,
+unsigned long shrink_slab(struct shrink_control *shrinkctl,
 			  unsigned long nr_pages_scanned,
 			  unsigned long lru_pages)
 {
 	struct shrinker *shrinker;
-	unsigned long ret = 0;
+	unsigned long freed = 0;
 
 	if (nr_pages_scanned == 0)
 		nr_pages_scanned = SWAP_CLUSTER_MAX;
 
 	if (!down_read_trylock(&shrinker_rwsem)) {
-		/* Assume we'll be able to shrink next time */
-		ret = 1;
+		/*
+		 * If we would return 0, our callers would understand that we
+		 * have nothing else to shrink and give up trying. By returning
+		 * 1 we keep it going and assume we'll be able to shrink next
+		 * time.
+		 */
+		freed = 1;
 		goto out;
 	}
 
 	list_for_each_entry(shrinker, &shrinker_list, list) {
 		unsigned long long delta;
-		long total_scan, pages_got;
-		long freeable;
-		int shrink_ret = 0;
+		long total_scan;
+		long max_pass;
 		long nr;
 		long new_nr;
 		long batch_size = shrinker->batch ? shrinker->batch
 						  : SHRINK_BATCH;
-		long min_cache_size = batch_size;
 
-		if (current_is_kswapd())
-			min_cache_size = 0;
-
-		freeable = do_shrinker_shrink(shrinker, shrink, 0);
-		if (freeable <= 0)
+		if (shrinker->count_objects)
+			max_pass = shrinker->count_objects(shrinker, shrinkctl);
+		else
+			max_pass = do_shrinker_shrink(shrinker, shrinkctl, 0);
+		if (max_pass == 0)
 			continue;
-
-		/*
-		 * copy the current shrinker scan count into a local variable
-		 * and zero it so that other concurrent shrinker invocations
-		 * don't also do this scanning work.
-		 */
-		nr = atomic_long_xchg(&shrinker->nr_in_batch, 0);
-
-		total_scan = nr;
-		delta = (4 * nr_pages_scanned) / shrinker->seeks;
-		delta *= freeable;
-		do_div(delta, lru_pages + 1);
-		total_scan += delta;
-		if (total_scan < 0) {
-			printk(KERN_ERR "shrink_slab: %pF negative objects to "
-			       "delete nr=%ld\n",
-			       shrinker->shrink, total_scan);
-			total_scan = freeable;
-		}
 
 		/*
 		 * We need to avoid excessive windup on filesystem shrinkers
@@ -310,46 +294,52 @@ unsigned long shrink_slab(struct shrink_control *shrink,
 		 * shrinkers to return -1 all the time. This results in a large
 		 * nr being built up so when a shrink that can do some work
 		 * comes along it empties the entire cache due to nr >>>
-		 * freeable.  This is bad for sustaining a working set in
+		 * max_pass.  This is bad for sustaining a working set in
 		 * memory.
 		 *
 		 * Hence only allow the shrinker to scan the entire cache when
 		 * a large delta change is calculated directly.
 		 */
-		if (delta < freeable / 4)
-			total_scan = min(total_scan, freeable / 2);
+		if (delta < max_pass / 4)
+			total_scan = min(total_scan, max_pass / 2);
 
 		/*
 		 * Avoid risking looping forever due to too large nr value:
 		 * never try to free more than twice the estimate number of
 		 * freeable entries.
 		 */
-		if (total_scan > freeable * 2)
-			total_scan = freeable * 2;
+		if (total_scan > max_pass * 2)
+			total_scan = max_pass * 2;
 
-		trace_mm_shrink_slab_start(shrinker, shrink, nr,
+		trace_mm_shrink_slab_start(shrinker, shrinkctl, nr,
 					nr_pages_scanned, lru_pages,
-					freeable, delta, total_scan);
+					max_pass, delta, total_scan);
 
-		while (total_scan > min_cache_size) {
-			int nr_before;
+		while (total_scan > batch_size) {
 
-			if (total_scan < batch_size)
-				batch_size = total_scan;
+			if (shrinker->scan_objects) {
+				unsigned long ret;
+				shrinkctl->nr_to_scan = batch_size;
+				ret = shrinker->scan_objects(shrinker, shrinkctl);
 
-			nr_before = do_shrinker_shrink(shrinker, shrink, 0);
-			shrink_ret = do_shrinker_shrink(shrinker, shrink,
-							batch_size);
-			if (shrink_ret == -1)
-				break;
-			if (shrink_ret < nr_before) {
-				pages_got = nr_before - shrink_ret;
-				ret += pages_got;
-				total_scan -= pages_got > batch_size ? pages_got : batch_size;
+				if (ret == SHRINK_STOP)
+					break;
+				freed += ret;
 			} else {
-				total_scan -= batch_size;
+				int nr_before;
+				long ret;
+
+				nr_before = do_shrinker_shrink(shrinker, shrinkctl, 0);
+				ret = do_shrinker_shrink(shrinker, shrinkctl,
+								batch_size);
+				if (ret == -1)
+					break;
+				if (ret < nr_before)
+				freed += nr_before - ret;
 			}
+
 			count_vm_events(SLABS_SCANNED, batch_size);
+			total_scan -= batch_size;
 
 			cond_resched();
 		}
@@ -365,12 +355,12 @@ unsigned long shrink_slab(struct shrink_control *shrink,
 		else
 			new_nr = atomic_long_read(&shrinker->nr_in_batch);
 
-		trace_mm_shrink_slab_end(shrinker, shrink_ret, nr, new_nr);
+		trace_mm_shrink_slab_end(shrinker, freed, nr, new_nr);
 	}
 	up_read(&shrinker_rwsem);
 out:
 	cond_resched();
-	return ret;
+	return freed;
 }
 
 static inline int is_page_cache_freeable(struct page *page)
