@@ -1402,6 +1402,9 @@ unsigned int cpufreq_get(unsigned int cpu)
 	unsigned int ret_freq = 0;
 	struct cpufreq_policy *policy = cpufreq_cpu_get(cpu);
 
+	if (cpufreq_disabled() || !cpufreq_driver)
+		return -ENOENT;
+
 	if (!policy)
 		goto out;
 
@@ -2055,7 +2058,7 @@ static struct notifier_block __refdata cpufreq_cpu_notifier = {
  * @driver_data: A struct cpufreq_driver containing the values#
  * submitted by the CPU Frequency driver.
  *
- *   Registers a CPU Frequency driver to this core code. This code
+ * Registers a CPU Frequency driver to this core code. This code
  * returns zero on success, -EBUSY when another driver got here first
  * (and isn't unregistered in the meantime).
  *
@@ -2130,7 +2133,7 @@ EXPORT_SYMBOL_GPL(cpufreq_register_driver);
 /**
  * cpufreq_unregister_driver - unregister the current CPUFreq driver
  *
- *    Unregister the current CPUFreq driver. Only call this if you have
+ * Unregister the current CPUFreq driver. Only call this if you have
  * the right to do so, i.e. if you have succeeded in initialising before!
  * Returns zero if successful, and -EINVAL if the cpufreq_driver is
  * currently not initialised.
