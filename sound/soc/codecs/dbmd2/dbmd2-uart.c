@@ -569,7 +569,7 @@ static int uart_can_boot(struct dbmd2_private *p)
 		uart_p->uart_probe_thread = NULL;
 	}
 
-	INIT_COMPLETION(uart_p->uart_done);
+	reinit_completion(&uart_p->uart_done);
 
 	if (retries == 0) {
 		dev_err(p->dev, "%s: UART not available\n", __func__);

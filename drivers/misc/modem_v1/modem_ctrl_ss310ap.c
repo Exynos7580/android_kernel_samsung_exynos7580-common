@@ -299,8 +299,8 @@ static int ss310ap_boot_on(struct modem_ctl *mc)
 	if (ld->boot_on)
 		ld->boot_on(ld, mc->bootd);
 
-	INIT_COMPLETION(mc->init_cmpl);
-	INIT_COMPLETION(mc->off_cmpl);
+	reinit_completion(&mc->init_cmpl);
+	reinit_completion(&mc->off_cmpl);
 
 	list_for_each_entry(iod, &mc->modem_state_notify_list, list) {
 		if (iod && atomic_read(&iod->opened) > 0)

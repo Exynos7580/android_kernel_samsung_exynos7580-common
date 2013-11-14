@@ -1549,7 +1549,7 @@ static int shmem_send(struct link_device *ld, struct io_device *iod,
 			}
 
 			mif_err("wait TX RESUME CMD...\n");
-			INIT_COMPLETION(ld->raw_tx_resumed);
+			reinit_completion(&ld->raw_tx_resumed);
 			wait_for_completion_timeout(&ld->raw_tx_resumed,
 				msecs_to_jiffies(3000));
 			mif_err("TX resumed done.\n");

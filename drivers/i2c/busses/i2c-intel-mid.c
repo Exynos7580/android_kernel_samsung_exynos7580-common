@@ -537,7 +537,7 @@ static int xfer_read(struct i2c_adapter *adap, unsigned char *buf, int length)
 		return -EMSGSIZE;
 	}
 
-	INIT_COMPLETION(i2c->complete);
+	reinit_completion(&i2c->complete);
 
 	readl(i2c->base + IC_CLR_INTR);
 	writel(0x0044, i2c->base + IC_INTR_MASK);
@@ -590,7 +590,7 @@ static int xfer_write(struct i2c_adapter *adap,
 		return -EMSGSIZE;
 	}
 
-	INIT_COMPLETION(i2c->complete);
+	reinit_completion(&i2c->complete);
 
 	readl(i2c->base + IC_CLR_INTR);
 	writel(0x0050, i2c->base + IC_INTR_MASK);

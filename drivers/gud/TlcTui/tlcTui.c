@@ -137,7 +137,7 @@ static uint32_t send_cmd_to_user(uint32_t command_id)
 	if (atomic_read(&fileopened)) {
 		/* S.LSI : Clean up previous response. */
 		complete_all(&io_comp);
-		INIT_COMPLETION(io_comp);
+		reinit_completion(&io_comp);
 
 		/* Unlock the ioctl thread (IOCTL_WAIT) in order to let the
 		* client know that there is a command to process. */
@@ -156,7 +156,7 @@ static uint32_t send_cmd_to_user(uint32_t command_id)
 		ret = TUI_DCI_ERR_INTERNAL_ERROR;
 		goto end;
 	}
-	INIT_COMPLETION(io_comp);
+	reinit_completion(&io_comp);
 
 	/* Check id of the cmd processed by ioctl thread (paranoia) */
 	if (g_user_rsp.id != command_id) {
@@ -418,7 +418,7 @@ int tlc_wait_cmd(uint32_t *cmd_id)
 	/* Wait for signal from DCI handler */
 	/* In case of an interrupted sys call, return with -EINTR */
 	wait_for_completion_interruptible(&dci_comp);
-	INIT_COMPLETION(dci_comp);
+	reinit_completion(&dci_comp);
 
 	*cmd_id = g_cmd_id;
 	return 0;

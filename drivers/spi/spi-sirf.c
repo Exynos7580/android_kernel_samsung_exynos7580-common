@@ -292,7 +292,7 @@ static int spi_sirfsoc_transfer(struct spi_device *spi, struct spi_transfer *t)
 	sspi->tx = t->tx_buf;
 	sspi->rx = t->rx_buf;
 	sspi->left_tx_cnt = sspi->left_rx_cnt = t->len;
-	INIT_COMPLETION(sspi->done);
+	reinit_completion(&sspi->done);
 
 	writel(SIRFSOC_SPI_INT_MASK_ALL, sspi->base + SIRFSOC_SPI_INT_STATUS);
 

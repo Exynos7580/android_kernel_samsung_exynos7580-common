@@ -174,7 +174,7 @@ static int mpc512x_psc_spi_transfer_rxtx(struct spi_device *spi,
 			len--;
 		}
 
-		INIT_COMPLETION(mps->done);
+		reinit_completion(&mps->done);
 
 		/* interrupt on tx fifo empty */
 		out_be32(&fifo->txisr, MPC512x_PSC_FIFO_EMPTY);

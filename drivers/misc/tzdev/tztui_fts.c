@@ -301,8 +301,8 @@ static int request_touch(void)
 	if (pm_runtime_get(fts_info->client->adapter->dev.parent) < 0)
 		ERR("pm_runtime_get error");
 
-	INIT_COMPLETION(fts_info->st_powerdown);
-	/*INIT_COMPLETION(info->st_interrupt);*/
+	reinit_completion(&fts_info->st_powerdown);
+	/*reinit_completion(&info->st_interrupt);*/
 
 	i2c_dev = get_i2c_device(fts_info);
 	if (!i2c_dev) {
@@ -334,7 +334,7 @@ static int request_touch(void)
 	local_i2c_dev = i2c_dev;
 	local_fts_info = fts_info;
 
-	INIT_COMPLETION(irq_completion);
+	reinit_completion(&irq_completion);
 	retval = request_threaded_irq(fts_info->irq, NULL, tui_fts_irq, IRQF_TRIGGER_LOW | IRQF_ONESHOT, "tztui", tui_fts_irq);
 	/*retval = request_irq(fts_info->irq, tui_fts_irq, IRQF_TRIGGER_LOW | IRQF_ONESHOT, "tztui", tui_fts_irq);*/
 

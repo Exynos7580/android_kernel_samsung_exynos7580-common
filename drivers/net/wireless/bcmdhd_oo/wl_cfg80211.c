@@ -1835,7 +1835,7 @@ wl_cfg80211_p2p_if_add(struct bcm_cfg80211 *cfg,
 		DNGL_FUNC(dhd_cfg80211_set_p2p_info, (cfg, dhd_mode));
 			/* reinitialize completion to clear previous count */
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 13, 0))
-			INIT_COMPLETION(cfg->iface_disable);
+			reinit_completion(&cfg->iface_disable);
 #else
 			init_completion(&cfg->iface_disable);
 #endif /* LINUX_VERSION_CODE < KERNEL_VERSION(3, 13, 0) */
@@ -14591,7 +14591,7 @@ wl_bss_connect_done(struct bcm_cfg80211 *cfg, struct net_device *ndev,
 				init_completion(&cfg->iface_disable);
 #else
 				/* reinitialize completion to clear previous count */
-				INIT_COMPLETION(cfg->iface_disable);
+				reinit_completion(&cfg->iface_disable);
 #endif // endif
 			}
 #ifdef CUSTOM_SET_CPUCORE

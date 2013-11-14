@@ -748,7 +748,7 @@ static void coda_device_run(void *m2m_priv)
 	/* 1 second timeout in case CODA locks up */
 	schedule_delayed_work(&dev->timeout, HZ);
 
-	INIT_COMPLETION(dev->done);
+	reinit_completion(&dev->done);
 	coda_command_async(ctx, CODA_COMMAND_PIC_RUN);
 }
 

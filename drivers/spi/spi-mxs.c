@@ -238,7 +238,7 @@ static int mxs_spi_txrx_dma(struct mxs_spi *spi, int cs,
 	if (!dma_xfer)
 		return -ENOMEM;
 
-	INIT_COMPLETION(spi->c);
+	reinit_completion(&spi->c);
 
 	ctrl0 = readl(ssp->base + HW_SSP_CTRL0);
 	ctrl0 &= ~BM_SSP_CTRL0_XFER_COUNT;
