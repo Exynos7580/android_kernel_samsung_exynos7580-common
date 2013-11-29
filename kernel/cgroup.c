@@ -2564,9 +2564,9 @@ static int cgroup_file_open(struct inode *inode, struct file *file)
 
 static int cgroup_file_release(struct inode *inode, struct file *file)
 {
-	struct cftype *cft = __d_cft(file->f_dentry);
-	if (cft->release)
-		return cft->release(inode, file);
+	if (file->f_op == &cgroup_seqfile_operations)
+		single_release(inode, file);
+
 	return 0;
 }
 

@@ -489,8 +489,6 @@ struct cftype {
 	 */
 	int (*trigger)(struct cgroup *cgrp, unsigned int event);
 
-	int (*release)(struct inode *inode, struct file *file);
-
 	/*
 	 * register_event() callback will be used to add new userspace
 	 * waiter for changes related to the cftype. Implement it if
