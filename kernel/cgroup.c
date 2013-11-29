@@ -3861,12 +3861,6 @@ static int cgroup_pidlist_release(struct inode *inode, struct file *file)
 {
 	struct cgroup_pidlist_open_file *of;
 
-	if (!(file->f_mode & FMODE_READ))
-		return 0;
-	/*
-	 * the seq_file will only be initialized if the file was opened for
-	 * reading; hence we check if it's not null only in that case.
-	 */
 	of = ((struct seq_file *)file->private_data)->private;
 	cgroup_release_pid_array(of->pidlist);
 	return seq_release_private(inode, file);
@@ -3891,10 +3885,6 @@ static int cgroup_pidlist_open(struct file *file, enum cgroup_filetype type)
 	struct cgroup_pidlist_open_file *of;
 	struct cgroup_pidlist *l;
 	int retval;
-
-	/* Nothing to do for write-only files */
-	if (!(file->f_mode & FMODE_READ))
-		return 0;
 
 	/* have the array populated */
 	retval = pidlist_array_load(cgrp, type, &l);
@@ -4176,14 +4166,12 @@ static struct cftype files[] = {
 		.name = "tasks",
 		.open = cgroup_tasks_open,
 		.write_u64 = cgroup_tasks_write,
-		.release = cgroup_pidlist_release,
 		.mode = S_IRUGO | S_IWUSR,
 	},
 	{
 		.name = CGROUP_FILE_GENERIC_PREFIX "procs",
 		.open = cgroup_procs_open,
 		.write_u64 = cgroup_procs_write,
-		.release = cgroup_pidlist_release,
 		.mode = S_IRUGO | S_IWUSR,
 	},
 	{
