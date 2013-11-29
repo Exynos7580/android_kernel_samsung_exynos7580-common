@@ -3480,6 +3480,13 @@ struct cgroup_pidlist {
 	struct rw_semaphore mutex;
 };
 
+/* seq_file->private points to the following */
+struct cgroup_pidlist_open_file {
+	enum cgroup_filetype		type;
+	struct cgroup			*cgrp;
+	struct cgroup_pidlist		*pidlist;
+};
+
 /*
  * The following two functions "fix" the issue where there are more pids
  * than kmalloc will give memory for; in such cases, we use vmalloc/vfree.
@@ -3708,7 +3715,8 @@ static void *cgroup_pidlist_start(struct seq_file *s, loff_t *pos)
 	 * after a seek to the start). Use a binary-search to find the
 	 * next pid to display, if any
 	 */
-	struct cgroup_pidlist *l = s->private;
+	struct cgroup_pidlist_open_file *of = s->private;
+	struct cgroup_pidlist *l = of->pidlist;
 	int index = 0, pid = *pos;
 	int *iter;
 
@@ -3738,13 +3746,15 @@ static void *cgroup_pidlist_start(struct seq_file *s, loff_t *pos)
 
 static void cgroup_pidlist_stop(struct seq_file *s, void *v)
 {
-	struct cgroup_pidlist *l = s->private;
-	up_read(&l->mutex);
+	struct cgroup_pidlist_open_file *of = s->private;
+
+	up_read(&of->pidlist->mutex);
 }
 
 static void *cgroup_pidlist_next(struct seq_file *s, void *v, loff_t *pos)
 {
-	struct cgroup_pidlist *l = s->private;
+	struct cgroup_pidlist_open_file *of = s->private;
+	struct cgroup_pidlist *l = of->pidlist;
 	pid_t *p = v;
 	pid_t *end = l->list + l->length;
 	/*
@@ -3803,16 +3813,17 @@ static void cgroup_release_pid_array(struct cgroup_pidlist *l)
 
 static int cgroup_pidlist_release(struct inode *inode, struct file *file)
 {
-	struct cgroup_pidlist *l;
+	struct cgroup_pidlist_open_file *of;
+
 	if (!(file->f_mode & FMODE_READ))
 		return 0;
 	/*
 	 * the seq_file will only be initialized if the file was opened for
 	 * reading; hence we check if it's not null only in that case.
 	 */
-	l = ((struct seq_file *)file->private_data)->private;
-	cgroup_release_pid_array(l);
-	return seq_release(inode, file);
+	of = ((struct seq_file *)file->private_data)->private;
+	cgroup_release_pid_array(of->pidlist);
+	return seq_release_private(inode, file);
 }
 
 static const struct file_operations cgroup_pidlist_operations = {
@@ -3831,6 +3842,7 @@ static const struct file_operations cgroup_pidlist_operations = {
 static int cgroup_pidlist_open(struct file *file, enum cgroup_filetype type)
 {
 	struct cgroup *cgrp = __d_cgrp(file->f_dentry->d_parent);
+	struct cgroup_pidlist_open_file *of;
 	struct cgroup_pidlist *l;
 	int retval;
 
@@ -3845,12 +3857,16 @@ static int cgroup_pidlist_open(struct file *file, enum cgroup_filetype type)
 	/* configure file information */
 	file->f_op = &cgroup_pidlist_operations;
 
-	retval = seq_open(file, &cgroup_pidlist_seq_operations);
-	if (retval) {
+	of = __seq_open_private(file, &cgroup_pidlist_seq_operations,
+				sizeof(*of));
+	if (!of) {
 		cgroup_release_pid_array(l);
-		return retval;
+		return -ENOMEM;
 	}
-	((struct seq_file *)file->private_data)->private = l;
+
+	of->type = type;
+	of->cgrp = cgrp;
+	of->pidlist = l;
 	return 0;
 }
 static int cgroup_tasks_open(struct inode *unused, struct file *file)
