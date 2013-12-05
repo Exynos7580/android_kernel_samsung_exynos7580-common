@@ -2358,91 +2358,49 @@ static int cgroup_sane_behavior_show(struct cgroup *cgrp, struct cftype *cft,
 /* A buffer size big enough for numbers or short strings */
 #define CGROUP_LOCAL_BUFFER_SIZE 64
 
-static ssize_t cgroup_write_X64(struct cgroup *cgrp, struct cftype *cft,
-				struct file *file,
-				const char __user *userbuf,
-				size_t nbytes, loff_t *unused_ppos)
-{
-	char buffer[CGROUP_LOCAL_BUFFER_SIZE];
-	int retval = 0;
-	char *end;
-
-	if (!nbytes)
-		return -EINVAL;
-	if (nbytes >= sizeof(buffer))
-		return -E2BIG;
-	if (copy_from_user(buffer, userbuf, nbytes))
-		return -EFAULT;
-
-	buffer[nbytes] = 0;     /* nul-terminate */
-	if (cft->write_u64) {
-		u64 val = simple_strtoull(strstrip(buffer), &end, 0);
-		if (*end)
-			return -EINVAL;
-		retval = cft->write_u64(cgrp, cft, val);
-	} else {
-		s64 val = simple_strtoll(strstrip(buffer), &end, 0);
-		if (*end)
-			return -EINVAL;
-		retval = cft->write_s64(cgrp, cft, val);
-	}
-	if (!retval)
-		retval = nbytes;
-	return retval;
-}
-
-static ssize_t cgroup_write_string(struct cgroup *cgrp, struct cftype *cft,
-				   struct file *file,
-				   const char __user *userbuf,
-				   size_t nbytes, loff_t *unused_ppos)
-{
-	char local_buffer[CGROUP_LOCAL_BUFFER_SIZE];
-	int retval = 0;
-	size_t max_bytes = cft->max_write_len;
-	char *buffer = local_buffer;
-
-	if (!max_bytes)
-		max_bytes = sizeof(local_buffer) - 1;
-	if (nbytes >= max_bytes)
-		return -E2BIG;
-	/* Allocate a dynamic buffer if we need one */
-	if (nbytes >= sizeof(local_buffer)) {
-		buffer = kmalloc(nbytes + 1, GFP_KERNEL);
-		if (buffer == NULL)
-			return -ENOMEM;
-	}
-	if (nbytes && copy_from_user(buffer, userbuf, nbytes)) {
-		retval = -EFAULT;
-		goto out;
-	}
-
-	buffer[nbytes] = 0;     /* nul-terminate */
-	retval = cft->write_string(cgrp, cft, strstrip(buffer));
-	if (!retval)
-		retval = nbytes;
-out:
-	if (buffer != local_buffer)
-		kfree(buffer);
-	return retval;
-}
-
-static ssize_t cgroup_file_write(struct file *file, const char __user *buf,
-						size_t nbytes, loff_t *ppos)
+static ssize_t cgroup_file_write(struct file *file, const char __user *userbuf,
+				 size_t nbytes, loff_t *ppos)
 {
 	struct cftype *cft = __d_cft(file->f_dentry);
 	struct cgroup *cgrp = __d_cgrp(file->f_dentry->d_parent);
+	size_t max_bytes = cft->max_write_len ?: CGROUP_LOCAL_BUFFER_SIZE - 1;
+	char *buf;
+	int ret;
 
-	if (cgroup_is_removed(cgrp))
-		return -ENODEV;
-	if (cft->write_u64 || cft->write_s64)
-		return cgroup_write_X64(cgrp, cft, file, buf, nbytes, ppos);
-	if (cft->write_string)
-		return cgroup_write_string(cgrp, cft, file, buf, nbytes, ppos);
-	if (cft->trigger) {
-		int ret = cft->trigger(cgrp, (unsigned int)cft->private);
-		return ret ? ret : nbytes;
+	if (nbytes >= max_bytes)
+		return -E2BIG;
+
+	buf = kmalloc(nbytes + 1, GFP_KERNEL);
+	if (!buf)
+		return -ENOMEM;
+
+	if (copy_from_user(buf, userbuf, nbytes)) {
+		ret = -EFAULT;
+		goto out_free;
 	}
-	return -EINVAL;
+
+	buf[nbytes] = '\0';
+
+	if (cft->write_string) {
+		ret = cft->write_string(cgrp, cft, strstrip(buf));
+	} else if (cft->write_u64) {
+		unsigned long long v;
+		ret = kstrtoull(buf, 0, &v);
+		if (!ret)
+			ret = cft->write_u64(cgrp, cft, v);
+	} else if (cft->write_s64) {
+		long long v;
+		ret = kstrtoll(buf, 0, &v);
+		if (!ret)
+			ret = cft->write_s64(cgrp, cft, v);
+		} else if (cft->trigger) {
+			ret = cft->trigger(cgrp, (unsigned int)cft->private);
+	} else {
+		ret = -EINVAL;
+	}
+out_free:
+	kfree(buf);
+	return ret ?: nbytes;
 }
 
 static ssize_t cgroup_read_u64(struct cgroup *cgrp, struct cftype *cft,
