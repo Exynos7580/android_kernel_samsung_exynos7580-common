@@ -384,16 +384,6 @@ struct css_set {
 };
 
 /*
- * cgroup_map_cb is an abstract callback API for reporting map-valued
- * control files
- */
-
-struct cgroup_map_cb {
-	int (*fill)(struct cgroup_map_cb *cb, const char *key, u64 value);
-	void *state;
-};
-
-/*
  * struct cftype: handler definitions for cgroup control files
  *
  * When reading/writing to a file:
@@ -432,9 +422,6 @@ struct cftype {
 	unsigned int flags;
 
 	int (*open)(struct inode *inode, struct file *file);
-	ssize_t (*read)(struct cgroup *cgrp, struct cftype *cft,
-			struct file *file,
-			char __user *buf, size_t nbytes, loff_t *ppos);
 	/*
 	 * read_u64() is a shortcut for the common case of returning a
 	 * single integer. Use it in place of read()
@@ -445,24 +432,11 @@ struct cftype {
 	 */
 	s64 (*read_s64)(struct cgroup *cgrp, struct cftype *cft);
 	/*
-	 * read_map() is used for defining a map of key/value
-	 * pairs. It should call cb->fill(cb, key, value) for each
-	 * entry. The key/value pairs (and their ordering) should not
-	 * change between reboots.
-	 */
-	int (*read_map)(struct cgroup *cont, struct cftype *cft,
-			struct cgroup_map_cb *cb);
-	/*
 	 * read_seq_string() is used for outputting a simple sequence
 	 * using seqfile.
 	 */
 	int (*read_seq_string)(struct cgroup *cont, struct cftype *cft,
 			       struct seq_file *m);
-
-	ssize_t (*write)(struct cgroup *cgrp, struct cftype *cft,
-			 struct file *file,
-			 const char __user *buf, size_t nbytes, loff_t *ppos);
-
 	/*
 	 * write_u64() is a shortcut for the common case of accepting
 	 * a single integer (as parsed by simple_strtoull) from
