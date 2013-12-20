@@ -287,7 +287,7 @@ ext4_init_acl(handle_t *handle, struct inode *inode, struct inode *dir)
 	struct posix_acl *default_acl, *acl;
 	int error;
 
-	error = posix_acl_create(dir, &inode->i_mode, &default_acl, &acl);
+	error = __posix_acl_create(dir, &inode->i_mode, &default_acl, &acl);
 	if (error)
 		return error;
 
