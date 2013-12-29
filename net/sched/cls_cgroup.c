@@ -11,105 +11,12 @@
 
 #include <linux/module.h>
 #include <linux/slab.h>
-#include <linux/types.h>
-#include <linux/string.h>
-#include <linux/errno.h>
 #include <linux/skbuff.h>
-#include <linux/cgroup.h>
 #include <linux/rcupdate.h>
-#include <linux/fdtable.h>
 #include <net/rtnetlink.h>
 #include <net/pkt_cls.h>
 #include <net/sock.h>
 #include <net/cls_cgroup.h>
-
-static inline struct cgroup_cls_state *cgrp_cls_state(struct cgroup *cgrp)
-{
-	return container_of(cgroup_subsys_state(cgrp, net_cls_subsys_id),
-			    struct cgroup_cls_state, css);
-}
-
-static inline struct cgroup_cls_state *task_cls_state(struct task_struct *p)
-{
-	return container_of(task_subsys_state(p, net_cls_subsys_id),
-			    struct cgroup_cls_state, css);
-}
-
-static struct cgroup_subsys_state *cgrp_css_alloc(struct cgroup *cgrp)
-{
-	struct cgroup_cls_state *cs;
-
-	cs = kzalloc(sizeof(*cs), GFP_KERNEL);
-	if (!cs)
-		return ERR_PTR(-ENOMEM);
-	return &cs->css;
-}
-
-static int cgrp_css_online(struct cgroup *cgrp)
-{
-	if (cgrp->parent)
-		cgrp_cls_state(cgrp)->classid =
-			cgrp_cls_state(cgrp->parent)->classid;
-	return 0;
-}
-
-static void cgrp_css_free(struct cgroup *cgrp)
-{
-	kfree(cgrp_cls_state(cgrp));
-}
-
-static int update_classid(const void *v, struct file *file, unsigned n)
-{
-	int err;
-	struct socket *sock = sock_from_file(file, &err);
-	if (sock)
-		sock->sk->sk_classid = (u32)(unsigned long)v;
-	return 0;
-}
-
-static void cgrp_attach(struct cgroup *cgrp, struct cgroup_taskset *tset)
-{
-	struct task_struct *p;
-	void *v;
-
-	cgroup_taskset_for_each(p, cgrp, tset) {
-		task_lock(p);
-		v = (void *)(unsigned long)task_cls_classid(p);
-		iterate_fd(p->files, 0, update_classid, v);
-		task_unlock(p);
-	}
-}
-
-static u64 read_classid(struct cgroup *cgrp, struct cftype *cft)
-{
-	return cgrp_cls_state(cgrp)->classid;
-}
-
-static int write_classid(struct cgroup *cgrp, struct cftype *cft, u64 value)
-{
-	cgrp_cls_state(cgrp)->classid = (u32) value;
-	return 0;
-}
-
-static struct cftype ss_files[] = {
-	{
-		.name = "classid",
-		.read_u64 = read_classid,
-		.write_u64 = write_classid,
-	},
-	{ }	/* terminate */
-};
-
-struct cgroup_subsys net_cls_subsys = {
-	.name		= "net_cls",
-	.css_alloc	= cgrp_css_alloc,
-	.css_online	= cgrp_css_online,
-	.css_free	= cgrp_css_free,
-	.attach		= cgrp_attach,
-	.subsys_id	= net_cls_subsys_id,
-	.base_cftypes	= ss_files,
-	.module		= THIS_MODULE,
-};
 
 struct cls_cgroup_head {
 	u32			handle;
@@ -306,25 +213,12 @@ static struct tcf_proto_ops cls_cgroup_ops __read_mostly = {
 
 static int __init init_cgroup_cls(void)
 {
-	int ret;
-
-	ret = cgroup_load_subsys(&net_cls_subsys);
-	if (ret)
-		goto out;
-
-	ret = register_tcf_proto_ops(&cls_cgroup_ops);
-	if (ret)
-		cgroup_unload_subsys(&net_cls_subsys);
-
-out:
-	return ret;
+return register_tcf_proto_ops(&cls_cgroup_ops);
 }
 
 static void __exit exit_cgroup_cls(void)
 {
 	unregister_tcf_proto_ops(&cls_cgroup_ops);
-
-	cgroup_unload_subsys(&net_cls_subsys);
 }
 
 module_init(init_cgroup_cls);
