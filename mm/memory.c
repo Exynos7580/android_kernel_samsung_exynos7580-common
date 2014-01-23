@@ -702,7 +702,7 @@ static void print_bad_pte(struct vm_area_struct *vma, unsigned long addr,
 		current->comm,
 		(long long)pte_val(pte), (long long)pmd_val(*pmd));
 	if (page)
-		dump_page(page);
+		dump_page(page, "bad pte");
 	printk(KERN_ALERT
 		"addr:%p vm_flags:%08lx anon_vma:%p mapping:%p index:%lx\n",
 		(void *)addr, vma->vm_flags, vma->anon_vma, mapping, index);
@@ -1486,7 +1486,7 @@ static int __migrate_cma_pinpage(struct page *page, struct vm_area_struct *vma)
 
 	if (__isolate_lru_page(page, 0) != 0) {
 		pr_warn("%s: failed to isolate lru page\n", __func__);
-		dump_page(page);
+		dump_page(page, "failed to isolate lru page");
 		return -EFAULT;
 	} else {
 		spin_lock_irq(&zone->lru_lock);
