@@ -631,8 +631,8 @@ int vnswap_submit_bio(int rw, int nand_offset,
 	int ret = 0;
 
 	if (!rw) {
-		VM_BUG_ON(!PageLocked(page));
-		VM_BUG_ON(PageUptodate(page));
+		VM_BUG_ON_PAGE(!PageLocked(page), page);
+		VM_BUG_ON_PAGE(PageUptodate(page), page);
 	}
 
 	bio = bio_alloc(GFP_NOIO, 1);
