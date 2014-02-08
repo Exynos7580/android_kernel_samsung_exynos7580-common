@@ -69,6 +69,7 @@ enum ipi_msg_type {
 	IPI_CPU_STOP,
 	IPI_TIMER,
 	IPI_IRQ_WORK,
+	IPI_WAKEUP,
 };
 
 /*
@@ -505,7 +506,13 @@ static const char *ipi_types[NR_IPI] = {
 	S(IPI_CPU_STOP, "CPU stop interrupts"),
 	S(IPI_TIMER, "Timer broadcast interrupts"),
 	S(IPI_IRQ_WORK, "IRQ work interrupts"),
+	S(IPI_WAKEUP, "CPU wakeup interrupts"),
 };
+
+void arch_send_wakeup_ipi_mask(const struct cpumask *mask)
+{
+	smp_cross_call(mask, IPI_WAKEUP);
+}
 
 void show_ipi_list(struct seq_file *p, int prec)
 {
@@ -594,6 +601,9 @@ void handle_IPI(int ipinr, struct pt_regs *regs)
 		irq_exit();
 		break;
 #endif
+
+	case IPI_WAKEUP:
+		break;
 
 #ifdef CONFIG_IRQ_WORK
 	case IPI_IRQ_WORK:
