@@ -41,7 +41,7 @@ static inline void bfq_init_entity(struct bfq_entity *entity,
 
 static struct bfqio_cgroup *cgroup_to_bfqio(struct cgroup *cgroup)
 {
-	return container_of(cgroup_subsys_state(cgroup, bfqio_subsys_id),
+	return container_of(cgroup_subsys_state(cgroup, bfqio_cgrp_id),
 			    struct bfqio_cgroup, css);
 }
 
@@ -411,7 +411,7 @@ static struct bfq_group *bfq_bic_update_cgroup(struct bfq_io_cq *bic)
 	BUG_ON(bfqd == NULL);
 
 	rcu_read_lock();
-	cgroup = task_cgroup(current, bfqio_subsys_id);
+	cgroup = task_cgroup(current, bfqio_cgrp_id);
 	bfqg = __bfq_bic_change_cgroup(bfqd, bic, cgroup);
 	rcu_read_unlock();
 
@@ -847,13 +847,12 @@ static void bfqio_destroy(struct cgroup *cgroup)
 	kfree(bgrp);
 }
 
-struct cgroup_subsys bfqio_subsys = {
-	.name = "bfqio",
+
+struct cgroup_subsys bfqio_cgrp_subsys = {
 	.css_alloc = bfqio_create,
 	.can_attach = bfqio_can_attach,
 	.attach = bfqio_attach,
 	.css_free = bfqio_destroy,
-	.subsys_id = bfqio_subsys_id,
 	.base_cftypes = bfqio_files,
 };
 #else

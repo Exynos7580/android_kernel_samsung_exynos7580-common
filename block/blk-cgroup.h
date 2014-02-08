@@ -181,13 +181,13 @@ void blkg_conf_finish(struct blkg_conf_ctx *ctx);
 
 static inline struct blkcg *cgroup_to_blkcg(struct cgroup *cgroup)
 {
-	return container_of(cgroup_subsys_state(cgroup, blkio_subsys_id),
+	return container_of(cgroup_subsys_state(cgroup, blkio_cgrp_id),
 			    struct blkcg, css);
 }
 
 static inline struct blkcg *task_blkcg(struct task_struct *tsk)
 {
-	return container_of(task_subsys_state(tsk, blkio_subsys_id),
+	return container_of(task_subsys_state(tsk, blkio_cgrp_id),
 			    struct blkcg, css);
 }
 

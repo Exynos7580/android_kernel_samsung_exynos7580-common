@@ -36,14 +36,14 @@ struct cpuacct {
 /* return cpu accounting group corresponding to this container */
 static inline struct cpuacct *cgroup_ca(struct cgroup *cgrp)
 {
-	return container_of(cgroup_subsys_state(cgrp, cpuacct_subsys_id),
+	return container_of(cgroup_subsys_state(cgrp, cpuacct_cgrp_id),
 			    struct cpuacct, css);
 }
 
 /* return cpu accounting group to which this task belongs */
 static inline struct cpuacct *task_ca(struct task_struct *tsk)
 {
-	return container_of(task_subsys_state(tsk, cpuacct_subsys_id),
+	return container_of(task_subsys_state(tsk, cpuacct_cgrp_id),
 			    struct cpuacct, css);
 }
 
@@ -286,11 +286,9 @@ void cpuacct_account_field(struct task_struct *p, int index, u64 val)
 	rcu_read_unlock();
 }
 
-struct cgroup_subsys cpuacct_subsys = {
-	.name		= "cpuacct",
+struct cgroup_subsys cpuacct_cgrp_subsys = {
 	.css_alloc	= cpuacct_css_alloc,
 	.css_free	= cpuacct_css_free,
-	.subsys_id	= cpuacct_subsys_id,
 	.base_cftypes	= files,
 	.early_init	= 1,
 };

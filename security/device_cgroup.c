@@ -60,15 +60,13 @@ static inline struct dev_cgroup *css_to_devcgroup(struct cgroup_subsys_state *s)
 
 static inline struct dev_cgroup *cgroup_to_devcgroup(struct cgroup *cgroup)
 {
-	return css_to_devcgroup(cgroup_subsys_state(cgroup, devices_subsys_id));
+	return css_to_devcgroup(cgroup_subsys_state(cgroup, devices_cgrp_id));
 }
 
 static inline struct dev_cgroup *task_devcgroup(struct task_struct *task)
 {
-	return css_to_devcgroup(task_subsys_state(task, devices_subsys_id));
+	return css_to_devcgroup(task_subsys_state(task, devices_cgrp_id));
 }
-
-struct cgroup_subsys devices_subsys;
 
 static int devcgroup_can_attach(struct cgroup *new_cgrp,
 				struct cgroup_taskset *set)
@@ -728,14 +726,12 @@ static struct cftype dev_cgroup_files[] = {
 	{ }	/* terminate */
 };
 
-struct cgroup_subsys devices_subsys = {
-	.name = "devices",
+cgroup_subsys devices_subsys
 	.can_attach = devcgroup_can_attach,
 	.css_alloc = devcgroup_css_alloc,
 	.css_free = devcgroup_css_free,
 	.css_online = devcgroup_online,
 	.css_offline = devcgroup_offline,
-	.subsys_id = devices_subsys_id,
 	.base_cftypes = dev_cgroup_files,
 };
 

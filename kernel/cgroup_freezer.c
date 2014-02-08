@@ -47,13 +47,13 @@ struct freezer {
 
 static inline struct freezer *cgroup_freezer(struct cgroup *cgroup)
 {
-	return container_of(cgroup_subsys_state(cgroup, freezer_subsys_id),
+	return container_of(cgroup_subsys_state(cgroup, freezer_cgrp_id),
 			    struct freezer, css);
 }
 
 static inline struct freezer *task_freezer(struct task_struct *task)
 {
-	return container_of(task_subsys_state(task, freezer_subsys_id),
+	return container_of(task_subsys_state(task, freezer_cgrp_id),
 			    struct freezer, css);
 }
 
@@ -89,8 +89,6 @@ static const char *freezer_state_strs(unsigned int state)
 		return "FREEZING";
 	return "THAWED";
 };
-
-struct cgroup_subsys freezer_subsys;
 
 static struct cgroup_subsys_state *freezer_css_alloc(struct cgroup *cgroup)
 {
@@ -475,13 +473,11 @@ static struct cftype files[] = {
 	{ }	/* terminate */
 };
 
-struct cgroup_subsys freezer_subsys = {
-	.name		= "freezer",
+struct cgroup_subsys freezer_cgrp_subsys = {
 	.css_alloc	= freezer_css_alloc,
 	.css_online	= freezer_css_online,
 	.css_offline	= freezer_css_offline,
 	.css_free	= freezer_css_free,
-	.subsys_id	= freezer_subsys_id,
 	.attach		= freezer_attach,
 	.fork		= freezer_fork,
 	.base_cftypes	= files,

@@ -99,14 +99,14 @@ struct cpuset {
 /* Retrieve the cpuset for a cgroup */
 static inline struct cpuset *cgroup_cs(struct cgroup *cont)
 {
-	return container_of(cgroup_subsys_state(cont, cpuset_subsys_id),
+	return container_of(cgroup_subsys_state(cont, cpuset_cgrp_id),
 			    struct cpuset, css);
 }
 
 /* Retrieve the cpuset for a task */
 static inline struct cpuset *task_cs(struct task_struct *task)
 {
-	return container_of(task_subsys_state(task, cpuset_subsys_id),
+	return container_of(task_subsys_state(task, cpuset_cgrp_id),
 			    struct cpuset, css);
 }
 
@@ -1964,8 +1964,7 @@ static void cpuset_css_free(struct cgroup *cont)
 	kfree(cs);
 }
 
-struct cgroup_subsys cpuset_subsys = {
-	.name = "cpuset",
+struct cgroup_subsys cpuset_cgrp_subsys = {
 	.css_alloc = cpuset_css_alloc,
 	.css_online = cpuset_css_online,
 	.css_offline = cpuset_css_offline,
@@ -1974,7 +1973,6 @@ struct cgroup_subsys cpuset_subsys = {
 	.allow_attach = cpuset_allow_attach,
 	.cancel_attach = cpuset_cancel_attach,
 	.attach = cpuset_attach,
-	.subsys_id = cpuset_subsys_id,
 	.base_cftypes = files,
 	.early_init = 1,
 };
@@ -2600,7 +2598,7 @@ int proc_cpuset_show(struct seq_file *m, struct pid_namespace *ns,
 		goto out;
 
 	rcu_read_lock();
-	css = task_subsys_state(tsk, cpuset_subsys_id);
+	css = task_subsys_state(tsk, cpuset_cgrp_id);
 	retval = cgroup_path(css->cgroup, buf, PAGE_SIZE);
 	rcu_read_unlock();
 	if (retval < 0)

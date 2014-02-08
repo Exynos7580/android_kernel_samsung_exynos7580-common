@@ -41,7 +41,7 @@ extern int cgroupstats_build(struct cgroupstats *stats,
 extern int proc_cgroup_show(struct seq_file *, void *);
 
 /* define the enumeration of all cgroup subsystems */
-#define SUBSYS(_x) _x ## _subsys_id,
+#define SUBSYS(_x) _x ## _cgrp_id,
 enum cgroup_subsys_id {
 #include <linux/cgroup_subsys.h>
 	CGROUP_SUBSYS_COUNT,
@@ -552,7 +552,6 @@ struct cgroup_subsys {
 		     struct task_struct *task);
 	void (*bind)(struct cgroup *root);
 
-	int subsys_id;
 	int disabled;
 	int early_init;
 	/*
@@ -576,6 +575,8 @@ struct cgroup_subsys {
 	bool broken_hierarchy;
 	bool warned_broken_hierarchy;
 
+	/* the following two fields are initialized automtically during boot */
+	int subsys_id;
 #define MAX_CGROUP_TYPE_NAMELEN 32
 	const char *name;
 
@@ -597,7 +598,7 @@ struct cgroup_subsys {
 	struct cftype_set base_cftset;
 };
 
-#define SUBSYS(_x) extern struct cgroup_subsys _x ## _subsys;
+#define SUBSYS(_x) extern struct cgroup_subsys _x ## _cgrp_subsys;
 #include <linux/cgroup_subsys.h>
 #undef SUBSYS
 
