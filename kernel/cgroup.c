@@ -980,7 +980,7 @@ static void cgroup_clear_directory(struct dentry *dir, bool base_files,
 
 	for_each_subsys(cgrp->root, ss) {
 		struct cftype_set *set;
-		if (!test_bit(ss->subsys_id, &subsys_mask))
+		if (!test_bit(ss->id, &subsys_mask))
 			continue;
 		list_for_each_entry(set, &ss->cftsets, node)
 			cgroup_addrm_files(cgrp, NULL, set->cfts, false);
@@ -4142,7 +4142,7 @@ static int cgroup_populate_dir(struct cgroup *cgrp, bool base_files,
 	/* process cftsets of each subsystem */
 	for_each_subsys(cgrp->root, ss) {
 		struct cftype_set *set;
-		if (!test_bit(ss->subsys_id, &subsys_mask))
+		if (!test_bit(ss->id, &subsys_mask))
 			continue;
 
 		list_for_each_entry(set, &ss->cftsets, node)
@@ -4151,7 +4151,7 @@ static int cgroup_populate_dir(struct cgroup *cgrp, bool base_files,
 
 	/* This cgroup is ready now */
 	for_each_subsys(cgrp->root, ss) {
-		struct cgroup_subsys_state *css = cgrp->subsys[ss->subsys_id];
+		struct cgroup_subsys_state *css = cgrp->subsys[ss->id];
 		/*
 		 * Update id->css pointer and make this css visible from
 		 * CSS ID functions. This pointer will be dereferened
@@ -4182,8 +4182,8 @@ static void init_cgroup_css(struct cgroup_subsys_state *css,
 	css->id = NULL;
 	if (cgrp == dummytop)
 		css->flags |= CSS_ROOT;
-	BUG_ON(cgrp->subsys[ss->subsys_id]);
-	cgrp->subsys[ss->subsys_id] = css;
+	BUG_ON(cgrp->subsys[ss->id]);
+	cgrp->subsys[ss->id] = css;
 
 	/*
 	 * css holds an extra ref to @cgrp->dentry which is put on the last
@@ -4204,7 +4204,7 @@ static int online_css(struct cgroup_subsys *ss, struct cgroup *cgrp)
 	if (ss->css_online)
 		ret = ss->css_online(cgrp);
 	if (!ret)
-		cgrp->subsys[ss->subsys_id]->flags |= CSS_ONLINE;
+		cgrp->subsys[ss->id]->flags |= CSS_ONLINE;
 	return ret;
 }
 
@@ -4212,7 +4212,7 @@ static int online_css(struct cgroup_subsys *ss, struct cgroup *cgrp)
 static void offline_css(struct cgroup_subsys *ss, struct cgroup *cgrp)
 	__releases(&cgroup_mutex) __acquires(&cgroup_mutex)
 {
-	struct cgroup_subsys_state *css = cgrp->subsys[ss->subsys_id];
+	struct cgroup_subsys_state *css = cgrp->subsys[ss->id];
 
 	lockdep_assert_held(&cgroup_mutex);
 
@@ -4222,7 +4222,7 @@ static void offline_css(struct cgroup_subsys *ss, struct cgroup *cgrp)
 	if (ss->css_offline)
 		ss->css_offline(cgrp);
 
-	cgrp->subsys[ss->subsys_id]->flags &= ~CSS_ONLINE;
+	cgrp->subsys[ss->id]->flags &= ~CSS_ONLINE;
 }
 
 /*
@@ -4361,7 +4361,7 @@ static long cgroup_create(struct cgroup *parent, struct dentry *dentry,
 
 err_free_all:
 	for_each_subsys(root, ss) {
-		if (cgrp->subsys[ss->subsys_id])
+		if (cgrp->subsys[ss->id])
 			ss->css_free(cgrp);
 	}
 	mutex_unlock(&cgroup_mutex);
@@ -4415,7 +4415,7 @@ static int cgroup_destroy_locked(struct cgroup *cgrp)
 	 * read lock.  See cgroup_next_sibling() for details.
 	 */
 	for_each_subsys(cgrp->root, ss) {
-		struct cgroup_subsys_state *css = cgrp->subsys[ss->subsys_id];
+		struct cgroup_subsys_state *css = cgrp->subsys[ss->id];
 
 		WARN_ON(atomic_read(&css->refcnt) < 0);
 		atomic_add(CSS_DEACT_BIAS, &css->refcnt);
@@ -4434,7 +4434,7 @@ static int cgroup_destroy_locked(struct cgroup *cgrp)
 	 * after all css's are released.
 	 */
 	for_each_subsys(cgrp->root, ss)
-		css_put(cgrp->subsys[ss->subsys_id]);
+		css_put(cgrp->subsys[ss->id]);
 
 	raw_spin_lock(&release_list_lock);
 	if (!list_empty(&cgrp->release_list))
@@ -4516,7 +4516,7 @@ static void __init cgroup_init_subsys(struct cgroup_subsys *ss)
 	 * pointer to this state - since the subsystem is
 	 * newly registered, all tasks and hence the
 	 * init_css_set is in the subsystem's top cgroup. */
-	init_css_set.subsys[ss->subsys_id] = css;
+	init_css_set.subsys[ss->id] = css;
 
 	need_forkexit_callback |= ss->fork || ss->exit;
 
@@ -4559,14 +4559,14 @@ int __init cgroup_init_early(void)
 	for (i = 0; i < CGROUP_SUBSYS_COUNT; i++) {
 		struct cgroup_subsys *ss = subsys[i];
 
-		WARN(!ss->css_alloc || !ss->css_free || ss->name || ss->subsys_id,
+		WARN(!ss->css_alloc || !ss->css_free || ss->name || ss->id,
 		     "invalid cgroup_subsys %d:%s css_alloc=%p css_free=%p name:id=%d:%s\n",
 		     i, cgroup_subsys_name[i], ss->css_alloc, ss->css_free,
-		     ss->subsys_id, ss->name);
+		     ss->id, ss->name);
 		WARN(strlen(cgroup_subsys_name[i]) > MAX_CGROUP_TYPE_NAMELEN,
 		     "cgroup_subsys_name %s too long\n", cgroup_subsys_name[i]);
 
-		ss->subsys_id = i;
+		ss->id = i;
 		ss->name = cgroup_subsys_name[i];
 
 		if (ss->early_init)
@@ -4597,7 +4597,7 @@ int __init cgroup_init(void)
 		if (!ss->early_init)
 			cgroup_init_subsys(ss);
 		if (ss->use_id)
-			cgroup_init_idr(ss, init_css_set.subsys[ss->subsys_id]);
+			cgroup_init_idr(ss, init_css_set.subsys[ss->id]);
 	}
 
 	/* Add init_css_set to the hash table */
@@ -5220,7 +5220,7 @@ static int alloc_css_id(struct cgroup_subsys *ss, struct cgroup *parent,
 	struct cgroup_subsys_state *parent_css, *child_css;
 	struct css_id *child_id, *parent_id;
 
-	subsys_id = ss->subsys_id;
+	subsys_id = ss->id;
 	parent_css = parent->subsys[subsys_id];
 	child_css = child->subsys[subsys_id];
 	parent_id = parent_css->id;

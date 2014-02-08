@@ -576,7 +576,7 @@ struct cgroup_subsys {
 	bool warned_broken_hierarchy;
 
 	/* the following two fields are initialized automtically during boot */
-	int subsys_id;
+	int id;
 #define MAX_CGROUP_TYPE_NAMELEN 32
 	const char *name;
 
