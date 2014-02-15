@@ -124,6 +124,7 @@
 
 #if defined(CONFIG_SMP) || defined(CONFIG_GENERIC_HARDIRQS)
 extern void synchronize_irq(unsigned int irq);
+extern void synchronize_hardirq(unsigned int irq);
 #else
 # define synchronize_irq(irq)	barrier()
 #endif
