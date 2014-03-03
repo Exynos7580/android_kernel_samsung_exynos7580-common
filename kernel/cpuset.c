@@ -974,7 +974,7 @@ static void cpuset_change_task_nodemask(struct task_struct *tsk,
 	if (current->flags & PF_EXITING) /* Let dying task have memory */
 		return;
 
-	task_lock(tsk);
+	rcu_read_lock();
 	/*
 	 * Determine if a loop is necessary if another thread is doing
 	 * read_mems_allowed_begin().  If at least one node remains unchanged and
@@ -1000,7 +1000,7 @@ static void cpuset_change_task_nodemask(struct task_struct *tsk,
 		local_irq_enable();
 	}
 
-	task_unlock(tsk);
+	rcu_read_unlock();
 }
 
 /*
@@ -2274,9 +2274,9 @@ void cpuset_cpus_allowed(struct task_struct *tsk, struct cpumask *pmask)
 	unsigned long flags;
 
 	spin_lock_irqsave(&callback_lock, flags);
-	task_lock(tsk);
+	rcu_read_lock();
 	guarantee_online_cpus(task_cs(tsk), pmask);
-	task_unlock(tsk);
+	rcu_read_unlock();
 	spin_unlock_irqrestore(&callback_lock, flags);
 }
 
@@ -2330,9 +2330,9 @@ nodemask_t cpuset_mems_allowed(struct task_struct *tsk)
 	unsigned long flags;
 
 	spin_lock_irqsave(&callback_lock, flags);
-	task_lock(tsk);
+	rcu_read_lock();
 	guarantee_online_mems(task_cs(tsk), &mask);
-	task_unlock(tsk);
+	rcu_read_unlock();
 	spin_unlock_irqrestore(&callback_lock, flags);
 
 	return mask;
