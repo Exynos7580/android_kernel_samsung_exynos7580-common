@@ -95,8 +95,8 @@ static int __init __reserved_mem_alloc_size(unsigned long node,
 	int t_len = (dt_root_addr_cells + dt_root_size_cells) * sizeof(__be32);
 	phys_addr_t start = 0, end = 0;
 	phys_addr_t base = 0, align = 0, size;
-	unsigned long len;
-	__be32 *prop;
+	int len;
+	const __be32 *prop;
 	int nomap;
 	int ret;
 
@@ -206,8 +206,8 @@ void __init fdt_init_reserved_mem(void)
 	for (i = 0; i < reserved_mem_count; i++) {
 		struct reserved_mem *rmem = &reserved_mem[i];
 		unsigned long node = rmem->fdt_node;
-		unsigned long len;
-		__be32 *prop;
+		int len;
+		const __be32 *prop;
 		int err = 0;
 
 		prop = of_get_flat_dt_prop(node, "phandle", &len);
