@@ -75,15 +75,12 @@ int ima_calc_file_hash(struct file *file, char *digest)
 	loff_t i_size, offset = 0;
 	char *rbuf;
 	int rc, read = 0;
-	struct {
-		struct shash_desc shash;
-		char ctx[crypto_shash_descsize(ima_shash_tfm)];
-	} desc;
+	SHASH_DESC_ON_STACK(shash, ima_shash_tfm);
 
-	desc.shash.tfm = ima_shash_tfm;
-	desc.shash.flags = 0;
+	shash->tfm = ima_shash_tfm;
+	shash->flags = 0;
 
-	rc = crypto_shash_init(&desc.shash);
+	rc = crypto_shash_init(shash);
 	if (rc != 0)
 		return rc;
 
@@ -109,13 +106,13 @@ int ima_calc_file_hash(struct file *file, char *digest)
 			break;
 		offset += rbuf_len;
 
-		rc = crypto_shash_update(&desc.shash, rbuf, rbuf_len);
+		rc = crypto_shash_update(shash, rbuf, rbuf_len);
 		if (rc)
 			break;
 	}
 	kfree(rbuf);
 	if (!rc)
-		rc = crypto_shash_final(&desc.shash, digest);
+		rc = crypto_shash_final(shash, digest);
 	if (read)
 		file->f_mode &= ~FMODE_READ;
 out:
@@ -128,14 +125,12 @@ out:
 int ima_calc_buffer_hash(const void *data, int len, char *digest)
 {
 	struct {
-		struct shash_desc shash;
-		char ctx[crypto_shash_descsize(ima_shash_tfm)];
-	} desc;
+		SHASH_DESC_ON_STACK(shash, ima_shash_tfm);
 
-	desc.shash.tfm = ima_shash_tfm;
-	desc.shash.flags = 0;
+	shash->tfm = ima_shash_tfm;
+	shash->flags = 0;
 
-	return crypto_shash_digest(&desc.shash, data, len, digest);
+	return crypto_shash_digest(shash, data, len, digest);
 }
 
 static void __init ima_pcrread(int idx, u8 *pcr)
@@ -154,15 +149,12 @@ int __init ima_calc_boot_aggregate(char *digest)
 {
 	u8 pcr_i[IMA_DIGEST_SIZE];
 	int rc, i;
-	struct {
-		struct shash_desc shash;
-		char ctx[crypto_shash_descsize(ima_shash_tfm)];
-	} desc;
+	SHASH_DESC_ON_STACK(shash, ima_shash_tfm];
 
-	desc.shash.tfm = ima_shash_tfm;
-	desc.shash.flags = 0;
+	shash->tfm = ima_shash_tfm;
+	shash->flags = 0;
 
-	rc = crypto_shash_init(&desc.shash);
+	rc = crypto_shash_init(shash);
 	if (rc != 0)
 		return rc;
 
@@ -170,9 +162,9 @@ int __init ima_calc_boot_aggregate(char *digest)
 	for (i = TPM_PCR0; i < TPM_PCR8; i++) {
 		ima_pcrread(i, pcr_i);
 		/* now accumulate with current aggregate */
-		rc = crypto_shash_update(&desc.shash, pcr_i, IMA_DIGEST_SIZE);
+		rc = crypto_shash_update(shash, pcr_i, IMA_DIGEST_SIZE);
 	}
 	if (!rc)
-		crypto_shash_final(&desc.shash, digest);
+		crypto_shash_final(shash, digest);
 	return rc;
 }
