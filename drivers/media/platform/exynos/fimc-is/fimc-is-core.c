@@ -1256,12 +1256,7 @@ static int fimc_is_probe(struct platform_device *pdev)
 	}
 
 	fimc_is_dev = &pdev->dev;
-	ret = dev_set_drvdata(fimc_is_dev, core);
-	if (ret) {
-		err("dev_set_drvdata is fail(%d)", ret);
-		kfree(core);
-		return ret;
-	}
+	dev_set_drvdata(fimc_is_dev, core);
 
 #ifdef CONFIG_USE_VENDER_FEATURE
 #ifdef CONFIG_OIS_USE

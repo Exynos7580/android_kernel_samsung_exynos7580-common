@@ -538,12 +538,7 @@ static int fimc_is_probe(struct platform_device *pdev)
 	}
 
 	fimc_is_dev = &pdev->dev;
-	ret = dev_set_drvdata(fimc_is_dev, core);
-	if (ret) {
-		probe_err("dev_set_drvdata is fail(%d)", ret);
-		kfree(core);
-		return ret;
-	}
+	dev_set_drvdata(fimc_is_dev, core);
 
 #ifdef USE_ION_ALLOC
 	core->fimc_ion_client = ion_client_create(ion_exynos, "fimc-is");
