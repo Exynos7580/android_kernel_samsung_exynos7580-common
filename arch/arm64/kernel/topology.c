@@ -596,7 +596,7 @@ static void __init reset_cpu_topology(void)
 		struct cpu_topology *cpu_topo = &cpu_topology[cpu];
 
 		cpu_topo->thread_id = -1;
-		cpu_topo->core_id = -1;
+		cpu_topo->core_id = 0;
 		cpu_topo->cluster_id = -1;
 
 		cpumask_clear(&cpu_topo->core_sibling);
