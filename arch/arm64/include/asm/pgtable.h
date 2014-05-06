@@ -269,6 +269,7 @@ static inline pmd_t pte_pmd(pte_t pte)
 #define mk_pmd(page,prot)	pfn_pmd(page_to_pfn(page),prot)
 
 #define pmd_page(pmd)           pfn_to_page(__phys_to_pfn(pmd_val(pmd) & PHYS_MASK))
+#define pud_pfn(pud)		(((pud_val(pud) & PUD_MASK) & PHYS_MASK) >> PAGE_SHIFT)
 
 #define set_pmd_at(mm, addr, pmdp, pmd)	set_pte_at(mm, addr, (pte_t *)pmdp, pmd_pte(pmd))
 
@@ -300,6 +301,13 @@ extern pgprot_t phys_mem_access_prot(struct file *file, unsigned long pfn,
 #define pmd_present(pmd)	(pmd_val(pmd))
 
 #define pmd_bad(pmd)		(!(pmd_val(pmd) & 2))
+
+#ifdef ARM64_64K_PAGES
+#define pud_sect(pud)		(0)
+#else
+#define pud_sect(pud)		((pud_val(pud) & PUD_TYPE_MASK) == \
+				PUD_TYPE_SECT)
+#endif
 
 static inline void set_pmd(pmd_t *pmdp, pmd_t pmd)
 {
