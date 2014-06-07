@@ -250,13 +250,9 @@ static int __init parse_dt_topology(void)
 	 * Check that all cores are in the topology; the SMP code will
 	 * only mark cores described in the DT as possible.
 	 */
-	for_each_possible_cpu(cpu) {
-		if (cpu_topology[cpu].cluster_id == -1) {
-			pr_err("CPU%d: No topology information specified\n",
-			       cpu);
+	for_each_possible_cpu(cpu)
+		if (cpu_topology[cpu].cluster_id == -1)
 			ret = -EINVAL;
-		}
-	}
 
 out_map:
 	of_node_put(map);
@@ -363,14 +359,6 @@ static void update_siblings_masks(unsigned int cpuid)
 {
 	struct cpu_topology *cpu_topo, *cpuid_topo = &cpu_topology[cpuid];
 	int cpu;
-
-	if (cpuid_topo->cluster_id == -1) {
-		/*
-		 * DT does not contain topology information for this cpu.
-		 */
-		pr_debug("CPU%u: No topology information configured\n", cpuid);
-		return;
-	}
 
 	/* update core and thread sibling masks */
 	for_each_possible_cpu(cpu) {
@@ -542,50 +530,38 @@ int cluster_to_logical_mask(unsigned int socket_id, cpumask_t *cluster_mask)
 
 void store_cpu_topology(unsigned int cpuid)
 {
-	struct cpu_topology *cpu_topo = &cpu_topology[cpuid];
-	unsigned int mpidr;
+	struct cpu_topology *cpuid_topo = &cpu_topology[cpuid];
+	u64 mpidr;
 
-	/* If the cpu topology has been already set, just return */
-	if (cpu_topo->core_id != -1)
-		return;
+	if (cpuid_topo->cluster_id != -1)
+		goto topology_populated;
 
 	mpidr = read_cpuid_mpidr();
 
-	/* create cpu topology mapping */
-	if ((mpidr & MPIDR_SMP_BITMASK) == MPIDR_SMP_VALUE) {
-		/*
-		 * This is a multiprocessor system
-		 * multiprocessor format & multiprocessor mode field are set
-		 */
-		if (mpidr & MPIDR_MT_BITMASK) {
-			/* core performance interdependency */
-			cpu_topo->thread_id = MPIDR_AFFINITY_LEVEL(mpidr, 0);
-			cpu_topo->core_id = MPIDR_AFFINITY_LEVEL(mpidr, 1);
-			cpu_topo->cluster_id = MPIDR_AFFINITY_LEVEL(mpidr, 2);
-		} else {
-			/* largely independent cores */
-			cpu_topo->thread_id = -1;
-			cpu_topo->core_id = MPIDR_AFFINITY_LEVEL(mpidr, 0);
-			cpu_topo->cluster_id = MPIDR_AFFINITY_LEVEL(mpidr, 1);
-		}
+	/* Uniprocessor systems can rely on default topology values */
+	if (mpidr & MPIDR_UP_BITMASK)
+		return;
+
+	/* Create cpu topology mapping based on MPIDR. */
+	if (mpidr & MPIDR_MT_BITMASK) {
+		/* Multiprocessor system : Multi-threads per core */
+		cpuid_topo->thread_id  = MPIDR_AFFINITY_LEVEL(mpidr, 0);
+		cpuid_topo->core_id    = MPIDR_AFFINITY_LEVEL(mpidr, 1);
+		cpuid_topo->cluster_id = MPIDR_AFFINITY_LEVEL(mpidr, 2);
 	} else {
-		/*
-		 * This is an uniprocessor system
-		 * we are in multiprocessor format but uniprocessor system
-		 * or in the old uniprocessor format
-		 */
-		cpu_topo->thread_id = -1;
-		cpu_topo->core_id = 0;
-		cpu_topo->cluster_id = -1;
+		/* Multiprocessor system : Single-thread per core */
+		cpuid_topo->thread_id  = -1;
+		cpuid_topo->core_id    = MPIDR_AFFINITY_LEVEL(mpidr, 0);
+		cpuid_topo->cluster_id = MPIDR_AFFINITY_LEVEL(mpidr, 1);
 	}
 
+	pr_debug("CPU%u: cluster %d core %d thread %d mpidr %#016llx\n",
+		 cpuid, cpuid_topo->cluster_id, cpuid_topo->core_id,
+		 cpuid_topo->thread_id, mpidr);
+
+topology_populated:
 	update_siblings_masks(cpuid);
 	update_cpu_power(cpuid);
-
-	pr_info("CPU%u: thread %d, cpu %d, cluster %d, mpidr %x\n",
-		cpuid, cpu_topology[cpuid].thread_id,
-		cpu_topology[cpuid].core_id,
-		cpu_topology[cpuid].cluster_id, mpidr);
 }
 
 static void __init reset_cpu_topology(void)
