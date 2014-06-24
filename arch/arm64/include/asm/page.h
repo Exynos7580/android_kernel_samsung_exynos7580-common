@@ -28,6 +28,15 @@
 #define PAGE_SIZE		(_AC(1,UL) << PAGE_SHIFT)
 #define PAGE_MASK		(~(PAGE_SIZE-1))
 
+/*
+ * The idmap and swapper page tables need some space reserved in the kernel
+ * image. The idmap only requires a pgd and a next level table to (section) map
+ * the kernel, while the swapper also maps the FDT and requires an additional
+ * table to map an early UART. See __create_page_tables for more information.
+ */
+#define SWAPPER_DIR_SIZE	(3 * PAGE_SIZE)
+#define IDMAP_DIR_SIZE		(2 * PAGE_SIZE)
+
 #ifndef __ASSEMBLY__
 
 #ifdef CONFIG_ARM64_64K_PAGES
