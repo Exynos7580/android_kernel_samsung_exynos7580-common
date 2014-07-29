@@ -161,6 +161,49 @@ TRACE_EVENT(rcu_grace_period_init,
 );
 
 /*
+ * Tracepoint for RCU no-CBs CPU callback handoffs.  This event is intended
+ * to assist debugging of these handoffs.
+ *
+ * The first argument is the name of the RCU flavor, and the second is
+ * the number of the offloaded CPU are extracted.  The third and final
+ * argument is a string as follows:
+ *
+ *      "WakeEmpty": Wake rcuo kthread, first CB to empty list.
+ *      "WakeEmptyIsDeferred": Wake rcuo kthread later, first CB to empty list.
+ *      "WakeOvf": Wake rcuo kthread, CB list is huge.
+ *      "WakeOvfIsDeferred": Wake rcuo kthread later, CB list is huge.
+ *      "WakeNot": Don't wake rcuo kthread.
+ *      "WakeNotPoll": Don't wake rcuo kthread because it is polling.
+ *      "DeferredWake": Carried out the "IsDeferred" wakeup.
+ *      "Poll": Start of new polling cycle for rcu_nocb_poll.
+ *      "Sleep": Sleep waiting for CBs for !rcu_nocb_poll.
+ *      "WokeEmpty": rcuo kthread woke to find empty list.
+ *      "WokeNonEmpty": rcuo kthread woke to find non-empty list.
+ *      "WaitQueue": Enqueue partially done, timed wait for it to complete.
+ *      "WokeQueue": Partial enqueue now complete.
+ */
+TRACE_EVENT(rcu_nocb_wake,
+
+        TP_PROTO(const char *rcuname, int cpu, const char *reason),
+
+        TP_ARGS(rcuname, cpu, reason),
+
+        TP_STRUCT__entry(
+                __field(const char *, rcuname)
+                __field(int, cpu)
+                __field(const char *, reason)
+        ),
+
+        TP_fast_assign(
+                __entry->rcuname = rcuname;
+                __entry->cpu = cpu;
+                __entry->reason = reason;
+        ),
+
+        TP_printk("%s %d %s", __entry->rcuname, __entry->cpu, __entry->reason)
+);
+
+/*
  * Tracepoint for tasks blocking within preemptible-RCU read-side
  * critical sections.  Track the type of RCU (which one day might
  * include SRCU), the grace-period number that the task is blocking
