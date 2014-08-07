@@ -97,8 +97,6 @@ struct cpufreq_interactive_tunables {
 	spinlock_t target_loads_lock;
 	unsigned int *target_loads;
 	int ntarget_loads;
-	/* Sampling down factor to be applied to min_sample_time at max freq */
-	unsigned int sampling_down_factor;
 	/*
 	 * The minimum amount of time to spend at a frequency before we can ramp
 	 * down.
@@ -380,7 +378,6 @@ static void cpufreq_interactive_timer(unsigned long data)
 	unsigned int loadadjfreq;
 	unsigned int index;
 	unsigned long flags;
-	unsigned long mod_min_sample_time;
 
 	if (!down_read_trylock(&pcpu->enable_sem))
 		return;
@@ -446,14 +443,9 @@ static void cpufreq_interactive_timer(unsigned long data)
 	 * Do not scale below floor_freq unless we have been at or above the
 	 * floor frequency for the minimum sample time since last validated.
 	 */
-	if (pcpu->policy->cur == pcpu->policy->max) {
-		mod_min_sample_time = tunables->sampling_down_factor;
-	} else {
-		mod_min_sample_time = tunables->min_sample_time;
-	}
-
 	if (new_freq < pcpu->floor_freq) {
-		if (now - pcpu->floor_validate_time < mod_min_sample_time) {
+		if (now - pcpu->floor_validate_time <
+				tunables->min_sample_time) {
 			trace_cpufreq_interactive_notyet(
 				data, cpu_load, pcpu->target_freq,
 				pcpu->policy->cur, new_freq);
@@ -913,26 +905,6 @@ static ssize_t store_hispeed_freq(struct cpufreq_interactive_tunables *tunables,
 	return count;
 }
 
-static ssize_t show_sampling_down_factor(struct cpufreq_interactive_tunables
-		*tunables, char *buf)
-{
-	return sprintf(buf, "%u\n", tunables->sampling_down_factor);
-}
-
-static ssize_t store_sampling_down_factor(struct cpufreq_interactive_tunables
-		*tunables, const char *buf, size_t count)
-{
-	int ret;
-	long unsigned int val;
-
-	ret = strict_strtoul(buf, 0, &val);
-	if (ret < 0)
-		return ret;
-	tunables->sampling_down_factor = val;
-
-	return count;
-}
-
 static ssize_t show_go_hispeed_load(struct cpufreq_interactive_tunables
 		*tunables, char *buf)
 {
@@ -1159,7 +1131,6 @@ show_store_gov_pol_sys(boost);
 store_gov_pol_sys(boostpulse);
 show_store_gov_pol_sys(boostpulse_duration);
 show_store_gov_pol_sys(io_is_busy);
-show_store_gov_pol_sys(sampling_down_factor);
 
 #define gov_sys_attr_rw(_name)						\
 static struct global_attr _name##_gov_sys =				\
@@ -1183,7 +1154,6 @@ gov_sys_pol_attr_rw(timer_slack);
 gov_sys_pol_attr_rw(boost);
 gov_sys_pol_attr_rw(boostpulse_duration);
 gov_sys_pol_attr_rw(io_is_busy);
-gov_sys_pol_attr_rw(sampling_down_factor);
 
 static struct global_attr boostpulse_gov_sys =
 	__ATTR(boostpulse, 0200, NULL, store_boostpulse_gov_sys);
@@ -1204,7 +1174,6 @@ static struct attribute *interactive_attributes_gov_sys[] = {
 	&boostpulse_gov_sys.attr,
 	&boostpulse_duration_gov_sys.attr,
 	&io_is_busy_gov_sys.attr,
-	&sampling_down_factor_gov_sys.attr,
 	NULL,
 };
 
@@ -1226,7 +1195,6 @@ static struct attribute *interactive_attributes_gov_pol[] = {
 	&boostpulse_gov_pol.attr,
 	&boostpulse_duration_gov_pol.attr,
 	&io_is_busy_gov_pol.attr,
-	&sampling_down_factor_gov_pol.attr,
 	NULL,
 };
 
