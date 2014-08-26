@@ -9,9 +9,95 @@
 #include <linux/irq.h>
 #include <linux/module.h>
 #include <linux/interrupt.h>
+#include <linux/suspend.h>
 #include <linux/syscore_ops.h>
 #include <linux/wakeup_reason.h>
+
 #include "internals.h"
+
+void irq_pm_restore_handler(struct irqaction *action)
+{
+	if (action->s_handler) {
+		action->handler = action->s_handler;
+		action->s_handler = NULL;
+		action->dev_id = action->s_dev_id;
+		action->s_dev_id = NULL;
+	}
+}
+
+static void irq_pm_substitute_handler(struct irqaction *action,
+				      irq_handler_t new_handler)
+{
+	if (!action->s_handler) {
+		action->s_handler = action->handler;
+		action->handler = new_handler;
+		action->s_dev_id = action->dev_id;
+		action->dev_id = action;
+	}
+}
+
+static irqreturn_t irq_wakeup_mode_handler(int irq, void *dev_id)
+{
+	struct irqaction *action = dev_id;
+	struct irq_desc *desc;
+
+	if (action->next)
+		return IRQ_NONE;
+
+	desc = irq_to_desc(irq);
+	desc->istate |= IRQS_SUSPENDED | IRQS_PENDING;
+	desc->depth++;
+	irq_disable(desc);
+	pm_system_wakeup();
+	return IRQ_HANDLED;
+}
+
+static void irq_pm_wakeup_mode(struct irq_desc *desc)
+{
+	struct irqaction *action;
+
+	for (action = desc->action; action; action = action->next)
+		irq_pm_substitute_handler(action, irq_wakeup_mode_handler);
+}
+
+static void irq_pm_normal_mode(struct irq_desc *desc)
+{
+	struct irqaction *action;
+
+	for (action = desc->action; action; action = action->next)
+		irq_pm_restore_handler(action);
+}
+
+void wakeup_mode_for_irqs(bool enable)
+{
+	struct irq_desc *desc;
+	int irq;
+
+	for_each_irq_desc(irq, desc) {
+		struct irqaction *action = desc->action;
+		unsigned long flags;
+
+		raw_spin_lock_irqsave(&desc->lock, flags);
+
+		if (action && irqd_is_wakeup_set(&desc->irq_data)) {
+			if (enable) {
+				if (desc->istate & IRQS_SUSPENDED) {
+					irq_pm_wakeup_mode(desc);
+					desc->istate &= ~IRQS_SUSPENDED;
+					__enable_irq(desc, irq, false);
+				}
+			} else {
+				if (!(desc->istate & IRQS_SUSPENDED)) {
+					__disable_irq(desc, irq, false);
+					desc->istate |= IRQS_SUSPENDED;
+				}
+				irq_pm_normal_mode(desc);
+			}
+		}
+
+		raw_spin_unlock_irqrestore(&desc->lock, flags);
+	}
+}
 
 /**
  * suspend_device_irqs - disable all currently enabled interrupt lines

@@ -100,6 +100,8 @@ typedef irqreturn_t (*irq_handler_t)(int, void *);
  * @thread_flags:	flags related to @thread
  * @thread_mask:	bitmask for keeping track of @thread activity
  * @dir:	pointer to the proc/irq/NN/name entry
+ * @s_handler:	original interrupt handler for wakeup mode interrupts
+ * @s_dev_id:	original device identification cookie for wakeup mode
  */
 struct irqaction {
 	irq_handler_t		handler;
@@ -114,6 +116,10 @@ struct irqaction {
 	unsigned long		thread_mask;
 	const char		*name;
 	struct proc_dir_entry	*dir;
+#ifdef CONFIG_PM_SLEEP
+	irq_handler_t		s_handler;
+	void			*s_dev_id;
+#endif
 } ____cacheline_internodealigned_in_smp;
 
 extern irqreturn_t no_action(int cpl, void *dev_id);
@@ -223,6 +229,7 @@ extern void irq_wake_thread(unsigned int irq, void *dev_id);
 #ifdef CONFIG_GENERIC_HARDIRQS
 extern void suspend_device_irqs(void);
 extern void resume_device_irqs(void);
+extern void wakeup_mode_for_irqs(bool enable);
 #ifdef CONFIG_PM_SLEEP
 extern int check_wakeup_irqs(void);
 #else

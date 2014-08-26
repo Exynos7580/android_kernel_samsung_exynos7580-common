@@ -180,3 +180,17 @@ static inline bool irqd_has_set(struct irq_data *d, unsigned int mask)
 {
 	return d->state_use_accessors & mask;
 }
+
+#ifdef CONFIG_PM_SLEEP
+static inline bool irq_pm_saved_id(struct irqaction *action, void *dev_id)
+{
+	return action->s_dev_id == dev_id;
+}
+extern void irq_pm_restore_handler(struct irqaction *action);
+#else
+static inline bool irq_pm_saved_id(struct irqaction *action, void *dev_id)
+{
+	return false;
+}
+static inline void irq_pm_restore_handler(struct irqaction *action) {}
+#endif

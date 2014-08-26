@@ -1329,13 +1329,15 @@ static struct irqaction *__free_irq(unsigned int irq, void *dev_id)
 			return NULL;
 		}
 
-		if (action->dev_id == dev_id)
+		if (action->dev_id == dev_id || irq_pm_saved_id(action, dev_id))
 			break;
 		action_ptr = &action->next;
 	}
 
 	/* Found it - now remove it from the list of entries: */
 	*action_ptr = action->next;
+
+	irq_pm_restore_handler(action);
 
 	/* If this was the last handler, shut down the IRQ line: */
 	if (!desc->action) {

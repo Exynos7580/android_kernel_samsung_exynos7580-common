@@ -29,6 +29,7 @@
 #include <linux/rtc.h>
 #include <trace/events/power.h>
 #include <linux/wakeup_reason.h>
+#include <linux/interrupt.h>
 
 #include "power.h"
 
@@ -64,7 +65,9 @@ static void freeze_begin(void)
 static void freeze_enter(void)
 {
 	cpuidle_resume();
+	wakeup_mode_for_irqs(true);
 	wait_event(suspend_freeze_wait_head, suspend_freeze_wake);
+	wakeup_mode_for_irqs(false);
 	cpuidle_pause();
 }
 
