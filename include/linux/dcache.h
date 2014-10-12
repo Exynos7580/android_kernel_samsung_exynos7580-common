@@ -10,7 +10,6 @@
 #include <linux/cache.h>
 #include <linux/rcupdate.h>
 
-struct nameidata;
 struct path;
 struct vfsmount;
 
