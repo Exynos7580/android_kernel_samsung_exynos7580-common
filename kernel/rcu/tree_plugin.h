@@ -2010,6 +2010,34 @@ bool rcu_is_nocb_cpu(int cpu)
 }
 
 /*
+ * Does the specified CPU need an RCU callback for the specified flavor
+ * of rcu_barrier()?
+ */
+static bool rcu_nocb_cpu_needs_barrier(struct rcu_state *rsp, int cpu)
+{
+	struct rcu_data *rdp = per_cpu_ptr(rsp->rda, cpu);
+	struct rcu_head *rhp;
+
+	/* No-CBs CPUs might have callbacks on any of three lists. */
+	rhp = ACCESS_ONCE(rdp->nocb_head);
+	if (!rhp)
+		rhp = ACCESS_ONCE(rdp->nocb_gp_head);
+	if (!rhp)
+		rhp = ACCESS_ONCE(rdp->nocb_follower_head);
+
+	/* Having no rcuo kthread but CBs after scheduler starts is bad! */
+	if (!ACCESS_ONCE(rdp->nocb_kthread) && rhp) {
+		/* RCU callback enqueued before CPU first came online??? */
+		pr_err("RCU: Never-onlined no-CBs CPU %d has CB %p\n",
+		       cpu, rhp->func);
+		WARN_ON_ONCE(1);
+	}
+
+	return !!rhp;
+}
+
+
+/*
  * Enqueue the specified string of rcu_head structures onto the specified
  * CPU's no-CBs lists.  The CPU is specified by rdp, the head of the
  * string by rhp, and the tail of the string by rhtp.  The non-lazy/lazy
@@ -2279,6 +2307,12 @@ static bool init_nocb_callback_list(struct rcu_data *rdp)
 }
 
 #else /* #ifdef CONFIG_RCU_NOCB_CPU */
+
+static bool rcu_nocb_cpu_needs_barrier(struct rcu_state *rsp, int cpu)
+{
+	WARN_ON_ONCE(1); /* Should be dead code. */
+	return false;
+}
 
 static void rcu_nocb_gp_cleanup(struct rcu_state *rsp, struct rcu_node *rnp)
 {
