@@ -551,7 +551,7 @@ static void break_cow(struct rmap_item *rmap_item)
 static struct page *page_trans_compound_anon(struct page *page)
 {
 	if (PageTransCompound(page)) {
-		struct page *head = compound_head(page);
+		struct page *head =  compound_trans_head(page);
 		/*
 		 * head may actually be splitted and freed from under
 		 * us but it's ok here.
@@ -1634,7 +1634,7 @@ static void cmp_and_merge_page(struct page *page, struct rmap_item *rmap_item)
 		 * split_huge_page should succeed.
 		 */
 		split = PageTransCompound(page)
-			&& compound_head(page) == compound_head(tree_page);
+			&& compound_trans_head(page) == compound_trans_head(tree_page);
 		put_page(tree_page);
 		if (kpage) {
 			/*
