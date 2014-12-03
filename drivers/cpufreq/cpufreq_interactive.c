@@ -84,6 +84,8 @@ static unsigned int default_above_hispeed_delay[] = {
 static unsigned long screen_off_max = DEFAULT_SCREEN_OFF_MAX;
 #endif
 
+static 	bool boosted;
+
 struct cpufreq_interactive_tunables {
 	int usage_count;
 	/* Hi speed to bump to from lo speed when load burst (default max) */
@@ -376,7 +378,6 @@ static void cpufreq_interactive_timer(unsigned long data)
 	unsigned int loadadjfreq;
 	unsigned int index;
 	unsigned long flags;
-	bool boosted;
 
 	if (!down_read_trylock(&pcpu->enable_sem))
 		return;
@@ -652,6 +653,8 @@ static void cpufreq_interactive_boost(const struct cpufreq_policy *policy)
 	struct cpufreq_interactive_cpuinfo *pcpu;
 	struct cpufreq_interactive_tunables *tunables;
 	struct cpumask boost_mask;
+
+	boosted = true;
 
 	spin_lock_irqsave(&speedchange_cpumask_lock, flags[0]);
 
@@ -1008,7 +1011,8 @@ static ssize_t store_boost(struct cpufreq_interactive_tunables *tunables,
 
 	if (tunables->boost_val) {
 		trace_cpufreq_interactive_boost("on");
-		cpufreq_interactive_boost(policy);
+		if (!boosted)
+			cpufreq_interactive_boost(policy);
 	} else {
 		tunables->boostpulse_endtime = ktime_to_us(ktime_get());
 		trace_cpufreq_interactive_unboost("off");
@@ -1032,7 +1036,8 @@ static ssize_t store_boostpulse(struct cpufreq_interactive_tunables *tunables,
 	tunables->boostpulse_endtime = ktime_to_us(ktime_get()) +
 		tunables->boostpulse_duration_val;
 	trace_cpufreq_interactive_boost("pulse");
-	cpufreq_interactive_boost(policy);
+	if (!boosted)
+		cpufreq_interactive_boost(policy);
 	return count;
 }
 
