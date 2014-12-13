@@ -157,7 +157,6 @@
 #define ZS_SIZE_CLASS_DELTA	(PAGE_SIZE >> 8)
 #define ZS_SIZE_CLASSES		((ZS_MAX_ALLOC_SIZE - ZS_MIN_ALLOC_SIZE) / \
 					ZS_SIZE_CLASS_DELTA + 1)
-
 /*
  * We do not maintain any list for completely empty zspages,
  * since a zspage is freed when it becomes empty.
@@ -1196,6 +1195,7 @@ struct zs_pool *zs_create_pool(gfp_t flags, struct zs_ops *ops)
 {
 	int i, ovhd_size;
 	struct zs_pool *pool;
+	struct size_class *prev_class = NULL;
 
 	ovhd_size = roundup(sizeof(*pool), PAGE_SIZE);
 	pool = kzalloc(ovhd_size, GFP_KERNEL);
@@ -1217,7 +1217,6 @@ struct zs_pool *zs_create_pool(gfp_t flags, struct zs_ops *ops)
 		int size;
 		int pages_per_zspage;
 		struct size_class *class;
-		struct size_class *prev_class;
 
 		size = ZS_MIN_ALLOC_SIZE + i * ZS_SIZE_CLASS_DELTA;
 		if (size > ZS_MAX_ALLOC_SIZE)
@@ -1233,8 +1232,7 @@ struct zs_pool *zs_create_pool(gfp_t flags, struct zs_ops *ops)
 		 * characteristics. So, we makes size_class point to
 		 * previous size_class if possible.
 		 */
-		if (i < ZS_SIZE_CLASSES - 1) {
-			prev_class = pool->size_class[i + 1];
+		if (prev_class) {
 			if (can_merge(prev_class, size, pages_per_zspage)) {
 				pool->size_class[i] = prev_class;
 				continue;
@@ -1250,6 +1248,8 @@ struct zs_pool *zs_create_pool(gfp_t flags, struct zs_ops *ops)
 		class->pages_per_zspage = pages_per_zspage;
 		spin_lock_init(&class->lock);
 		pool->size_class[i] = class;
+
+		prev_class = class;
 	}
 
 	pool->flags = flags;
