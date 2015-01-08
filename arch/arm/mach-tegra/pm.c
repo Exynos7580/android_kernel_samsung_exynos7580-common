@@ -143,7 +143,7 @@ void tegra_idle_lp2_last(void)
 {
 	tegra_pmc_pm_set(TEGRA_SUSPEND_LP2);
 
-	cpu_cluster_pm_enter();
+	cpu_cluster_pm_enter(0);
 	suspend_cpu_complex();
 
 	cpu_suspend(PHYS_OFFSET - PAGE_OFFSET, &tegra_sleep_cpu);
