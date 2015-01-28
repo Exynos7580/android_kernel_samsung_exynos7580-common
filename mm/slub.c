@@ -3395,6 +3395,7 @@ int kmem_cache_shrink(struct kmem_cache *s)
 	struct list_head *slabs_by_inuse =
 		kmalloc(sizeof(struct list_head) * objects, GFP_KERNEL);
 	unsigned long flags;
+        int ret = 0;
 
 	if (!slabs_by_inuse)
 		return -ENOMEM;
@@ -3430,6 +3431,9 @@ int kmem_cache_shrink(struct kmem_cache *s)
 		for (i = objects - 1; i > 0; i--)
 			list_splice(slabs_by_inuse + i, n->partial.prev);
 
+		if (n->nr_partial || slabs_node(s, node))
+			ret = 1;
+
 		spin_unlock_irqrestore(&n->list_lock, flags);
 
 		/* Release empty slabs */
@@ -3438,7 +3442,7 @@ int kmem_cache_shrink(struct kmem_cache *s)
 	}
 
 	kfree(slabs_by_inuse);
-	return 0;
+	return ret;
 }
 EXPORT_SYMBOL(kmem_cache_shrink);
 
