@@ -272,9 +272,9 @@ static struct zs_ops zs_zpool_ops = {
 	.evict =	zs_zpool_evict
 };
 
-static void *zs_zpool_create(gfp_t gfp, struct zpool_ops *zpool_ops)
+static void *zs_zpool_create(char *name, gfp_t gfp, struct zpool_ops *zpool_ops)
 {
-	return zs_create_pool(gfp, &zs_zpool_ops);
+	return zs_create_pool(name, gfp, &zs_zpool_ops);
 }
 
 static void zs_zpool_destroy(void *pool)
@@ -1320,7 +1320,7 @@ EXPORT_SYMBOL_GPL(zs_malloc);
  * On success, a pointer to the newly created pool is returned,
  * otherwise NULL.
  */
-struct zs_pool *zs_create_pool(gfp_t flags, struct zs_ops *ops)
+struct zs_pool *zs_create_pool(char *name, gfp_t flags, struct zs_ops *ops)
 {
 	int i;
 	struct zs_pool *pool;
