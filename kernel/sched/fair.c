@@ -941,8 +941,10 @@ void task_numa_work(struct callback_head *work)
 		vma = mm->mmap;
 	}
 	for (; vma; vma = vma->vm_next) {
-		if (!vma_migratable(vma))
+		if (!vma_migratable(vma) || !vma_policy_mof(vma) ||
+			is_vm_hugetlb_page(vma)) {
 			continue;
+		}
 
 		/* Skip small VMAs. They are not likely to be of relevance */
 		if (vma->vm_end - vma->vm_start < HPAGE_SIZE)
