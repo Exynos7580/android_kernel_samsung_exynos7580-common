@@ -560,17 +560,15 @@ static void remove_zspage(struct page *page, struct size_class *class,
  * page from the freelist of the old fullness group to that of the new
  * fullness group.
  */
-static enum fullness_group fix_fullness_group(struct zs_pool *pool,
+static enum fullness_group fix_fullness_group(struct size_class *class,
 						struct page *page)
 {
 	int class_idx;
-	struct size_class *class;
 	enum fullness_group currfg, newfg;
 
 	BUG_ON(!is_first_page(page));
 
 	get_zspage_mapping(page, &class_idx, &currfg);
-	class = pool->size_class[class_idx];
 	newfg = get_fullness_group(page);
 	/* Need to do this even if currfg == newfg, to update lru */
 	remove_zspage(page, class, currfg);
@@ -934,7 +932,7 @@ static int reclaim_zspage(struct zs_pool *pool, struct page *first_page)
 			ret = pool->ops->evict(pool, handle);
 			if (ret) {
 				spin_lock(&class->lock);
-				fix_fullness_group(pool, first_page);
+				fix_fullness_group(class, first_page);
 				spin_unlock(&class->lock);
 				return ret;
 			}
@@ -1574,6 +1572,38 @@ unsigned long zs_malloc(struct zs_pool *pool, size_t size)
 }
 EXPORT_SYMBOL_GPL(zs_malloc);
 
+static void obj_zs_free(struct zs_pool *pool, struct size_class *class,
+			unsigned long obj)
+{
+	struct link_free *link;
+	struct page *first_page, *f_page;
+	unsigned long f_objidx, f_offset;
+	void *vaddr;
+
+	int class_idx;
+	enum fullness_group fullness;
+
+	BUG_ON(!obj);
+
+	obj_to_location(obj, &f_page, &f_objidx);
+	first_page = get_first_page(f_page);
+
+	get_zspage_mapping(first_page, &class_idx, &fullness);
+	f_offset = obj_idx_to_offset(f_page, f_objidx, class->size);
+
+	vaddr = kmap_atomic(f_page);
+
+	/* Insert this object in containing zspage's freelist */
+	link = (struct link_free *)(vaddr + f_offset);
+	link->next = first_page->freelist;
+	kunmap_atomic(vaddr);
+	first_page->freelist = (void *)obj;
+
+	first_page->inuse--;
+
+	zs_stat_dec(class, OBJ_USED, 1);
+}
+
 /**
  * zs_free - Free the handle from this pool.
  * @pool: pool containing the handle
@@ -1587,8 +1617,7 @@ EXPORT_SYMBOL_GPL(zs_malloc);
 void zs_free(struct zs_pool *pool, unsigned long handle)
 {
 	struct page *first_page, *f_page;
-	unsigned long obj, f_objidx, f_offset;
-
+	unsigned long obj, f_objidx;
 	int class_idx;
 	struct size_class *class;
 	enum fullness_group fullness;
@@ -1603,26 +1632,13 @@ void zs_free(struct zs_pool *pool, unsigned long handle)
 
 	get_zspage_mapping(first_page, &class_idx, &fullness);
 	class = pool->size_class[class_idx];
-	f_offset = obj_idx_to_offset(f_page, f_objidx, class->size);
 
 	spin_lock(&class->lock);
-
-	/* must re-check fullness after taking class lock */
-	get_zspage_mapping(first_page, &class_idx, &fullness);
-	if (fullness == ZS_RECLAIM) {
-		spin_unlock(&class->lock);
-		return; /* will be freed during reclaim */
-	}
-
-	obj_free(obj, f_page, f_offset);
-
-	fullness = fix_fullness_group(pool, first_page);
-
-	zs_stat_dec(class, OBJ_USED, 1);
+	obj_zs_free(pool, class, obj);
+	fullness = fix_fullness_group(class, first_page);
 	if (fullness == ZS_EMPTY)
 		zs_stat_dec(class, OBJ_ALLOCATED, get_maxobj_per_zspage(
 				class->size, class->pages_per_zspage));
-
 	spin_unlock(&class->lock);
 
 	if (fullness == ZS_EMPTY) {
