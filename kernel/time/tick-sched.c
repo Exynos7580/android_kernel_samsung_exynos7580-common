@@ -992,11 +992,8 @@ static void tick_nohz_switch_to_nohz(void)
 	if (!tick_nohz_enabled)
 		return;
 
-	local_irq_disable();
-	if (tick_switch_to_oneshot(tick_nohz_handler)) {
-		local_irq_enable();
+	if (tick_switch_to_oneshot(tick_nohz_handler))
 		return;
-	}
 
 	ts->nohz_mode = NOHZ_MODE_LOWRES;
 
@@ -1014,7 +1011,6 @@ static void tick_nohz_switch_to_nohz(void)
 			break;
 		next = ktime_add(next, tick_period);
 	}
-	local_irq_enable();
 }
 
 /*
