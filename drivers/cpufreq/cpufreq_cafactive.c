@@ -464,9 +464,11 @@ static void __cpufreq_cafactive_timer(unsigned long data, bool is_notif)
 	tunables->boosted = tunables->boost_val || now < tunables->boostpulse_endtime;
 
 #ifdef CONFIG_POWERSUSPEND
-	if ((cpu_load >= tunables->go_hispeed_load || tunables->boosted) && !power_suspend_active) {
+	if ((cpu_load >= tunables->go_hispeed_load || tunables->boosted)
+	    && ((pcpu->policy->cpu == 0) || (pcpu->policy->cpu == 4)) && !power_suspend_active) {
 #else
-	if (cpu_load >= tunables->go_hispeed_load || tunables->boosted) {
+	if ((cpu_load >= tunables->go_hispeed_load || tunables->boosted)
+	    && ((pcpu->policy->cpu == 0) || (pcpu->policy->cpu == 4))) {
 #endif
 		if (pcpu->policy->cur < tunables->hispeed_freq &&
 		    cpu_load <= MAX_LOCAL_LOAD) {
