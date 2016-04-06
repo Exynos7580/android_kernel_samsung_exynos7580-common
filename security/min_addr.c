@@ -15,10 +15,12 @@ unsigned long dac_mmap_min_addr = CONFIG_DEFAULT_MMAP_MIN_ADDR;
 static void update_mmap_min_addr(void)
 {
 #ifdef CONFIG_LSM_MMAP_MIN_ADDR
-	if (dac_mmap_min_addr > CONFIG_LSM_MMAP_MIN_ADDR)
+	if (dac_mmap_min_addr > CONFIG_LSM_MMAP_MIN_ADDR) {
 		mmap_min_addr = dac_mmap_min_addr;
-	else
+	} else {
 		mmap_min_addr = CONFIG_LSM_MMAP_MIN_ADDR;
+		dac_mmap_min_addr = CONFIG_LSM_MMAP_MIN_ADDR;
+	}
 #else
 	mmap_min_addr = dac_mmap_min_addr;
 #endif
