@@ -442,7 +442,7 @@ int __mmc_switch(struct mmc_card *card, u8 set, u8 index, u8 value,
 		return 0;
 
 	/* Must check status to be sure of no errors */
-	timeout = jiffies + msecs_to_jiffies(MMC_OPS_TIMEOUT_MS);
+	timeout = jiffies + msecs_to_jiffies(MMC_OPS_TIMEOUT_MS) + 1;
 	ignore = (index == EXT_CSD_HS_TIMING) ? MMC_RSP_CRC : 0;
 
 	do {
