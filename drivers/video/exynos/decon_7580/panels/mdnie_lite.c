@@ -22,12 +22,10 @@
 #define MDNIE_SYSFS_PREFIX		"/sdcard/mdnie/"
 
 #define IS_DMB(idx)			(idx == DMB_NORMAL_MODE)
-#define IS_SCENARIO(idx)		((idx < SCENARIO_MAX) && !((idx > VIDEO_NORMAL_MODE) && (idx < CAMERA_MODE)))
-#define IS_ACCESSIBILITY(idx)		(idx && (idx < ACCESSIBILITY_MAX))
+#define IS_SCENARIO(idx)		(idx < SCENARIO_MAX && !(idx > VIDEO_NORMAL_MODE && idx < CAMERA_MODE))
+#define IS_ACCESSIBILITY(idx)		(idx && idx < ACCESSIBILITY_MAX)
 #define IS_HBM(idx)			(idx >= 6)
-#if defined(CONFIG_LCD_HMT)
-#define IS_HMT(idx)			(idx >= HMT_MDNIE_ON && idx < HMT_MDNIE_MAX)
-#endif
+#define IS_HMT(idx)			(idx && idx < HMT_MDNIE_MAX)
 
 #define SCENARIO_IS_VALID(idx)	(IS_DMB(idx) || IS_SCENARIO(idx))
 
@@ -55,7 +53,7 @@ static int mdnie_write_table(struct mdnie_info *mdnie, struct mdnie_table *table
 
 	for (i = 0; table->seq[i].len; i++) {
 		if (IS_ERR_OR_NULL(table->seq[i].cmd)) {
-			dev_err(mdnie->dev, "mdnie sequence %s %dth command is null,\n", table->name, i);
+			dev_info(mdnie->dev, "mdnie sequence %s %dth is null\n", table->name, i);
 			return -EPERM;
 		}
 	}
@@ -86,10 +84,7 @@ static struct mdnie_table *mdnie_find_table(struct mdnie_info *mdnie)
 		goto exit;
 #endif
 	} else if (IS_HBM(mdnie->auto_brightness)) {
-		if ((mdnie->scenario == BROWSER_MODE) || (mdnie->scenario == EBOOK_MODE))
-			table = &mdnie->tune->hbm_table[HBM_ON_TEXT];
-		else
-			table = &mdnie->tune->hbm_table[HBM_ON];
+		table = &mdnie->tune->hbm_table[HBM_ON];
 		goto exit;
 #if defined(CONFIG_TDMB)
 	} else if (IS_DMB(mdnie->scenario)) {
@@ -433,7 +428,7 @@ static ssize_t bypass_store(struct device *dev,
 
 	ret = kstrtouint(buf, 0, &value);
 
-	dev_info(dev, "%s :: value=%d\n", __func__, value);
+	dev_info(dev, "%s: value=%d\n", __func__, value);
 
 	if (ret < 0)
 		return ret;
@@ -561,8 +556,8 @@ static ssize_t sensorRGB_store(struct device *dev,
 	int ret;
 	struct mdnie_scr_info *scr_info = mdnie->tune->scr_info;
 
-	ret = sscanf(buf, "%d %d %d"
-		, &white_red, &white_green, &white_blue);
+	ret = sscanf(buf, "%d %d %d",
+		&white_red, &white_green, &white_blue);
 	if (ret < 0)
 		return ret;
 
@@ -597,6 +592,7 @@ static ssize_t sensorRGB_store(struct device *dev,
 	return count;
 }
 
+<<<<<<< HEAD
 static ssize_t whiteRGB_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
@@ -651,12 +647,19 @@ static ssize_t whiteRGB_store(struct device *dev,
 	return count;
 }
 
+=======
+>>>>>>> edb1cb7... Merge with SM-A310F-MM
 static ssize_t mdnie_ldu_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
 	struct mdnie_info *mdnie = dev_get_drvdata(dev);
+<<<<<<< HEAD
 	return sprintf(buf, "%d %d %d\n", mdnie->white_r,
 		mdnie->white_g, mdnie->white_b);
+=======
+
+	return sprintf(buf, "%d %d %d\n", mdnie->white_r, mdnie->white_g, mdnie->white_b);
+>>>>>>> edb1cb7... Merge with SM-A310F-MM
 }
 
 static ssize_t mdnie_ldu_store(struct device *dev,
@@ -669,12 +672,21 @@ static ssize_t mdnie_ldu_store(struct device *dev,
 	int ret;
 	struct mdnie_scr_info *scr_info = mdnie->tune->scr_info;
 
+<<<<<<< HEAD
 	ret = sscanf(buf, "%d", &idx);
 	if (ret < 0)
 		return ret;
 
 	if((mdnie->tune->max_adjust_ldu != 0) && (mdnie->tune->adjust_ldu_table != NULL)){
 		if((idx >= 0) && (idx < mdnie->tune->max_adjust_ldu)){
+=======
+	ret = kstrtoint(buf, 10, &idx);
+	if (ret < 0)
+		return ret;
+
+	if ((mdnie->tune->max_adjust_ldu != 0) && (mdnie->tune->adjust_ldu_table != NULL)) {
+		if ((idx >= 0) && (idx < mdnie->tune->max_adjust_ldu)) {
+>>>>>>> edb1cb7... Merge with SM-A310F-MM
 			mutex_lock(&mdnie->lock);
 			for (mode = 0; mode < MODE_MAX; mode++) {
 				for (scenario = 0; scenario <= EMAIL_MODE; scenario++) {
@@ -738,7 +750,10 @@ static struct device_attribute mdnie_attributes[] = {
 	__ATTR(auto_brightness, 0664, auto_brightness_show, auto_brightness_store),
 	__ATTR(mdnie, 0444, mdnie_show, NULL),
 	__ATTR(sensorRGB, 0664, sensorRGB_show, sensorRGB_store),
+<<<<<<< HEAD
 	__ATTR(whiteRGB, 0664, whiteRGB_show, whiteRGB_store),
+=======
+>>>>>>> edb1cb7... Merge with SM-A310F-MM
 	__ATTR(mdnie_ldu, 0664, mdnie_ldu_show, mdnie_ldu_store),
 #ifdef CONFIG_LCD_HMT
 	__ATTR(hmt_color_temperature, 0664, hmtColorTemp_show, hmtColorTemp_store),
@@ -791,7 +806,7 @@ static int mdnie_register_fb(struct mdnie_info *mdnie)
 	return fb_register_client(&mdnie->fb_notif);
 }
 
-int mdnie_register(struct device *p, void *data, mdnie_w w, mdnie_r r, u16 *coordinate, struct mdnie_tune *tune)
+int mdnie_register(struct device *p, void *data, mdnie_w w, mdnie_r r, unsigned int *coordinate, struct mdnie_tune *tune)
 {
 	int ret = 0;
 	struct mdnie_info *mdnie;

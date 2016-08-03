@@ -49,6 +49,10 @@
 #include "decon_helper.h"
 #include "dpu_common.h"
 #include "regs-dpu.h"
+<<<<<<< HEAD
+=======
+#include "panels/dsim_panel.h"
+>>>>>>> edb1cb7... Merge with SM-A310F-MM
 
 #include "../../../staging/android/sw_sync.h"
 
@@ -4273,7 +4277,7 @@ static int decon_register_esd_funcion(struct decon_device *decon)
 	if (esd->err_irq) {
 		if (devm_request_irq(dev, esd->err_irq, decon_esd_err_handler,
 				err_irqf_type, "err-irq", decon)) {
-			dsim_err("%s : faield to request irq for err_fg\n", __func__);
+			dsim_err("%s : failed to request irq for err_fg\n", __func__);
 			esd->err_irq = 0;
 			ret--;
 		}
@@ -4282,7 +4286,7 @@ static int decon_register_esd_funcion(struct decon_device *decon)
 	if (esd->disp_det_irq) {
 		if (devm_request_irq(dev, esd->disp_det_irq, decon_disp_det_handler,
 				det_irqf_type, "display-det", decon)) {
-			dsim_err("%s : faied to request irq for display det\n", __func__);
+			dsim_err("%s : failed to request irq for display det\n", __func__);
 			esd->disp_det_irq = 0;
 			ret--;
 		}
@@ -4379,7 +4383,7 @@ static int decon_probe(struct platform_device *pdev)
 	struct decon_init_param p;
 	struct decon_regs_data win_regs;
 	struct dsim_device *dsim = NULL;
-	struct panel_private *panel = NULL;
+	struct panel_private *priv = NULL;
 	struct exynos_md *md;
 	struct device_node *cam_stat;
 	int win_idx = 0;
@@ -4708,12 +4712,12 @@ decon_init_done:
 		dsim = container_of(decon->output_sd, struct dsim_device, sd);
 
 	if (dsim) {
-		panel = &dsim->priv;
-		if ((panel) && (!panel->lcdConnected)) {
-			dsim_info("decon does not found panel\n");
+		priv = &dsim->priv;
+		if ((priv) && (!priv->lcdConnected)) {
+			decon_info("decon does not found panel\n");
 			decon->ignore_vsync = true;
 		}
-		dsim_info("panel id : %x : %x : %x\n", panel->id[0], panel->id[1], panel->id[2]);
+		decon_info("panel id : %x\n", lcdtype);
 	}
 
 #ifdef CONFIG_DECON_MIPI_DSI_PKTGO

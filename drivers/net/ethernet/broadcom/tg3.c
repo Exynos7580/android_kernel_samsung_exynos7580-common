@@ -6437,7 +6437,11 @@ static void tg3_tx(struct tg3_napi *tnapi)
 		pkts_compl++;
 		bytes_compl += skb->len;
 
+<<<<<<< HEAD
 		dev_kfree_skb_any(skb);
+=======
+		dev_kfree_skb(skb);
+>>>>>>> edb1cb7... Merge with SM-A310F-MM
 
 		if (unlikely(tx_bug)) {
 			tg3_tx_recover(tp);
@@ -6769,7 +6773,11 @@ static int tg3_rx(struct tg3_napi *tnapi, int budget)
 		if (len > (tp->dev->mtu + ETH_HLEN) &&
 		    skb->protocol != htons(ETH_P_8021Q) &&
 		    skb->protocol != htons(ETH_P_8021AD)) {
+<<<<<<< HEAD
 			dev_kfree_skb_any(skb);
+=======
+			dev_kfree_skb(skb);
+>>>>>>> edb1cb7... Merge with SM-A310F-MM
 			goto drop_it_no_recycle;
 		}
 
@@ -7652,7 +7660,11 @@ static int tigon3_dma_hwbug_workaround(struct tg3_napi *tnapi,
 					  PCI_DMA_TODEVICE);
 		/* Make sure the mapping succeeded */
 		if (pci_dma_mapping_error(tp->pdev, new_addr)) {
+<<<<<<< HEAD
 			dev_kfree_skb_any(new_skb);
+=======
+			dev_kfree_skb(new_skb);
+>>>>>>> edb1cb7... Merge with SM-A310F-MM
 			ret = -1;
 		} else {
 			u32 save_entry = *entry;
@@ -7667,13 +7679,21 @@ static int tigon3_dma_hwbug_workaround(struct tg3_napi *tnapi,
 					    new_skb->len, base_flags,
 					    mss, vlan)) {
 				tg3_tx_skb_unmap(tnapi, save_entry, -1);
+<<<<<<< HEAD
 				dev_kfree_skb_any(new_skb);
+=======
+				dev_kfree_skb(new_skb);
+>>>>>>> edb1cb7... Merge with SM-A310F-MM
 				ret = -1;
 			}
 		}
 	}
 
+<<<<<<< HEAD
 	dev_kfree_skb_any(skb);
+=======
+	dev_kfree_skb(skb);
+>>>>>>> edb1cb7... Merge with SM-A310F-MM
 	*pskb = new_skb;
 	return ret;
 }
@@ -7716,7 +7736,11 @@ static int tg3_tso_bug(struct tg3 *tp, struct sk_buff *skb)
 	} while (segs);
 
 tg3_tso_bug_end:
+<<<<<<< HEAD
 	dev_kfree_skb_any(skb);
+=======
+	dev_kfree_skb(skb);
+>>>>>>> edb1cb7... Merge with SM-A310F-MM
 
 	return NETDEV_TX_OK;
 }
@@ -7954,7 +7978,11 @@ dma_error:
 	tg3_tx_skb_unmap(tnapi, tnapi->tx_prod, --i);
 	tnapi->tx_buffers[tnapi->tx_prod].skb = NULL;
 drop:
+<<<<<<< HEAD
 	dev_kfree_skb_any(skb);
+=======
+	dev_kfree_skb(skb);
+>>>>>>> edb1cb7... Merge with SM-A310F-MM
 drop_nofree:
 	tp->tx_dropped++;
 	return NETDEV_TX_OK;
@@ -8392,8 +8420,12 @@ static int tg3_init_rings(struct tg3 *tp)
 		if (tnapi->rx_rcb)
 			memset(tnapi->rx_rcb, 0, TG3_RX_RCB_RING_BYTES(tp));
 
+<<<<<<< HEAD
 		if (tnapi->prodring.rx_std &&
 		    tg3_rx_prodring_alloc(tp, &tnapi->prodring)) {
+=======
+		if (tg3_rx_prodring_alloc(tp, &tnapi->prodring)) {
+>>>>>>> edb1cb7... Merge with SM-A310F-MM
 			tg3_free_rings(tp);
 			return -ENOMEM;
 		}
@@ -10518,7 +10550,11 @@ static ssize_t tg3_show_temp(struct device *dev,
 	tg3_ape_scratchpad_read(tp, &temperature, attr->index,
 				sizeof(temperature));
 	spin_unlock_bh(&tp->lock);
+<<<<<<< HEAD
 	return sprintf(buf, "%u\n", temperature * 1000);
+=======
+	return sprintf(buf, "%u\n", temperature);
+>>>>>>> edb1cb7... Merge with SM-A310F-MM
 }
 
 
@@ -17389,6 +17425,26 @@ static int tg3_init_one(struct pci_dev *pdev,
 		goto err_out_apeunmap;
 	}
 
+<<<<<<< HEAD
+=======
+	/*
+	 * Reset chip in case UNDI or EFI driver did not shutdown
+	 * DMA self test will enable WDMAC and we'll see (spurious)
+	 * pending DMA on the PCI bus at that point.
+	 */
+	if ((tr32(HOSTCC_MODE) & HOSTCC_MODE_ENABLE) ||
+	    (tr32(WDMAC_MODE) & WDMAC_MODE_ENABLE)) {
+		tw32(MEMARB_MODE, MEMARB_MODE_ENABLE);
+		tg3_halt(tp, RESET_KIND_SHUTDOWN, 1);
+	}
+
+	err = tg3_test_dma(tp);
+	if (err) {
+		dev_err(&pdev->dev, "DMA engine test failed, aborting\n");
+		goto err_out_apeunmap;
+	}
+
+>>>>>>> edb1cb7... Merge with SM-A310F-MM
 	intmbx = MAILBOX_INTERRUPT_0 + TG3_64BIT_REG_LOW;
 	rcvmbx = MAILBOX_RCVRET_CON_IDX_0 + TG3_64BIT_REG_LOW;
 	sndmbx = MAILBOX_SNDHOST_PROD_IDX_0 + TG3_64BIT_REG_LOW;
@@ -17433,6 +17489,7 @@ static int tg3_init_one(struct pci_dev *pdev,
 			sndmbx += 0xc;
 	}
 
+<<<<<<< HEAD
 	/*
 	 * Reset chip in case UNDI or EFI driver did not shutdown
 	 * DMA self test will enable WDMAC and we'll see (spurious)
@@ -17450,6 +17507,8 @@ static int tg3_init_one(struct pci_dev *pdev,
 		goto err_out_apeunmap;
 	}
 
+=======
+>>>>>>> edb1cb7... Merge with SM-A310F-MM
 	tg3_init_coal(tp);
 
 	pci_set_drvdata(pdev, dev);
