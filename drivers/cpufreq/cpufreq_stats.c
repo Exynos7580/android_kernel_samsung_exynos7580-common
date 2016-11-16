@@ -39,6 +39,7 @@
 DECLARE_HASHTABLE(uid_hash_table, UID_HASH_BITS);
 
 static spinlock_t cpufreq_stats_lock;
+static DEFINE_SPINLOCK(cpufreq_stats_table_lock);
 
 static DEFINE_SPINLOCK(task_time_in_state_lock); /* task->time_in_state */
 static DEFINE_RT_MUTEX(uid_lock); /* uid_hash_table */
@@ -369,8 +370,12 @@ void acct_update_power(struct task_struct *task, cputime_t cputime) {
 	}
 
 	powerstats = per_cpu(cpufreq_power_stats, cpu_num);
-	if (!powerstats)
+
+	spin_lock_irqsave(&cpufreq_stats_table_lock, flags);
+	if (!powerstats) {
+		spin_unlock_irqrestore(&cpufreq_stats_table_lock, flags);
 		return;
+	}
 
 	cpu_freq_i = atomic_read(&stats->cpu_freq_i);
 	if (cpu_freq_i == -1)
@@ -379,6 +384,7 @@ void acct_update_power(struct task_struct *task, cputime_t cputime) {
 	curr = powerstats->curr[cpu_freq_i];
 	if (task->cpu_power != ULLONG_MAX)
 		task->cpu_power += curr * cputime_to_usecs(cputime);
+	spin_unlock_irqrestore(&cpufreq_stats_table_lock, flags);
 }
 EXPORT_SYMBOL_GPL(acct_update_power);
 
