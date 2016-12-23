@@ -51,6 +51,8 @@
 #define V4L2_PIX_FMT_VP9      v4l2_fourcc('V', 'P', '9', '0') /* VP9 */
 #define V4L2_PIX_FMT_HEVC    v4l2_fourcc('H', 'E', 'V', 'C') /* HEVC */
 
+/* added for lihwjpeg.so */
+
 /* yuv444 of JFIF JPEG */
 #define V4L2_PIX_FMT_JPEG_444 v4l2_fourcc('J', 'P', 'G', '4')
 /* yuv422 of JFIF JPEG */
