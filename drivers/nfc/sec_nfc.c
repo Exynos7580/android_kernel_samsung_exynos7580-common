@@ -38,7 +38,7 @@
 #include <linux/gpio.h>
 #include <linux/slab.h>
 #include <linux/fs.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 #include <linux/nfc/sec_nfc.h>
 
 #ifdef CONFIG_SEC_NFC_CLK_REQ

@@ -51,7 +51,7 @@
 #include <linux/async.h>
 #include <linux/slab.h>
 #include <linux/pm_runtime.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 #include <asm/unaligned.h>
 #ifdef CONFIG_USB_STORAGE_DETECT
 #include <linux/kthread.h>

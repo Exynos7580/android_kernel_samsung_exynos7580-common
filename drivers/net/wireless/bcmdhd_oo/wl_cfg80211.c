@@ -40,7 +40,7 @@
 #include <fils.h>
 #endif // endif
 #include <linux/if_arp.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 #include <ethernet.h>
 #include <linux/kernel.h>

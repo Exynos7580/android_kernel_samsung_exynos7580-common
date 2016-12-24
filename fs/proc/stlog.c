@@ -13,7 +13,7 @@
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/interrupt.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 #include <linux/stlog.h>
 
 extern wait_queue_head_t ringbuf_wait;

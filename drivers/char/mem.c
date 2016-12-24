@@ -38,7 +38,7 @@
 #include <linux/mst_ctrl.h>
 #endif
 
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 #ifdef CONFIG_IA64
 # include <linux/efi.h>

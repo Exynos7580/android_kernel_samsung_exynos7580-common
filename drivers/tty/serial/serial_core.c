@@ -35,7 +35,7 @@
 #include <linux/mutex.h>
 
 #include <asm/irq.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 #if defined(CONFIG_BT_BCM4339) || defined(CONFIG_BT_BCM4354) || defined(CONFIG_BT_BCM4358) || defined(CONFIG_BT_BCM43455) /* This is just temporary features*/
 #define BT4339_LINE 3

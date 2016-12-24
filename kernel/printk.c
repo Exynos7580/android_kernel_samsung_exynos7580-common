@@ -46,7 +46,7 @@
 #include <linux/irq_work.h>
 #include <linux/utsname.h>
 
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/printk.h>

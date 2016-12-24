@@ -52,7 +52,7 @@
 #include "tz_core_migration.h"
 #include <linux/fs.h>
 #include <asm/segment.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 #include <linux/buffer_head.h>
 
 MODULE_AUTHOR("Jaemin Ryu <jm77.ryu@samsung.com>");

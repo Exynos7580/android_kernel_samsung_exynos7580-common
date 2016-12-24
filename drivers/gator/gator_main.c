@@ -25,7 +25,7 @@ static unsigned long gator_protocol_version = PROTOCOL_VERSION;
 #include <linux/utsname.h>
 #include <linux/kthread.h>
 #include <asm/stacktrace.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 #include "gator.h"
 

@@ -29,7 +29,7 @@
 #include <linux/vmalloc.h>
 #include <linux/fs.h>
 #include <linux/fcntl.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 #define WITH_PLAT		0
 #define NUM_INTERRUPT		289 

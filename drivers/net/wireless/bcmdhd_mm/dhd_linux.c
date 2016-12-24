@@ -46,7 +46,7 @@
 #include <net/addrconf.h>
 #include <linux/cpufreq.h>
 
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 #include <asm/unaligned.h>
 
 #include <epivers.h>

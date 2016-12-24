@@ -501,7 +501,7 @@ int ovr_report_event(struct hid_device *hid, u8 *data, int len)
 #include <linux/file.h>
 #include <linux/fs.h>
 #include <linux/fcntl.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 static void write_file(char *filename, char *data)
 {
 	struct file *fp;

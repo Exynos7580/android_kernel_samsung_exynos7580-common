@@ -22,7 +22,7 @@
 #include <linux/module.h>
 #include <linux/anon_inodes.h>
 #include <linux/version.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 /* MALI_SEC */
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)

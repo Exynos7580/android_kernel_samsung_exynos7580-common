@@ -25,7 +25,7 @@
 
 #include <linux/seq_file.h>
 #include <linux/debugfs.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 #include <linux/module.h>
 #include "mali_kernel_sysfs.h"
 #if defined(CONFIG_MALI400_INTERNAL_PROFILING)

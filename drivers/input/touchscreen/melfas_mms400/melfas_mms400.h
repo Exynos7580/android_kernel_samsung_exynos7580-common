@@ -33,7 +33,7 @@
 #include <linux/gpio_event.h>
 #include <linux/wakelock.h>
 #include <linux/vmalloc.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 #include <linux/regulator/consumer.h>
 #include <linux/pinctrl/consumer.h>
 

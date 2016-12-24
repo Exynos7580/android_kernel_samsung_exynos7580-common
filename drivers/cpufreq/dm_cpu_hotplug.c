@@ -20,7 +20,7 @@
 
 #include <linux/fs.h>
 #include <asm/segment.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 #include <linux/buffer_head.h>
 
 #include <mach/cpufreq.h>

@@ -17,7 +17,7 @@
 #ifndef __MALI_OSK_SPECIFIC_H__
 #define __MALI_OSK_SPECIFIC_H__
 
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 #include "mali_sync.h"
 

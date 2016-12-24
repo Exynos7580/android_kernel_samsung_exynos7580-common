@@ -5,7 +5,7 @@
 #include <linux/earlysuspend.h>
 #endif
 #include <linux/slab.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 #include <linux/i2c.h>
 #include <linux/input.h>
 #include <linux/input/mt.h>

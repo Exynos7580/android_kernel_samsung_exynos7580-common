@@ -30,7 +30,7 @@
 #include <linux/vmalloc.h>
 #include <linux/fs.h>
 #include <linux/fcntl.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 #define NUM_DISK		4
 #define CHK_SIZE		4096

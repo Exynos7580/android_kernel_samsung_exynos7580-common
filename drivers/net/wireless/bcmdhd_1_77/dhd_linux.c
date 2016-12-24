@@ -59,7 +59,7 @@
 #ifdef DHD_DUMP_MNGR
 #include <linux/namei.h>
 #endif /* DHD_DUMP_MNGR */
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 #include <asm/unaligned.h>
 
 #include <epivers.h>
