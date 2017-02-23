@@ -171,10 +171,10 @@ static void print_wakeup_sources(void)
 	wakeups = get_wakeup_reasons_nosync();
 	list_for_each_entry(n, wakeups, next) {
 		if (n->desc && n->desc->action && n->desc->action->name)
-			pr_info("Resume caused by IRQ %d, %s\n", n->irq,
+			printk(KERN_DEBUG "Resume caused by IRQ %d, %s\n", n->irq,
 				n->desc->action->name);
 		else
-			pr_info("Resume caused by IRQ %d\n", n->irq);
+			printk(KERN_DEBUG "Resume caused by IRQ %d\n", n->irq);
 	}
 }
 
