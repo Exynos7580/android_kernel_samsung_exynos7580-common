@@ -1502,7 +1502,7 @@ static int __init msm_otg_probe(struct platform_device *pdev)
 		ret = -ENOMEM;
 		goto put_core_clk;
 	}
-	dev_info(&pdev->dev, "OTG regs = %p\n", motg->regs);
+	dev_info(&pdev->dev, "OTG regs = %pK\n", motg->regs);
 
 	motg->irq = platform_get_irq(pdev, 0);
 	if (!motg->irq) {

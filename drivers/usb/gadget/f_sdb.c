@@ -279,7 +279,7 @@ static int sdb_create_bulk_endpoints(struct f_sdb *sdb_func,
 	struct usb_ep *ep;
 	int i;
 
-	DBG(cdev, "sdb_create_bulk_endpoints dev: %p\n", dev);
+	DBG(cdev, "sdb_create_bulk_endpoints dev: %pK\n", dev);
 
 	ep = usb_ep_autoconfig(cdev->gadget, in_desc);
 	if (!ep) {
@@ -526,7 +526,7 @@ sdb_function_bind(struct usb_configuration *c, struct usb_function *f)
 	int			id;
 	int			ret;
 
-	DBG(cdev, "sdb_function_bind sdb_func: %p\n", sdb_func);
+	DBG(cdev, "sdb_function_bind sdb_func: %pK\n", sdb_func);
 
 	/* allocate interface ID(s) */
 	id = usb_interface_id(c, f);
