@@ -699,7 +699,7 @@ static int exynos_get_voltage_tolerance(struct device *cpu_dev)
 }
 
 #ifndef CONFIG_EXYNOS7580_QUAD
-static int __cpuinit exynos_cpufreq_cpu_up_notifier(struct notifier_block *notifier,
+static int exynos_cpufreq_cpu_up_notifier(struct notifier_block *notifier,
 					unsigned long action, void *hcpu)
 {
 	unsigned int cpu = (unsigned long)hcpu;
@@ -724,7 +724,7 @@ static int __cpuinit exynos_cpufreq_cpu_up_notifier(struct notifier_block *notif
 	return NOTIFY_OK;
 }
 
-static int __cpuinit exynos_cpufreq_cpu_down_notifier(struct notifier_block *notifier,
+static int exynos_cpufreq_cpu_down_notifier(struct notifier_block *notifier,
 		unsigned long action, void *hcpu)
 {
 	unsigned int cpu = (unsigned long)hcpu;

@@ -313,7 +313,7 @@ static void exynos_trace_ipi(void *info)
 	etm_disable(*hcpu);
 }
 
-static int __cpuinit core_notify(struct notifier_block *self, unsigned long action, void *data)
+static int core_notify(struct notifier_block *self, unsigned long action, void *data)
 {
 	int hcpu = (unsigned long)data;
 
@@ -325,7 +325,7 @@ static int __cpuinit core_notify(struct notifier_block *self, unsigned long acti
 	return NOTIFY_OK;
 }
 
-static struct notifier_block __cpuinitdata core_nb = {
+static struct notifier_block core_nb = {
 	.notifier_call = core_notify,
 };
 
@@ -351,7 +351,7 @@ static int exynos_c2_etm_pm_notifier(struct notifier_block *self,
 	return NOTIFY_OK;
 }
 
-static struct notifier_block __cpuinitdata exynos_c2_etm_pm_nb = {
+static struct notifier_block exynos_c2_etm_pm_nb = {
 	.notifier_call = exynos_c2_etm_pm_notifier,
 };
 

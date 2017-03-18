@@ -355,7 +355,7 @@ static int exynos_cs_pm_notifier(struct notifier_block *self,
 	return NOTIFY_OK;
 }
 
-static int __cpuinit exynos_cs_cpu_notifier(struct notifier_block *nfb,
+static int exynos_cs_cpu_notifier(struct notifier_block *nfb,
 		unsigned long action, void *hcpu)
 {
 	int cpu = (unsigned long)hcpu;
@@ -372,11 +372,11 @@ static int __cpuinit exynos_cs_cpu_notifier(struct notifier_block *nfb,
 	return NOTIFY_OK;
 }
 
-static struct notifier_block __cpuinitdata exynos_cs_pm_notifier_block = {
+static struct notifier_block exynos_cs_pm_notifier_block = {
 	.notifier_call = exynos_cs_pm_notifier,
 };
 
-static struct notifier_block __cpuinitdata exynos_cs_cpu_notifier_block = {
+static struct notifier_block exynos_cs_cpu_notifier_block = {
 	.notifier_call = exynos_cs_cpu_notifier,
 };
 

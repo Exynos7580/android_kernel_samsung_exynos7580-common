@@ -567,7 +567,7 @@ static ssize_t show_time_in_state(struct device *dev,
 }
 
 #if defined(CONFIG_POWERSUSPEND)
-static void __cpuinit powersave_resume(struct power_suspend *handler)
+static void powersave_resume(struct power_suspend *handler)
 {
 	mutex_lock(&hotplug_lock);
 	ctrl_hotplug.suspended = false;
@@ -580,7 +580,7 @@ static void __cpuinit powersave_resume(struct power_suspend *handler)
 	mutex_unlock(&hotplug_lock);
 }
 
-static void __cpuinit powersave_suspend(struct power_suspend *handler)
+static void powersave_suspend(struct power_suspend *handler)
 {
 	mutex_lock(&hotplug_lock);
 	hotplug_enter_hstate(false, H6);

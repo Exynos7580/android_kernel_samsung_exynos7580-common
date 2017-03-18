@@ -65,7 +65,7 @@ static unsigned int cycle = 0, delay0 = 0;
 static unsigned long delay_jif = 0;
 static int enabled __read_mostly = 0; //disable by default.
 
-static void __cpuinit asmp_work_fn(struct work_struct *work) {
+static void asmp_work_fn(struct work_struct *work) {
 	unsigned int cpu = 0, slow_cpu = 0;
 	unsigned int rate, cpu0_rate, slow_rate = UINT_MAX, fast_rate;
 	unsigned int max_rate, up_rate, down_rate;
@@ -145,7 +145,7 @@ static void asmp_power_suspend(struct power_suspend *h) {
 	pr_info(ASMP_TAG"suspended\n");
 }
 
-static void __cpuinit asmp_late_resume(struct power_suspend *h) {
+static void asmp_late_resume(struct power_suspend *h) {
 	unsigned int cpu;
 
 	/* hotplug offline cpu cores */
@@ -169,7 +169,7 @@ static struct power_suspend __refdata asmp_power_suspend_handler = {
 	.resume = asmp_late_resume,
 };
 
-static int __cpuinit set_enabled(const char *val, const struct kernel_param *kp) {
+static int set_enabled(const char *val, const struct kernel_param *kp) {
 	int ret;
 	unsigned int cpu;
 

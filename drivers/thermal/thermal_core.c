@@ -2069,7 +2069,7 @@ static void thermal_unregister_governors(void)
 }
 
 #ifdef CONFIG_SCHED_HMP
-static int __cpuinit thermal_cpu_callback(struct notifier_block *nfb,
+static int thermal_cpu_callback(struct notifier_block *nfb,
 				    unsigned long action, void *hcpu)
 {
 	unsigned long cpu = (unsigned long)hcpu;
@@ -2096,7 +2096,7 @@ static int __cpuinit thermal_cpu_callback(struct notifier_block *nfb,
 	return NOTIFY_OK;
 }
 
-static struct notifier_block __cpuinitdata thermal_cpu_notifier =
+static struct notifier_block thermal_cpu_notifier =
 {
    .notifier_call = thermal_cpu_callback,
 };

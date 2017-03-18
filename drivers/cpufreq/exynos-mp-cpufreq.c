@@ -802,7 +802,7 @@ static int exynos_cpufreq_resume(struct cpufreq_policy *policy)
 }
 #endif
 
-static int __cpuinit exynos_cpufreq_cpu_notifier(struct notifier_block *notifier,
+static int exynos_cpufreq_cpu_notifier(struct notifier_block *notifier,
 					unsigned long action, void *hcpu)
 {
 	unsigned int cpu = (unsigned long)hcpu;
