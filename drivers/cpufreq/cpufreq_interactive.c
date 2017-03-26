@@ -484,7 +484,7 @@ static void cpufreq_interactive_timer(unsigned long data)
 	spin_lock_irqsave(&speedchange_cpumask_lock, flags);
 	cpumask_set_cpu(data, &speedchange_cpumask);
 	spin_unlock_irqrestore(&speedchange_cpumask_lock, flags);
-	wake_up_process(tunables->speedchange_task);
+	wake_up_process_no_notif(tunables->speedchange_task);
 
 rearm_if_notmax:
 	/*
@@ -688,7 +688,7 @@ static void cpufreq_interactive_boost(const struct cpufreq_policy *policy)
 
 
 	if (anyboost && tunables->speedchange_task)
-		wake_up_process(tunables->speedchange_task);
+		wake_up_process_no_notif(tunables->speedchange_task);
 }
 
 static int cpufreq_interactive_notifier(
@@ -1356,7 +1356,7 @@ static int cpufreq_governor_interactive(struct cpufreq_policy *policy,
 #endif
 
 		/* NB: wake up so the thread does not look hung to the freezer */
-		wake_up_process(tunables->speedchange_task);
+		wake_up_process_no_notif(tunables->speedchange_task);
 		mutex_unlock(&gov_lock);
 		break;
 
@@ -1500,7 +1500,7 @@ static int cpufreq_interactive_cluster1_min_qos_handler(struct notifier_block *b
 		spin_unlock_irqrestore(&speedchange_cpumask_lock, flags);
 
 		if (tunables->speedchange_task)
-			wake_up_process(tunables->speedchange_task);
+			wake_up_process_no_notif(tunables->speedchange_task);
 	}
 exit:
 	mutex_unlock(&gov_lock);
@@ -1551,7 +1551,7 @@ static int cpufreq_interactive_cluster1_max_qos_handler(struct notifier_block *b
 		spin_unlock_irqrestore(&speedchange_cpumask_lock, flags);
 
 		if (tunables->speedchange_task)
-			wake_up_process(tunables->speedchange_task);
+			wake_up_process_no_notif(tunables->speedchange_task);
 	}
 exit:
 	mutex_unlock(&gov_lock);
@@ -1600,7 +1600,7 @@ static int cpufreq_interactive_cluster0_min_qos_handler(struct notifier_block *b
 		spin_unlock_irqrestore(&speedchange_cpumask_lock, flags);
 
 		if (tunables->speedchange_task)
-			wake_up_process(tunables->speedchange_task);
+			wake_up_process_no_notif(tunables->speedchange_task);
 	}
 exit:
 	mutex_unlock(&gov_lock);
@@ -1646,7 +1646,7 @@ static int cpufreq_interactive_cluster0_max_qos_handler(struct notifier_block *b
 		spin_unlock_irqrestore(&speedchange_cpumask_lock, flags);
 
 		if (tunables->speedchange_task)
-			wake_up_process(tunables->speedchange_task);
+			wake_up_process_no_notif(tunables->speedchange_task);
 	}
 exit:
 	mutex_unlock(&gov_lock);
