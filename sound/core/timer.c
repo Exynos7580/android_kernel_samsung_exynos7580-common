@@ -252,6 +252,9 @@ int snd_timer_open(struct snd_timer_instance **ti,
 			mutex_unlock(&register_mutex);
 			return -ENOMEM;
 		}
+		/* take a card refcount for safe disconnection */
+		if (timer->card)
+			get_device(timer->card->card_dev);
 		timeri->slave_class = tid->dev_sclass;
 		timeri->slave_id = tid->device;
 		timeri->flags |= SNDRV_TIMER_IFLG_SLAVE;
@@ -290,9 +293,6 @@ int snd_timer_open(struct snd_timer_instance **ti,
 		mutex_unlock(&register_mutex);
 		return -ENOMEM;
 	}
-	/* take a card refcount for safe disconnection */
-	if (timer->card)
-		get_device(timer->card->card_dev);
 	timeri->slave_class = tid->dev_sclass;
 	timeri->slave_id = slave_id;
 
@@ -1701,7 +1701,6 @@ static int snd_timer_user_params(struct file *file,
 			err = -EINVAL;
 			goto _end;
 		}
-
 	}
 	if (params.queue_size > 0 &&
 	    (params.queue_size < 32 || params.queue_size > 1024)) {
@@ -1945,6 +1944,7 @@ static ssize_t snd_timer_user_read(struct file *file, char __user *buffer,
 
 	tu = file->private_data;
 	unit = tu->tread ? sizeof(struct snd_timer_tread) : sizeof(struct snd_timer_read);
+	mutex_lock(&tu->ioctl_lock);
 	spin_lock_irq(&tu->qlock);
 	while ((long)count - result >= unit) {
 		while (!tu->qused) {
@@ -1960,14 +1960,16 @@ static ssize_t snd_timer_user_read(struct file *file, char __user *buffer,
 			add_wait_queue(&tu->qchange_sleep, &wait);
 
 			spin_unlock_irq(&tu->qlock);
+			mutex_unlock(&tu->ioctl_lock);
 			schedule();
+			mutex_lock(&tu->ioctl_lock);
 			spin_lock_irq(&tu->qlock);
 
 			remove_wait_queue(&tu->qchange_sleep, &wait);
 
 			if (tu->disconnected) {
 				err = -ENODEV;
-				break;
+				goto _error;
 			}
 			if (signal_pending(current)) {
 				err = -ERESTARTSYS;
@@ -1977,24 +1979,26 @@ static ssize_t snd_timer_user_read(struct file *file, char __user *buffer,
 
 		qhead = tu->qhead++;
 		tu->qhead %= tu->queue_size;
-		tu->qused--;
 		spin_unlock_irq(&tu->qlock);
 
 		mutex_lock(&tu->ioctl_lock);
 		if (tu->tread) {
 			if (copy_to_user(buffer, &tu->tqueue[qhead],
-					 sizeof(struct snd_timer_tread)))
+					 sizeof(struct snd_timer_tread))) {
 				mutex_unlock(&tu->ioctl_lock);
 				err = -EFAULT;
+			}
 		} else {
 			if (copy_to_user(buffer, &tu->queue[qhead],
-					 sizeof(struct snd_timer_read)))
+					 sizeof(struct snd_timer_read))) {
 				mutex_unlock(&tu->ioctl_lock);
 				err = -EFAULT;
+			}
 		}
 		mutex_unlock(&tu->ioctl_lock);
 
 		spin_lock_irq(&tu->qlock);
+		tu->qused--;
 		if (err < 0)
 			goto _error;
 		result += unit;
@@ -2002,6 +2006,7 @@ static ssize_t snd_timer_user_read(struct file *file, char __user *buffer,
 	}
  _error:
 	spin_unlock_irq(&tu->qlock);
+	mutex_unlock(&tu->ioctl_lock);
 	return result > 0 ? result : err;
 }
 
