@@ -167,6 +167,7 @@ struct inodes_stat_t {
 #define FS_IOC32_SETVERSION		_IOW('v', 2, int)
 
 #define FS_IOC_INVAL_MAPPING		_IO('f', 13)
+
 /*
  * File system encryption support
  */
@@ -189,11 +190,11 @@ struct inodes_stat_t {
 
 
 struct fscrypt_policy {
-	char version;
-	char contents_encryption_mode;
-	char filenames_encryption_mode;
-	char flags;
-	char master_key_descriptor[FS_KEY_DESCRIPTOR_SIZE];
+	__u8 version;
+	__u8 contents_encryption_mode;
+	__u8 filenames_encryption_mode;
+	__u8 flags;
+	__u8 master_key_descriptor[FS_KEY_DESCRIPTOR_SIZE];
 } __packed;
 
 #define FS_IOC_SET_ENCRYPTION_POLICY	_IOR('f', 19, struct fscrypt_policy)
