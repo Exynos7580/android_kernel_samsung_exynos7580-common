@@ -41,9 +41,6 @@
 
 #include "cpufreq_governor.h"
 
-/* variable to detect screen on/off */
-static bool scr_suspended;
-
 #define CREATE_TRACE_POINTS
 #include <trace/events/cpufreq_cafactive.h>
 
@@ -442,10 +439,10 @@ static void __cpufreq_cafactive_timer(unsigned long data, bool is_notif)
 	now = update_load(data);
 	delta_time = (unsigned int)(now - pcpu->cputime_speedadj_timestamp);
 	cputime_speedadj = pcpu->cputime_speedadj;
-	if (scr_suspended == false
+	if (suspended == false
 		&& tunables->timer_rate != tunables->prev_timer_rate)
 		tunables->timer_rate = tunables->prev_timer_rate;
-	else if (scr_suspended == true
+	else if (suspended == true
 		&& tunables->timer_rate != SCREEN_OFF_TIMER_RATE ) {
 		tunables->prev_timer_rate = tunables->timer_rate;
 		tunables->timer_rate
@@ -668,7 +665,7 @@ static int cpufreq_cafactive_speedchange_task(void *data)
 				pjcpu->floor_validate_time = fvt;
 			}
 			
-			if (scr_suspended == true)
+			if (suspended == true)
 				if (max_freq > screen_off_max) max_freq = screen_off_max;
 
 			if (max_freq != pcpu->policy->cur) {
@@ -1330,26 +1327,6 @@ static struct cpufreq_cafactive_tunables *restore_tunables(
 
 	return per_cpu(cpuinfo, cpu).cached_tunables;
 }
-
-/* callback functions to detect screen on and off events */
-static void cafactive_early_suspend(struct power_suspend *handler)
-{
-	scr_suspended = true;
-
-	return;
-}
-
-static void cafactive_late_resume(struct power_suspend *handler)
-{
-	scr_suspended = false;
-
-	return;
-}
-
-static struct power_suspend cafactive_suspend = {
-	.suspend = cafactive_early_suspend,
-	.resume = cafactive_late_resume,
-};
 	
 static int cpufreq_governor_cafactive(struct cpufreq_policy *policy,
 		unsigned int event)
