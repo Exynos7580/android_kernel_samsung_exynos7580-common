@@ -38,7 +38,6 @@
 #include <linux/powersuspend.h>
 #endif
 #include <asm/cputime.h>
-#include <linux/earlysuspend.h>
 
 #include "cpufreq_governor.h"
 
@@ -1308,6 +1307,7 @@ static struct cpufreq_cafactive_tunables *alloc_tunable(
 	tunables->ntarget_loads = ARRAY_SIZE(default_target_loads);
 	tunables->min_sample_time = DEFAULT_MIN_SAMPLE_TIME;
 	tunables->timer_rate = DEFAULT_TIMER_RATE;
+	tunables->prev_timer_rate = DEFAULT_TIMER_RATE;
 	tunables->boostpulse_duration_val = DEFAULT_MIN_SAMPLE_TIME;
 	tunables->timer_slack_val = DEFAULT_TIMER_SLACK;
 
@@ -1332,20 +1332,23 @@ static struct cpufreq_cafactive_tunables *restore_tunables(
 }
 
 /* callback functions to detect screen on and off events */
-static void early_suspend_screen_off(struct early_suspend *h)
+static void cafactive_early_suspend(struct power_suspend *handler)
 {
 	scr_suspended = true;
+
+	return;
 }
 
-static void late_resume_screen_on(struct early_suspend *h)
+static void cafactive_late_resume(struct power_suspend *handler)
 {
 	scr_suspended = false;
+
+	return;
 }
 
-struct early_suspend screen_detect = {
-	.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN,
-	.suspend = early_suspend_screen_off,
-	.resume = late_resume_screen_on,
+static struct power_suspend cafactive_suspend = {
+	.suspend = cafactive_early_suspend,
+	.resume = cafactive_late_resume,
 };
 	
 static int cpufreq_governor_cafactive(struct cpufreq_policy *policy,
@@ -1383,7 +1386,6 @@ static int cpufreq_governor_cafactive(struct cpufreq_policy *policy,
 		}
 
 		tunables->usage_count = 1;
-		tunables->prev_timer_rate = DEFAULT_TIMER_RATE;
 			
 		policy->governor_data = tunables;
 		if (!have_governor_per_policy())
