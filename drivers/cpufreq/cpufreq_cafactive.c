@@ -38,8 +38,12 @@
 #include <linux/powersuspend.h>
 #endif
 #include <asm/cputime.h>
+#include <linux/earlysuspend.h>
 
 #include "cpufreq_governor.h"
+
+/* variable to detect screen on/off */
+static bool scr_suspended;
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/cpufreq_cafactive.h>
@@ -94,9 +98,13 @@ static bool suspended = false;
 static unsigned int default_target_loads[] = {DEFAULT_TARGET_LOAD};
 
 #define DEFAULT_TIMER_RATE (20 * USEC_PER_MSEC)
+#define SCREEN_OFF_TIMER_RATE ((unsigned long)(60 * USEC_PER_MSEC))
 #define DEFAULT_ABOVE_HISPEED_DELAY DEFAULT_TIMER_RATE
 static unsigned int default_above_hispeed_delay[] = {
 	DEFAULT_ABOVE_HISPEED_DELAY };
+
+#define DEFAULT_SCREEN_OFF_MAX 1000000
+static unsigned long screen_off_max = DEFAULT_SCREEN_OFF_MAX;
 
 struct cpufreq_cafactive_tunables {
 	int usage_count;
@@ -119,6 +127,7 @@ struct cpufreq_cafactive_tunables {
 	 * The sample rate of the timer used to increase frequency
 	 */
 	unsigned long timer_rate;
+	unsigned long prev_timer_rate;
 	/*
 	 * Wait this long before raising speed above hispeed, by default a
 	 * single timer interval.
@@ -434,6 +443,16 @@ static void __cpufreq_cafactive_timer(unsigned long data, bool is_notif)
 	now = update_load(data);
 	delta_time = (unsigned int)(now - pcpu->cputime_speedadj_timestamp);
 	cputime_speedadj = pcpu->cputime_speedadj;
+	if (scr_suspended == false
+		&& tunables->timer_rate != tunables->prev_timer_rate)
+		tunables->timer_rate = tunables->prev_timer_rate;
+	else if (scr_suspended == true
+		&& tunables->timer_rate != SCREEN_OFF_TIMER_RATE ) {
+		tunables->prev_timer_rate = tunables->timer_rate;
+		tunables->timer_rate
+			= max(tunables->timer_rate,
+				SCREEN_OFF_TIMER_RATE);
+	}
 	pcpu->last_evaluated_jiffy = get_jiffies_64();
 	spin_unlock_irqrestore(&pcpu->load_lock, flags);
 
@@ -649,6 +668,9 @@ static int cpufreq_cafactive_speedchange_task(void *data)
 				pjcpu = &per_cpu(cpuinfo, j);
 				pjcpu->floor_validate_time = fvt;
 			}
+			
+			if (scr_suspended == true)
+				if (max_freq > screen_off_max) max_freq = screen_off_max;
 
 			if (max_freq != pcpu->policy->cur) {
 				__cpufreq_driver_target(pcpu->policy,
@@ -987,6 +1009,7 @@ static ssize_t store_timer_rate(struct cpufreq_cafactive_tunables *tunables,
 			val_round);
 
 	tunables->timer_rate = val_round;
+	tunables->prev_timer_rate = val_round;
 	return count;
 }
 
@@ -1308,6 +1331,23 @@ static struct cpufreq_cafactive_tunables *restore_tunables(
 	return per_cpu(cpuinfo, cpu).cached_tunables;
 }
 
+/* callback functions to detect screen on and off events */
+static void early_suspend_screen_off(struct early_suspend *h)
+{
+	scr_suspended = true;
+}
+
+static void late_resume_screen_on(struct early_suspend *h)
+{
+	scr_suspended = false;
+}
+
+struct early_suspend screen_detect = {
+	.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN,
+	.suspend = early_suspend_screen_off,
+	.resume = late_resume_screen_on,
+};
+	
 static int cpufreq_governor_cafactive(struct cpufreq_policy *policy,
 		unsigned int event)
 {
@@ -1343,6 +1383,8 @@ static int cpufreq_governor_cafactive(struct cpufreq_policy *policy,
 		}
 
 		tunables->usage_count = 1;
+		tunables->prev_timer_rate = DEFAULT_TIMER_RATE;
+			
 		policy->governor_data = tunables;
 		if (!have_governor_per_policy())
 			common_tunables = tunables;
