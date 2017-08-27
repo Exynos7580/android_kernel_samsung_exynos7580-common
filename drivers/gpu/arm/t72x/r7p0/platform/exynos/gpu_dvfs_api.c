@@ -521,7 +521,6 @@ int gpu_dvfs_get_level(int clock)
 	return -1;
 }
 
-<<<<<<< HEAD
 int gpu_dvfs_get_stock_level(int clock)
 {
 	struct kbase_device *kbdev = pkbdev;
@@ -541,8 +540,6 @@ int gpu_dvfs_get_stock_level(int clock)
 	return -1;
 }
 
-=======
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 int gpu_dvfs_get_voltage(int clock)
 {
 	struct kbase_device *kbdev = pkbdev;

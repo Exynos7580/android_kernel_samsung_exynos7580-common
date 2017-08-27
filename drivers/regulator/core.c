@@ -1418,11 +1418,7 @@ struct regulator *regulator_get_exclusive(struct device *dev, const char *id)
 }
 EXPORT_SYMBOL_GPL(regulator_get_exclusive);
 
-<<<<<<< HEAD
 /* regulator_list_mutex lock held by regulator_put() */
-=======
-/* Locks held by regulator_put() */
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 static void _regulator_put(struct regulator *regulator)
 {
 	struct regulator_dev *rdev;

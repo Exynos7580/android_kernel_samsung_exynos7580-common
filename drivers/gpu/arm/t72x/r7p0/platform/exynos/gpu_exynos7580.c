@@ -39,20 +39,15 @@
 #define L2CONFIG_MO_1BY2			(0b1111)
 #define L2CONFIG_MO_NO_RESTRICT			(0)
 
-<<<<<<< HEAD
 #ifdef CONFIG_MALI_DVFS
 #define CPU_MAX PM_QOS_CLUSTER1_FREQ_MAX_DEFAULT_VALUE
 #else
 #define CPU_MAX -1
 #endif
-=======
-#define CPU_MAX PM_QOS_CLUSTER1_FREQ_MAX_DEFAULT_VALUE
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 
 /*  clk,vol,abb,min,max,down stay, pm_qos mem,
 	pm_qos int, pm_qos cpu_kfc_min, pm_qos cpu_egl_max */
 static gpu_dvfs_info gpu_dvfs_table_default[] = {
-<<<<<<< HEAD
 	{800, 1100000, 0,  99, 100, 1, 0, 825000, 400000,  1200000, CPU_MAX},
 	{734, 1100000, 0,  98,  99, 1, 0, 825000, 400000,  1000000, CPU_MAX},
 	{668, 1100000, 0,  78,  85, 1, 0, 741000, 400000,   800000, CPU_MAX},
@@ -61,16 +56,6 @@ static gpu_dvfs_info gpu_dvfs_table_default[] = {
 	{350, 1000000, 0,  78,  85, 1, 0, 559000, 267000,   500000, CPU_MAX},
 	{266,  900000, 0,  78,  85, 1, 0, 416000, 200000,   	 0, CPU_MAX},
 	{160,  900000, 0,  10,  20, 1, 0, 228000, 200000,   	 0, CPU_MAX},
-=======
-	{800, 1100000, 0,  99, 100, 1, 0, 825000, 400000,  1200000, 1600000},
-	{734, 1100000, 0,  98,  99, 1, 0, 825000, 400000,  1000000, 1600000},
-	{668, 1100000, 0,  78,  85, 1, 0, 825000, 400000,   800000, 1600000},
-	{534, 1000000, 0,  78,  85, 1, 0, 728000, 334000,   500000, 1600000},
-	{440, 1000000, 0,  78,  85, 1, 0, 667000, 267000,   500000, 1600000},
-	{350, 1000000, 0,  78,  85, 1, 0, 559000, 267000,   500000, 1600000},
-	{266,  900000, 0,  78,  85, 1, 0, 416000, 200000,   	 0, 1600000},
-	{160,  900000, 0,  10,  20, 1, 0, 416000, 200000,   	 0, 1600000},
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 };
 
 static int mif_min_table[] = {
@@ -82,12 +67,8 @@ static int mif_min_table[] = {
 static gpu_attribute gpu_config_attributes[] = {
 	{GPU_MAX_CLOCK, 800},
 	{GPU_MAX_CLOCK_LIMIT, 800},
-<<<<<<< HEAD
 	{GPU_MIN_CLOCK_LIMIT, 160},
 	{GPU_MIN_CLOCK, 160},
-=======
-	{GPU_MIN_CLOCK, 266},
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 	{GPU_DVFS_START_CLOCK, 266},
 	{GPU_DVFS_BL_CONFIG_CLOCK, 266},
 	{GPU_GOVERNOR_TYPE, G3D_DVFS_GOVERNOR_INTERACTIVE},
@@ -108,11 +89,7 @@ static gpu_attribute gpu_config_attributes[] = {
 	{GPU_GOVERNOR_TABLE_SIZE_BOOSTER,
 		GPU_DVFS_TABLE_LIST_SIZE(gpu_dvfs_table_default)},
 	{GPU_GOVERNOR_INTERACTIVE_HIGHSPEED_CLOCK, 420},
-<<<<<<< HEAD
 	{GPU_GOVERNOR_INTERACTIVE_HIGHSPEED_LOAD, 99},
-=======
-	{GPU_GOVERNOR_INTERACTIVE_HIGHSPEED_LOAD, 95},
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 	{GPU_GOVERNOR_INTERACTIVE_HIGHSPEED_DELAY, 0},
 	{GPU_DEFAULT_VOLTAGE, 900000},
 	{GPU_COLD_MINIMUM_VOL, 0},
@@ -125,11 +102,7 @@ static gpu_attribute gpu_config_attributes[] = {
 	{GPU_TEMP_THROTTLING5, 440},
 	{GPU_TEMP_THROTTLING6, 350},
 	{GPU_TEMP_THROTTLING7, 266},
-<<<<<<< HEAD
 	{GPU_TEMP_THROTTLING8, 160},
-=======
-	{GPU_TEMP_THROTTLING8, 266},
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 	{GPU_TEMP_TRIPPING, 266},
 	{GPU_POWER_COEFF, 46}, /* all core on param */
 	{GPU_DVFS_TIME_INTERVAL, 5},
@@ -153,13 +126,8 @@ static gpu_attribute gpu_config_attributes[] = {
 	{GPU_HWCNT_CHOOSE_L3_CACHE , 0},
 	{GPU_HWCNT_CHOOSE_MMU_L2 , 0},
 #endif
-<<<<<<< HEAD
 	{GPU_RUNTIME_PM_DELAY_TIME, 30},
 	{GPU_DVFS_POLLING_TIME, 15},
-=======
-	{GPU_RUNTIME_PM_DELAY_TIME, 50},
-	{GPU_DVFS_POLLING_TIME, 30},
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 	{GPU_PMQOS_INT_DISABLE, 0},
 	{GPU_PMQOS_MIF_MAX_CLOCK, 825000},
 	{GPU_PMQOS_MIF_MAX_CLOCK_BASE, 534},

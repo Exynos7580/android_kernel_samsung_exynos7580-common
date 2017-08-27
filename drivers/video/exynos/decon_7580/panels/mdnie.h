@@ -59,11 +59,7 @@ enum hmt_mode {
 	HMT_4000K,
 	HMT_6400K,
 	HMT_7500K,
-<<<<<<< HEAD
-	HMT_MDNIE_MAX,
-=======
 	HMT_MDNIE_MAX
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 };
 
 struct mdnie_seq_info {

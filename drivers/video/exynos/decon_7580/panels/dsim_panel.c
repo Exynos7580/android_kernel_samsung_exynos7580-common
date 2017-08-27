@@ -27,15 +27,8 @@ struct mipi_dsim_lcd_driver *mipi_lcd_driver = &s6e3aa2_mipi_lcd_driver;
 struct mipi_dsim_lcd_driver *mipi_lcd_driver = &s6e3fa3_mipi_lcd_driver;
 #elif defined(CONFIG_PANEL_S6E3FA3_A7XE)
 struct mipi_dsim_lcd_driver *mipi_lcd_driver = &s6e3fa3_mipi_lcd_driver;
-<<<<<<< HEAD
-struct dsim_panel_ops *mipi_panel_ops = &s6e3fa3_panel_ops;
 #elif defined(CONFIG_PANEL_EA8061_DYNAMIC)
 struct mipi_dsim_lcd_driver *mipi_lcd_driver = &ea8061_mipi_lcd_driver;
-struct dsim_panel_ops *mipi_panel_ops = &ea8061_panel_ops;
-=======
-#elif defined(CONFIG_PANEL_EA8061_DYNAMIC)
-struct mipi_dsim_lcd_driver *mipi_lcd_driver = &ea8061_mipi_lcd_driver;
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 #endif
 
 int dsim_panel_ops_init(struct dsim_device *dsim)

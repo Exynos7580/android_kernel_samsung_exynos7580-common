@@ -41,11 +41,7 @@ do { \
 
 #define EXYNOS7580_REVISION_0		(0x0)
 #define EXYNOS7580_REVISION_0_1		(0x01)
-<<<<<<< HEAD
 #define GPU_MAX_CLOCK_REVISION_0	800
-=======
-#define GPU_MAX_CLOCK_REVISION_0	668
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 
 #define BMAX_RETRY_CNT 10
 
@@ -114,10 +110,7 @@ typedef enum {
 	GPU_MAX_CLOCK = 0,
 	GPU_MAX_CLOCK_LIMIT,
 	GPU_MIN_CLOCK,
-<<<<<<< HEAD
 	GPU_MIN_CLOCK_LIMIT,
-=======
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 	GPU_DVFS_START_CLOCK,
 	GPU_DVFS_BL_CONFIG_CLOCK,
 	GPU_GOVERNOR_TYPE,
@@ -331,10 +324,7 @@ struct exynos_context {
 	int gpu_max_clock;
 	int gpu_max_clock_limit;
 	int gpu_min_clock;
-<<<<<<< HEAD
 	int gpu_min_clock_limit;
-=======
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 	int gpu_dvfs_start_clock;
 	int gpu_dvfs_config_clock;
 

@@ -1308,11 +1308,6 @@ struct kbase_context {
 
 	/* MALI_SEC_INTEGRATION */
 	bool destroying_context;
-<<<<<<< HEAD
-=======
-	atomic_t mem_profile_showing_state;
-	wait_queue_head_t mem_profile_wait;
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 };
 
 enum kbase_reg_access_type {

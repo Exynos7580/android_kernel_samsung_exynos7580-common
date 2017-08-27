@@ -200,12 +200,8 @@ uintptr_t mdnie_request_table(char *path, struct mdnie_table *org)
 
 	size = mdnie_request_firmware(path, ret ? org->name : NULL, &buf);
 	if (size <= 0) {
-<<<<<<< HEAD
 		if (buf)
 			kfree(buf);
-=======
-		kfree(buf);
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 		goto exit;
 	}
 

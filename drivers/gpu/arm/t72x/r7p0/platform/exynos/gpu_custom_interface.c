@@ -18,10 +18,7 @@
 #include <mali_kbase.h>
 
 #include <linux/fb.h>
-<<<<<<< HEAD
 #include <linux/sysfs_helpers.h>
-=======
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 
 #include "mali_kbase_platform.h"
 #include "gpu_dvfs_handler.h"
@@ -34,7 +31,6 @@
 #include <mach/apm-exynos.h>
 #include <mach/asv-exynos.h>
 
-<<<<<<< HEAD
 #ifdef CONFIG_SOC_EXYNOS7580
 #define GPU_MAX_VOLT		1100000
 #define GPU_MIN_VOLT		600000
@@ -43,8 +39,6 @@
 #error "Please define gpu voltage ranges for current SoC."
 #endif
 
-=======
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 extern struct kbase_device *pkbdev;
 
 int gpu_pmqos_dvfs_min_lock(int level)
@@ -234,7 +228,6 @@ static ssize_t show_asv_table(struct device *dev, struct device_attribute *attr,
 	return ret;
 }
 
-<<<<<<< HEAD
 static ssize_t show_volt_table(struct device *dev, struct device_attribute *attr, char *buf)
 {
 	struct exynos_context *platform = (struct exynos_context *)pkbdev->platform_context;
@@ -298,8 +291,6 @@ static ssize_t set_volt_table(struct device *dev, struct device_attribute *attr,
 	return count;
 }
 
-=======
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 static int gpu_get_dvfs_table(struct exynos_context *platform, char *buf, size_t buf_size)
 {
 	int i, cnt = 0;
@@ -501,7 +492,6 @@ static ssize_t set_governor(struct device *dev, struct device_attribute *attr, c
 	return count;
 }
 
-<<<<<<< HEAD
 static ssize_t show_gpu_custom_max_clock(struct device *dev, struct device_attribute *attr, char *buf)
 {
 	ssize_t ret = 0;
@@ -1008,8 +998,6 @@ static ssize_t set_gpu_tripping(struct device *dev, struct device_attribute *att
 	return count;
 }
 
-=======
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 static ssize_t show_max_lock_status(struct device *dev, struct device_attribute *attr, char *buf)
 {
 	ssize_t ret = 0;
@@ -2002,10 +1990,7 @@ DEVICE_ATTR(clock, S_IRUGO|S_IWUSR, show_clock, set_clock);
 DEVICE_ATTR(vol, S_IRUGO, show_vol, NULL);
 DEVICE_ATTR(power_state, S_IRUGO, show_power_state, NULL);
 DEVICE_ATTR(asv_table, S_IRUGO, show_asv_table, NULL);
-<<<<<<< HEAD
 DEVICE_ATTR(volt_table, S_IRUGO|S_IWUSR, show_volt_table, set_volt_table);
-=======
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 DEVICE_ATTR(dvfs_table, S_IRUGO, show_dvfs_table, NULL);
 DEVICE_ATTR(time_in_state, S_IRUGO|S_IWUSR, show_time_in_state, set_time_in_state);
 DEVICE_ATTR(utilization, S_IRUGO, show_utilization, NULL);
@@ -2023,7 +2008,6 @@ DEVICE_ATTR(highspeed_load, S_IRUGO|S_IWUSR, show_highspeed_load, set_highspeed_
 DEVICE_ATTR(highspeed_delay, S_IRUGO|S_IWUSR, show_highspeed_delay, set_highspeed_delay);
 DEVICE_ATTR(wakeup_lock, S_IRUGO|S_IWUSR, show_wakeup_lock, set_wakeup_lock);
 DEVICE_ATTR(polling_speed, S_IRUGO|S_IWUSR, show_polling_speed, set_polling_speed);
-<<<<<<< HEAD
 DEVICE_ATTR(max_clock, S_IRUGO|S_IWUSR, show_gpu_custom_max_clock, set_gpu_custom_max_clock);
 DEVICE_ATTR(min_clock, S_IRUGO|S_IWUSR, show_gpu_custom_min_clock, set_gpu_custom_min_clock);
 DEVICE_ATTR(throttling1, S_IRUGO|S_IWUSR, show_gpu_throttling1, set_gpu_throttling1);
@@ -2035,8 +2019,6 @@ DEVICE_ATTR(throttling6, S_IRUGO|S_IWUSR, show_gpu_throttling6, set_gpu_throttli
 DEVICE_ATTR(throttling7, S_IRUGO|S_IWUSR, show_gpu_throttling7, set_gpu_throttling7);
 DEVICE_ATTR(throttling8, S_IRUGO|S_IWUSR, show_gpu_throttling8, set_gpu_throttling8);
 DEVICE_ATTR(tripping, S_IRUGO|S_IWUSR, show_gpu_tripping, set_gpu_tripping);
-=======
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 DEVICE_ATTR(tmu, S_IRUGO|S_IWUSR, show_tmu, set_tmu_control);
 #ifdef CONFIG_CPU_THERMAL_IPA
 DEVICE_ATTR(norm_utilization, S_IRUGO, show_norm_utilization, NULL);
@@ -2081,14 +2063,11 @@ int gpu_create_sysfs_file(struct device *dev)
 		goto out;
 	}
 
-<<<<<<< HEAD
 	if (device_create_file(dev, &dev_attr_volt_table)) {
 		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "couldn't create sysfs file [volt_table]\n");
 		goto out;
 	}
 
-=======
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 	if (device_create_file(dev, &dev_attr_dvfs_table)) {
 		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "couldn't create sysfs file [dvfs_table]\n");
 		goto out;
@@ -2169,7 +2148,6 @@ int gpu_create_sysfs_file(struct device *dev)
 		goto out;
 	}
 
-<<<<<<< HEAD
 	if (device_create_file(dev, &dev_attr_max_clock)) {
 		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "couldn't create sysfs file [max_clock]\n");
 		goto out;
@@ -2225,8 +2203,6 @@ int gpu_create_sysfs_file(struct device *dev)
 		goto out;
 	}
 
-=======
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 	if (device_create_file(dev, &dev_attr_tmu)) {
 		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "couldn't create sysfs file [tmu]\n");
 		goto out;
@@ -2320,7 +2296,6 @@ void gpu_remove_sysfs_file(struct device *dev)
 	device_remove_file(dev, &dev_attr_highspeed_delay);
 	device_remove_file(dev, &dev_attr_wakeup_lock);
 	device_remove_file(dev, &dev_attr_polling_speed);
-<<<<<<< HEAD
 	device_remove_file(dev, &dev_attr_max_clock);
 	device_remove_file(dev, &dev_attr_min_clock);
 	device_remove_file(dev, &dev_attr_throttling1);
@@ -2332,8 +2307,6 @@ void gpu_remove_sysfs_file(struct device *dev)
 	device_remove_file(dev, &dev_attr_throttling7);
 	device_remove_file(dev, &dev_attr_throttling8);
 	device_remove_file(dev, &dev_attr_tripping);
-=======
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 	device_remove_file(dev, &dev_attr_tmu);
 #ifdef CONFIG_CPU_THERMAL_IPA
 	device_remove_file(dev, &dev_attr_norm_utilization);

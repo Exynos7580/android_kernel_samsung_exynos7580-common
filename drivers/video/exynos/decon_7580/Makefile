@@ -9,9 +9,6 @@ obj-$(CONFIG_EXYNOS_MIPI_DSI) += dsim.o
 dsim-y += dsim_drv.o dsim_reg_7580.o
 obj-$(CONFIG_EXYNOS_DECON_EXYNOS7580) += decon.o
 decon-y += decon_core.o decon-int_drv.o decon_helper.o decon_reg_7580.o decon_board.o
-<<<<<<< HEAD
 obj-$(CONFIG_EXYNOS_DECON_MDNIE_LITE) += decon_mdnie_control.o
-=======
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 obj-$(CONFIG_EXYNOS_DECON_DPU) += dpu_reg_7580.o
 obj-y += panels/

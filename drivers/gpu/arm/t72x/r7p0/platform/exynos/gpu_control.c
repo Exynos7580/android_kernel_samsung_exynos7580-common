@@ -18,33 +18,13 @@
 #include <mali_kbase.h>
 
 #include <linux/pm_qos.h>
-<<<<<<< HEAD
-=======
-#include <linux/cpufreq_kt.h>
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 #include <mach/pm_domains.h>
 
 #include "mali_kbase_platform.h"
 #include "gpu_dvfs_handler.h"
 #include "gpu_control.h"
 
-<<<<<<< HEAD
-#ifdef CONFIG_POWERSUSPEND
-#include <linux/powersuspend.h>
-
-unsigned int gpu_min_override = 160;
-unsigned int gpu_max_override = 800;
-unsigned int gpu_max_override_screen_off = 0;
-#endif
-
 static struct gpu_control_ops *ctr_ops;
-=======
-static struct gpu_control_ops *ctr_ops;
-
-unsigned int gpu_min_override = 266;
-unsigned int gpu_max_override = 772;
-unsigned int gpu_max_override_screen_off = 0;
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 
 #ifdef CONFIG_MALI_RT_PM
 static struct exynos_pm_domain *gpu_get_pm_domain(void)
@@ -131,21 +111,6 @@ int gpu_control_set_clock(struct kbase_device *kbdev, int clock)
 		return -ENODEV;
 	}
 
-<<<<<<< HEAD
-#ifdef CONFIG_POWERSUSPEND
-	if (clock < gpu_min_override)
-		clock = gpu_min_override;
-	if (!power_suspend_active || gpu_max_override_screen_off == 0) {
-		if (clock > gpu_max_override)
-			clock = gpu_max_override;
-	} else {
-		if (clock > gpu_max_override_screen_off)
-			clock = gpu_max_override_screen_off;
-	}
-#endif
-
-=======
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 	if (platform->dvs_is_enabled) {
 		GPU_LOG(DVFS_INFO, DUMMY, 0u, 0u,
 			"%s: can't set clock in the dvs mode (requested clock %d)\n", __func__, clock);
@@ -157,21 +122,6 @@ int gpu_control_set_clock(struct kbase_device *kbdev, int clock)
 		return -1;
 	}
 #endif
-<<<<<<< HEAD
-=======
-	if (clock < gpu_min_override)
-		clock = gpu_min_override;
-	if (screen_is_on || gpu_max_override_screen_off == 0)
-	{
-		if (clock > gpu_max_override)
-			clock = gpu_max_override;
-	}
-	else
-	{
-		if (clock > gpu_max_override_screen_off)
-			clock = gpu_max_override_screen_off;
-	}
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 
 	is_up = prev_clock < clock;
 

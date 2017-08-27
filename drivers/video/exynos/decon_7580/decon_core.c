@@ -49,10 +49,7 @@
 #include "decon_helper.h"
 #include "dpu_common.h"
 #include "regs-dpu.h"
-<<<<<<< HEAD
-=======
 #include "panels/dsim_panel.h"
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 
 #include "../../../staging/android/sw_sync.h"
 

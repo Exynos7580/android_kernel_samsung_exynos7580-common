@@ -110,7 +110,7 @@ static void mdnie_update_sequence(struct mdnie_info *mdnie, struct mdnie_table *
 	mdnie_write_table(mdnie, table);
 }
 
-void mdnie_update(struct mdnie_info *mdnie)
+static void mdnie_update(struct mdnie_info *mdnie)
 {
 	struct mdnie_table *table = NULL;
 	struct mdnie_scr_info *scr_info = mdnie->tune->scr_info;
@@ -561,7 +561,10 @@ static ssize_t sensorRGB_store(struct device *dev,
 	if (ret < 0)
 		return ret;
 
-	if (mdnie->enable) {
+	if (mdnie->enable && (mdnie->accessibility == ACCESSIBILITY_OFF)
+		&& (mdnie->mode == AUTO)
+		&& ((mdnie->scenario == BROWSER_MODE)
+		|| (mdnie->scenario == EBOOK_MODE))) {
 		dev_info(dev, "%s, white_r %d, white_g %d, white_b %d\n",
 			__func__, white_red, white_green, white_blue);
 
@@ -592,7 +595,6 @@ static ssize_t sensorRGB_store(struct device *dev,
 	return count;
 }
 
-<<<<<<< HEAD
 static ssize_t whiteRGB_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
@@ -647,19 +649,12 @@ static ssize_t whiteRGB_store(struct device *dev,
 	return count;
 }
 
-=======
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 static ssize_t mdnie_ldu_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
 	struct mdnie_info *mdnie = dev_get_drvdata(dev);
-<<<<<<< HEAD
-	return sprintf(buf, "%d %d %d\n", mdnie->white_r,
-		mdnie->white_g, mdnie->white_b);
-=======
 
 	return sprintf(buf, "%d %d %d\n", mdnie->white_r, mdnie->white_g, mdnie->white_b);
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 }
 
 static ssize_t mdnie_ldu_store(struct device *dev,
@@ -672,21 +667,12 @@ static ssize_t mdnie_ldu_store(struct device *dev,
 	int ret;
 	struct mdnie_scr_info *scr_info = mdnie->tune->scr_info;
 
-<<<<<<< HEAD
-	ret = sscanf(buf, "%d", &idx);
-	if (ret < 0)
-		return ret;
-
-	if((mdnie->tune->max_adjust_ldu != 0) && (mdnie->tune->adjust_ldu_table != NULL)){
-		if((idx >= 0) && (idx < mdnie->tune->max_adjust_ldu)){
-=======
 	ret = kstrtoint(buf, 10, &idx);
 	if (ret < 0)
 		return ret;
 
 	if ((mdnie->tune->max_adjust_ldu != 0) && (mdnie->tune->adjust_ldu_table != NULL)) {
 		if ((idx >= 0) && (idx < mdnie->tune->max_adjust_ldu)) {
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 			mutex_lock(&mdnie->lock);
 			for (mode = 0; mode < MODE_MAX; mode++) {
 				for (scenario = 0; scenario <= EMAIL_MODE; scenario++) {
@@ -750,10 +736,7 @@ static struct device_attribute mdnie_attributes[] = {
 	__ATTR(auto_brightness, 0664, auto_brightness_show, auto_brightness_store),
 	__ATTR(mdnie, 0444, mdnie_show, NULL),
 	__ATTR(sensorRGB, 0664, sensorRGB_show, sensorRGB_store),
-<<<<<<< HEAD
 	__ATTR(whiteRGB, 0664, whiteRGB_show, whiteRGB_store),
-=======
->>>>>>> edb1cb7... Merge with SM-A310F-MM
 	__ATTR(mdnie_ldu, 0664, mdnie_ldu_show, mdnie_ldu_store),
 #ifdef CONFIG_LCD_HMT
 	__ATTR(hmt_color_temperature, 0664, hmtColorTemp_show, hmtColorTemp_store),
