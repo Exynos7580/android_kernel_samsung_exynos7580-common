@@ -49,7 +49,8 @@ enum ACCESSIBILITY {
 enum HBM {
 	HBM_OFF,
 	HBM_ON,
-	HBM_MAX
+	HBM_ON_TEXT,
+	HBM_MAX,
 };
 
 enum hmt_mode {
@@ -59,7 +60,7 @@ enum hmt_mode {
 	HMT_4000K,
 	HMT_6400K,
 	HMT_7500K,
-	HMT_MDNIE_MAX
+	HMT_MDNIE_MAX,
 };
 
 struct mdnie_seq_info {
@@ -149,12 +150,12 @@ struct mdnie_info {
 	unsigned int white_rgb_enabled;
 	struct mdnie_table table_buffer;
 	mdnie_t sequence_buffer[256];
-	unsigned int coordinate[2];
+	u16 coordinate[2];
 };
 
 extern int mdnie_calibration(int *r);
 extern int mdnie_open_file(const char *path, char **fp);
-extern int mdnie_register(struct device *p, void *data, mdnie_w w, mdnie_r r, unsigned int *coordinate, struct mdnie_tune *tune);
+extern int mdnie_register(struct device *p, void *data, mdnie_w w, mdnie_r r, u16 *coordinate, struct mdnie_tune *tune);
 extern uintptr_t mdnie_request_table(char *path, struct mdnie_table *s);
 extern ssize_t attr_store_for_each(struct class *cls, const char *name, const char *buf, size_t size);
 extern struct class *get_mdnie_class(void);
