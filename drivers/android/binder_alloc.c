@@ -20,6 +20,7 @@
 #include <asm/cacheflush.h>
 #include <linux/list.h>
 #include <linux/mm.h>
+#include <linux/err.h>
 #include <linux/module.h>
 #include <linux/rtmutex.h>
 #include <linux/rbtree.h>
@@ -198,7 +199,7 @@ static int binder_update_page_range(struct binder_alloc *alloc, int allocate,
 		mm = get_task_mm(alloc->tsk);
 
 	if (mm) {
-		down_write(&mm->mmap_sem);
+		down_read(&mm->mmap_sem);
 		vma = alloc->vma;
 		if (vma && mm != alloc->vma_vm_mm) {
 			pr_err("%d: vma mm and task mm mismatch\n",
@@ -248,7 +249,7 @@ static int binder_update_page_range(struct binder_alloc *alloc, int allocate,
 		/* vm_insert_page does not seem to increment the refcount */
 	}
 	if (mm) {
-		up_write(&mm->mmap_sem);
+		up_read(&mm->mmap_sem);
 		mmput(mm);
 	}
 	return 0;
@@ -270,17 +271,18 @@ err_alloc_page_failed:
 	}
 err_no_vma:
 	if (mm) {
-		up_write(&mm->mmap_sem);
+		up_read(&mm->mmap_sem);
 		mmput(mm);
 	}
 	return vma ? -ENOMEM : -ESRCH;
 }
 
-struct binder_buffer *binder_alloc_new_buf_locked(struct binder_alloc *alloc,
-						  size_t data_size,
-						  size_t offsets_size,
-						  size_t extra_buffers_size,
-						  int is_async)
+static struct binder_buffer *binder_alloc_new_buf_locked(
+				struct binder_alloc *alloc,
+				size_t data_size,
+				size_t offsets_size,
+				size_t extra_buffers_size,
+				int is_async)
 {
 	struct rb_node *n = alloc->free_buffers.rb_node;
 	struct binder_buffer *buffer;
@@ -337,8 +339,36 @@ struct binder_buffer *binder_alloc_new_buf_locked(struct binder_alloc *alloc,
 		}
 	}
 	if (best_fit == NULL) {
+		size_t allocated_buffers = 0;
+		size_t largest_alloc_size = 0;
+		size_t total_alloc_size = 0;
+		size_t free_buffers = 0;
+		size_t largest_free_size = 0;
+		size_t total_free_size = 0;
+
+		for (n = rb_first(&alloc->allocated_buffers); n != NULL;
+		     n = rb_next(n)) {
+			buffer = rb_entry(n, struct binder_buffer, rb_node);
+			buffer_size = binder_alloc_buffer_size(alloc, buffer);
+			allocated_buffers++;
+			total_alloc_size += buffer_size;
+			if (buffer_size > largest_alloc_size)
+				largest_alloc_size = buffer_size;
+		}
+		for (n = rb_first(&alloc->free_buffers); n != NULL;
+		     n = rb_next(n)) {
+			buffer = rb_entry(n, struct binder_buffer, rb_node);
+			buffer_size = binder_alloc_buffer_size(alloc, buffer);
+			free_buffers++;
+			total_free_size += buffer_size;
+			if (buffer_size > largest_free_size)
+				largest_free_size = buffer_size;
+		}
 		pr_err("%d: binder_alloc_buf size %zd failed, no address space\n",
 			alloc->pid, size);
+		pr_err("allocated: %zd (num: %zd largest: %zd), free: %zd (num: %zd largest: %zd)\n",
+		       total_alloc_size, allocated_buffers, largest_alloc_size,
+		       total_free_size, free_buffers, largest_free_size);
 		return ERR_PTR(-ENOSPC);
 	}
 	if (n == NULL) {
@@ -580,7 +610,7 @@ int binder_alloc_mmap_handler(struct binder_alloc *alloc,
 		goto err_already_mapped;
 	}
 
-	area = get_vm_area(vma->vm_end - vma->vm_start, VM_IOREMAP);
+	area = get_vm_area(vma->vm_end - vma->vm_start, VM_ALLOC);
 	if (area == NULL) {
 		ret = -ENOMEM;
 		failure_string = "get_vm_area";
@@ -595,9 +625,9 @@ int binder_alloc_mmap_handler(struct binder_alloc *alloc,
 	if (cache_is_vipt_aliasing()) {
 		while (CACHE_COLOUR(
 				(vma->vm_start ^ (uint32_t)alloc->buffer))) {
-			pr_info("binder_mmap: %d %lx-%lx maps %pK bad alignment\n",
-				alloc->pid, vma->vm_start, vma->vm_end,
-				alloc->buffer);
+			pr_info("%s: %d %lx-%lx maps %pK bad alignment\n",
+				__func__, alloc->pid, vma->vm_start,
+				vma->vm_end, alloc->buffer);
 			vma->vm_start += PAGE_SIZE;
 		}
 	}
@@ -698,9 +728,10 @@ void binder_alloc_deferred_release(struct binder_alloc *alloc)
 static void print_binder_buffer(struct seq_file *m, const char *prefix,
 				struct binder_buffer *buffer)
 {
-	seq_printf(m, "%s %d: %pK size %zd:%zd %s\n",
+	seq_printf(m, "%s %d: %pK size %zd:%zd:%zd %s\n",
 		   prefix, buffer->debug_id, buffer->data,
 		   buffer->data_size, buffer->offsets_size,
+		   buffer->extra_buffers_size,
 		   buffer->transaction ? "active" : "delivered");
 }
 
@@ -770,4 +801,3 @@ void binder_alloc_init(struct binder_alloc *alloc)
 	alloc->pid = current->group_leader->pid;
 	mutex_init(&alloc->mutex);
 }
-
