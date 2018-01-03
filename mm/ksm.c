@@ -39,6 +39,13 @@
 #include <linux/numa.h>
 
 #include <asm/tlbflush.h>
+
+/* Support for xxhash and crc32c */
+#include <crypto/hash.h>
+#include <linux/crc32c.h>
+#include <linux/xxhash.h>
+#include <linux/sizes.h>
+
 #include "internal.h"
 
 #ifdef CONFIG_NUMA
@@ -263,6 +270,87 @@ static DEFINE_SPINLOCK(ksm_mmlist_lock);
 static inline int ksm_mode_always(void)
 {
 	return (ksm_mode == KSM_MODE_ALWAYS);
+}
+
+#define TIME_125MS  (HZ >> 3)
+#define PERF_TO_MBS(X) (X*PAGE_SIZE*(1 << 3)/(SZ_1M))
+
+#define HASH_NONE   0
+#define HASH_CRC32C 1
+#define HASH_XXHASH 2
+
+static int fastest_hash = HASH_NONE;
+
+static bool __init crc32c_available(void)
+{
+	static struct shash_desc desc;
+
+	desc.tfm = crypto_alloc_shash("crc32c", 0, 0);
+	desc.flags = 0;
+
+	if (IS_ERR(desc.tfm)) {
+		pr_warn("ksm: alloc crc32c shash error %ld\n",
+			-PTR_ERR(desc.tfm));
+		return false;
+	}
+
+	crypto_free_shash(desc.tfm);
+	return true;
+}
+
+static void __init choice_fastest_hash(void)
+{
+
+	unsigned long je;
+	unsigned long perf_crc32c = 0;
+	unsigned long perf_xxhash = 0;
+
+	fastest_hash = HASH_XXHASH;
+	if (!crc32c_available())
+		goto out;
+
+	preempt_disable();
+	je = jiffies + TIME_125MS;
+	while (time_before(jiffies, je)) {
+		crc32c(0, ZERO_PAGE(0), PAGE_SIZE);
+		perf_crc32c++;
+	}
+	preempt_enable();
+
+	preempt_disable();
+	je = jiffies + TIME_125MS;
+	while (time_before(jiffies, je)) {
+		xxhash(ZERO_PAGE(0), PAGE_SIZE, 0);
+		perf_xxhash++;
+	}
+	preempt_enable();
+
+	pr_info("ksm: crc32c hash() %5ld MB/s\n", PERF_TO_MBS(perf_crc32c));
+	pr_info("ksm: xxhash hash() %5ld MB/s\n", PERF_TO_MBS(perf_xxhash));
+
+	if (perf_crc32c > perf_xxhash)
+		fastest_hash = HASH_CRC32C;
+out:
+	if (fastest_hash == HASH_CRC32C)
+		pr_info("ksm: choice crc32c as hash function\n");
+	else
+		pr_info("ksm: choice xxhash as hash function\n");
+}
+
+static u32 fasthash(const void *input, size_t length)
+{
+again:
+	switch (fastest_hash) {
+	case HASH_CRC32C:
+		return crc32c(0, input, length);
+	case HASH_XXHASH:
+		return xxhash(input, length, 0);
+	default:
+		choice_fastest_hash();
+		/* The correct value depends on page size and endianness */
+		zero_checksum = fasthash(ZERO_PAGE(0), PAGE_SIZE);
+		goto again;
+	}
 }
 
 static int __init ksm_slab_init(void)
@@ -850,7 +938,7 @@ static u32 calc_checksum(struct page *page)
 {
 	u32 checksum;
 	void *addr = kmap_atomic(page);
-	checksum = jhash2(addr, PAGE_SIZE / 4, 17);
+	checksum = fasthash(addr, PAGE_SIZE);
 	kunmap_atomic(addr);
 	return checksum;
 }
@@ -2649,8 +2737,6 @@ static int __init ksm_init(void)
 	struct task_struct *ksm_thread;
 	int err;
 
-	/* The correct value depends on page size and endianness */
-	zero_checksum = calc_checksum(ZERO_PAGE(0));
 	/* Default to false for backwards compatibility */
 	ksm_use_zero_pages = false;
 
