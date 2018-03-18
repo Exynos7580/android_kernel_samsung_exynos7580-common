@@ -132,7 +132,7 @@ config BCM4335BT
 
 config BCMDHD_WIFI_PM
 	bool "Enable support for changing the WiFi power mode"
-	depends on BCM4343
+	depends on (BCM4330 || BCM4343 || BCM4334 || BCM4335 || BCM4339 || BCM4354 || BCM43241 || BCM43455 || BCM43454)
 	default y
 	---help---
 	Enable support for changing the WiFi power mode for screen-off.
