@@ -25,6 +25,18 @@
 	#address-cells = <2>;
 	#size-cells = <2>;
 
+	arm-pmu {
+		compatible = "arm,armv8-pmuv3";
+		interrupts = <0 34 4>,
+			     <0 35 4>,
+			     <0 36 4>,
+			     <0 37 4>,
+			     <0 50 4>,
+			     <0 51 4>,
+			     <0 52 4>,
+			     <0 53 4>;
+	};
+
 	aliases {
 		decon0 = &decon_0;
 		dsim0 = &dsim_0;
@@ -60,23 +72,24 @@
 		spi2 = &spi_2;
 	};
 
-	firmware: firmware {
-		android {
-			compatible = "android,firmware";
-			fstab {
-				compatible = "android,fstab";
-				system {
-					compatible = "android,system";
-					dev = "/dev/block/platform/13540000.dwmmc0/by-name/SYSTEM";
-					type = "ext4";
-					mnt_flags = "ro,noatime,errors=panic,noload,block_validity";
-					fsmgr_flags = "wait";
-					status = "ok";
-				};
+        firmware: firmware {
+                android {
+                        compatible = "android,firmware";
+                        fstab {
+                                compatible = "android,fstab";
+                                system {
+                                        compatible = "android,system";
+                                        dev = "/dev/block/platform/13540000.dwmmc0/by-name/SYSTEM";
+                                        type = "ext4";
+                                        mnt_flags = "ro,noatime,errors=panic,noload,block_validity";
+                                        fsmgr_flags = "wait";
+                                        status = "ok";
+                                };
 
-			};
-		};
-	};
+                        };
+                };
+        };
+
 
 	cpus {
 		#address-cells = <2>;
@@ -1129,24 +1142,18 @@
 			/* pclk: bus clock, aclk: DMA operation clock and SFR access */
 			"d_pclk_disp", "pclk_decon0", "mif_pll";
 
-		ip_ver = <4>;
+		ip_ver = <2>;
 		max_win = <7>;
 		n_sink_pad = <7>;
 		n_src_pad = <1>;
 		default_win = <0>;
 		trig_mode = <0>;	/* 0: hw trigger, 1: sw trigger */
 		dsi_mode = <0>;		/* 0: single dsi, 1: dual dsi */
-
-		status = "disabled";
+                psr_mode = <2>;         /* 0: video mode, 1: DP command mode, 2: MIPI command mode */
 
 		#address-cells = <2>;
 		#size-cells = <2>;
 		ranges;
-
-		cam-stat {
-			/* ISP_STATUS register */
-			reg = <0x0 0x10464144 0x0 0x4>;
-		};
 
 	};
 
