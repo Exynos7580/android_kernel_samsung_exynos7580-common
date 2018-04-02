@@ -39,8 +39,6 @@
 #endif
 #include <asm/cputime.h>
 
-#include "cpufreq_governor.h"
-
 #define CREATE_TRACE_POINTS
 #include <trace/events/cpufreq_cafactive.h>
 
@@ -80,10 +78,6 @@ static cpumask_t speedchange_cpumask;
 static spinlock_t speedchange_cpumask_lock;
 static struct mutex gov_lock;
 
-//static int set_window_count;
-//static int migration_register_count;
-//static struct mutex sched_lock;
-
 #ifdef CONFIG_POWERSUSPEND
 /* boolean for determining screen on/off state */
 static bool suspended = false;
@@ -94,13 +88,17 @@ static bool suspended = false;
 static unsigned int default_target_loads[] = {DEFAULT_TARGET_LOAD};
 
 #define DEFAULT_TIMER_RATE (20 * USEC_PER_MSEC)
+#ifdef CONFIG_POWERSUSPEND
 #define SCREEN_OFF_TIMER_RATE ((unsigned long)(60 * USEC_PER_MSEC))
+#endif
 #define DEFAULT_ABOVE_HISPEED_DELAY DEFAULT_TIMER_RATE
 static unsigned int default_above_hispeed_delay[] = {
 	DEFAULT_ABOVE_HISPEED_DELAY };
 
+#ifdef CONFIG_POWERSUSPEND
 #define DEFAULT_SCREEN_OFF_MAX 1000000
 static unsigned long screen_off_max = DEFAULT_SCREEN_OFF_MAX;
+#endif
 
 struct cpufreq_cafactive_tunables {
 	int usage_count;
@@ -123,7 +121,9 @@ struct cpufreq_cafactive_tunables {
 	 * The sample rate of the timer used to increase frequency
 	 */
 	unsigned long timer_rate;
+#ifdef CONFIG_POWERSUSPEND
 	unsigned long prev_timer_rate;
+#endif
 	/*
 	 * Wait this long before raising speed above hispeed, by default a
 	 * single timer interval.
@@ -185,15 +185,6 @@ static u64 round_to_nw_start(u64 jif,
 
 	return ret;
 }
-
-#if 0
-static inline int set_window_helper(
-			struct cpufreq_cafactive_tunables *tunables)
-{
-	return sched_set_window(round_to_nw_start(get_jiffies_64(), tunables),
-			 usecs_to_jiffies(tunables->timer_rate));
-}
-#endif
 
 static void cpufreq_cafactive_timer_resched(unsigned long cpu,
 					      bool slack_only)
@@ -439,6 +430,7 @@ static void __cpufreq_cafactive_timer(unsigned long data, bool is_notif)
 	now = update_load(data);
 	delta_time = (unsigned int)(now - pcpu->cputime_speedadj_timestamp);
 	cputime_speedadj = pcpu->cputime_speedadj;
+#ifdef CONFIG_POWERSUSPEND
 	if (suspended == false
 		&& tunables->timer_rate != tunables->prev_timer_rate)
 		tunables->timer_rate = tunables->prev_timer_rate;
@@ -449,6 +441,7 @@ static void __cpufreq_cafactive_timer(unsigned long data, bool is_notif)
 			= max(tunables->timer_rate,
 				SCREEN_OFF_TIMER_RATE);
 	}
+#endif
 	pcpu->last_evaluated_jiffy = get_jiffies_64();
 	spin_unlock_irqrestore(&pcpu->load_lock, flags);
 
@@ -664,10 +657,12 @@ static int cpufreq_cafactive_speedchange_task(void *data)
 				pjcpu = &per_cpu(cpuinfo, j);
 				pjcpu->floor_validate_time = fvt;
 			}
-			
-			if (suspended == true)
-				if (max_freq > screen_off_max) max_freq = screen_off_max;
 
+#ifdef CONFIG_POWERSUSPEND
+			if (suspended == true)
+				if (max_freq > screen_off_max)
+					max_freq = screen_off_max;
+#endif
 			if (max_freq != pcpu->policy->cur) {
 				__cpufreq_driver_target(pcpu->policy,
 							max_freq,
@@ -923,7 +918,7 @@ static ssize_t store_hispeed_freq(struct cpufreq_cafactive_tunables *tunables,
 	return count;
 }
 
-#define show_store_one_caf(file_name)					\
+#define show_store_one(file_name)					\
 static ssize_t show_##file_name(					\
 	struct cpufreq_cafactive_tunables *tunables, char *buf)	\
 {									\
@@ -942,8 +937,8 @@ static ssize_t store_##file_name(					\
 	tunables->file_name = val;					\
 	return count;							\
 }
-show_store_one_caf(max_freq_hysteresis);
-show_store_one_caf(align_windows);
+show_store_one(max_freq_hysteresis);
+show_store_one(align_windows);
 
 static ssize_t show_go_hispeed_load(struct cpufreq_cafactive_tunables
 		*tunables, char *buf)
@@ -1005,7 +1000,9 @@ static ssize_t store_timer_rate(struct cpufreq_cafactive_tunables *tunables,
 			val_round);
 
 	tunables->timer_rate = val_round;
+#ifdef CONFIG_POWERSUSPEND
 	tunables->prev_timer_rate = val_round;
+#endif
 	return count;
 }
 
@@ -1304,7 +1301,9 @@ static struct cpufreq_cafactive_tunables *alloc_tunable(
 	tunables->ntarget_loads = ARRAY_SIZE(default_target_loads);
 	tunables->min_sample_time = DEFAULT_MIN_SAMPLE_TIME;
 	tunables->timer_rate = DEFAULT_TIMER_RATE;
+#ifdef CONFIG_POWERSUSPEND
 	tunables->prev_timer_rate = DEFAULT_TIMER_RATE;
+#endif
 	tunables->boostpulse_duration_val = DEFAULT_MIN_SAMPLE_TIME;
 	tunables->timer_slack_val = DEFAULT_TIMER_SLACK;
 
@@ -1327,7 +1326,7 @@ static struct cpufreq_cafactive_tunables *restore_tunables(
 
 	return per_cpu(cpuinfo, cpu).cached_tunables;
 }
-	
+
 static int cpufreq_governor_cafactive(struct cpufreq_policy *policy,
 		unsigned int event)
 {
