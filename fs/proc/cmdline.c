@@ -50,6 +50,13 @@ static int __init proc_cmdline_init(void)
 #ifdef CONFIG_SECURITY_SELINUX_PERMISSIVE
 	proc_cmdline_set("androidboot.selinux", "permissive");
 #endif
+	proc_cmdline_set("androidboot.boot.veritymode", "enforcing");
+	proc_cmdline_set("androidboot.boot.verifiedbootstate", "green");
+	proc_cmdline_set("androidboot.boot.flash.locked", "1");
+	proc_cmdline_set("androidboot.boot.ddrinfo", "00000001");
+	proc_cmdline_set("androidboot.crypto.state", "encrypted");
+	proc_cmdline_set("androidboot.warranty_bit", "0");
+	proc_cmdline_set("androidboot.boot.warranty_bit", "0");
 
 	proc_create("cmdline", 0, NULL, &cmdline_proc_fops);
 	return 0;
