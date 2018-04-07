@@ -3195,7 +3195,7 @@ CONFIG_SEC_DEBUG=y
 #
 # BSP Feature
 #
-CONFIG_SEC_BSP=y
+# CONFIG_SEC_BSP is not set
 
 #
 # Samsung TN logging feature
@@ -3208,8 +3208,7 @@ CONFIG_SEC_DEBUG_LAST_KMSG=y
 #
 # Samsung TN Power Management Options
 #
-CONFIG_SEC_PM=y
-CONFIG_SEC_PM_DEBUG=y
+# CONFIG_SEC_PM is not set
 CONFIG_VNSWAP=y
 CONFIG_CLKDEV_LOOKUP=y
 CONFIG_HAVE_CLK_PREPARE=y

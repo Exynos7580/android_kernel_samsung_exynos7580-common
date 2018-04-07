@@ -3178,7 +3178,7 @@ CONFIG_SEC_DEBUG=y
 #
 # BSP Feature
 #
-CONFIG_SEC_BSP=y
+# CONFIG_SEC_BSP is not set
 
 #
 # Samsung TN logging feature
