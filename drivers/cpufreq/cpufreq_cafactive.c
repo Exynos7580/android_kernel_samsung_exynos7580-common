@@ -39,6 +39,8 @@
 #endif
 #include <asm/cputime.h>
 
+#include "cpu_load_metric.h"
+
 #define CREATE_TRACE_POINTS
 #include <trace/events/cpufreq_cafactive.h>
 
@@ -88,13 +90,13 @@ static bool suspended = false;
 static unsigned int default_target_loads[] = {DEFAULT_TARGET_LOAD};
 
 #define DEFAULT_TIMER_RATE (20 * USEC_PER_MSEC)
+
 #ifdef CONFIG_POWERSUSPEND
 #define SCREEN_OFF_TIMER_RATE ((unsigned long)(60 * USEC_PER_MSEC))
 #endif
 #define DEFAULT_ABOVE_HISPEED_DELAY DEFAULT_TIMER_RATE
 static unsigned int default_above_hispeed_delay[] = {
 	DEFAULT_ABOVE_HISPEED_DELAY };
-
 #ifdef CONFIG_POWERSUSPEND
 #define DEFAULT_SCREEN_OFF_MAX 1000000
 static unsigned long screen_off_max = DEFAULT_SCREEN_OFF_MAX;
@@ -397,6 +399,8 @@ static u64 update_load(int cpu)
 		active_time = delta_time - delta_idle;
 
 	pcpu->cputime_speedadj += active_time * pcpu->policy->cur;
+	
+	update_cpu_metric(cpu, now, delta_idle, delta_time, pcpu->policy);
 
 	pcpu->time_in_idle = now_idle;
 	pcpu->time_in_idle_timestamp = now;
@@ -424,6 +428,9 @@ static void __cpufreq_cafactive_timer(unsigned long data, bool is_notif)
 	if (!down_read_trylock(&pcpu->enable_sem))
 		return;
 	if (!pcpu->governor_enabled)
+		goto exit;
+
+	if (cpu_is_offline(data))
 		goto exit;
 
 	spin_lock_irqsave(&pcpu->load_lock, flags);
@@ -458,7 +465,7 @@ static void __cpufreq_cafactive_timer(unsigned long data, bool is_notif)
 					CPUFREQ_LOAD_CHANGE, &int_info);
 
 	spin_lock_irqsave(&pcpu->target_freq_lock, flags);
-	cpu_load = loadadjfreq / pcpu->policy->cur;
+	cpu_load = cpu_get_load(data);		// loadadjfreq / pcpu->policy->cur;
 	tunables->boosted = tunables->boost_val || now < tunables->boostpulse_endtime;
 
 #ifdef CONFIG_POWERSUSPEND
@@ -660,8 +667,7 @@ static int cpufreq_cafactive_speedchange_task(void *data)
 
 #ifdef CONFIG_POWERSUSPEND
 			if (suspended == true)
-				if (max_freq > screen_off_max)
-					max_freq = screen_off_max;
+				if (max_freq > screen_off_max) max_freq = screen_off_max;
 #endif
 			if (max_freq != pcpu->policy->cur) {
 				__cpufreq_driver_target(pcpu->policy,
