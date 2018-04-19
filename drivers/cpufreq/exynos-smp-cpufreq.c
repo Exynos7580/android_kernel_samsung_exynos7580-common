@@ -701,7 +701,7 @@ static int exynos_get_voltage_tolerance(struct device *cpu_dev)
 
 #ifndef CONFIG_EXYNOS7580_QUAD
 static int __cpuinit exynos_cpufreq_cpu_up_notifier(struct notifier_block *notifier,
-                                        unsigned long action, void *hcpu)
+					unsigned long action, void *hcpu)
 {
 	unsigned int cpu = (unsigned long)hcpu;
 	struct device *dev;
@@ -741,7 +741,7 @@ static int __cpuinit exynos_cpufreq_cpu_down_notifier(struct notifier_block *not
 			if (cluster == CL_ONE) {
 				cpumask_and(&mask, cpu_coregroup_mask(cpu), cpu_online_mask);
 				if (cpumask_weight(&mask) == 1)
-                pm_qos_update_request(&cluster_qos_max[CL_ONE], apll_freq[ARRAY_SIZE(apll_freq) - 1].freq / 1000);
+					pm_qos_update_request(&cluster_qos_max[CL_ONE], apll_freq[ARRAY_SIZE(apll_freq) - 1].freq / 1000);
 					//pm_qos_update_request(&cluster_qos_max[CL_ONE], apll_freq[ARRAY_SIZE(apll_freq) - 2].freq / 1000); //should be -1
 			}
 			break;
@@ -752,13 +752,13 @@ static int __cpuinit exynos_cpufreq_cpu_down_notifier(struct notifier_block *not
 }
 
 static struct notifier_block __refdata exynos_cpufreq_cpu_up_nb = {
-        .notifier_call = exynos_cpufreq_cpu_up_notifier,
-        .priority = INT_MIN,
+	.notifier_call = exynos_cpufreq_cpu_up_notifier,
+	.priority = INT_MIN,
 };
 
 static struct notifier_block __refdata exynos_cpufreq_cpu_down_nb = {
-        .notifier_call = exynos_cpufreq_cpu_down_notifier,
-        .priority = INT_MAX,
+	.notifier_call = exynos_cpufreq_cpu_down_notifier,
+	.priority = INT_MAX,
 };
 #endif
 
@@ -1012,7 +1012,7 @@ static ssize_t store_cpufreq_self_discharging(struct kobject *kobj, struct attri
 {
 	int input;
 	int i;
-  bool idleCtl = true;
+	bool idleCtl = true;
 
 	if (!sscanf(buf, "%d", &input))
 		return -EINVAL;
@@ -1044,17 +1044,17 @@ define_one_global_rw(cpufreq_self_discharging);
 #endif
 
 static struct attribute * g[] = {
-        &cpufreq_table.attr,
-        &cpufreq_min_limit.attr,
-        &cpufreq_max_limit.attr,
+	&cpufreq_table.attr,
+	&cpufreq_min_limit.attr,
+	&cpufreq_max_limit.attr,
 #ifdef CONFIG_SW_SELF_DISCHARGING
-        &cpufreq_self_discharging.attr,
+	&cpufreq_self_discharging.attr,
 #endif
-        NULL,
+	NULL,
 };
 
 static struct attribute_group attr_group = {
-        .attrs = g,
+	.attrs = g,
 };
 
 extern void (*disable_c3_idle)(bool disable);
@@ -1158,7 +1158,7 @@ static struct notifier_block exynos_min_cluster1_nb = {
 #endif
 
 static int exynos_max_cluster0_notifier(struct notifier_block *notifier,
-				       unsigned long val, void *v)
+					unsigned long val, void *v)
 {
 	struct cpufreq_policy *policy;
 	int ret;
@@ -1203,7 +1203,7 @@ out:
 
 #ifndef CONFIG_EXYNOS7580_QUAD
 static int exynos_max_cluster1_notifier(struct notifier_block *notifier,
-				       unsigned long val, void *v)
+					unsigned long val, void *v)
 {
 	struct cpufreq_policy *policy;
 	int ret;
@@ -1296,7 +1296,6 @@ static int exynos_smp_probe(struct platform_device *pdev)
 		pm_qos_add_request(&cluster_qos_max[CL_ONE], PM_QOS_CLUSTER1_FREQ_MAX, apll_freq[0].freq / 1000);
 		maxlock_freq = apll_freq[0].freq / 1000;
 #endif
-//	}
 
 	pm_qos_add_request(&cluster_qos_min[CL_ZERO], PM_QOS_CLUSTER0_FREQ_MIN, 0);
 #ifndef CONFIG_EXYNOS7580_QUAD
