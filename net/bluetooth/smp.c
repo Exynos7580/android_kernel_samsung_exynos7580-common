@@ -21,6 +21,7 @@
 */
 
 #include <linux/crypto.h>
+#include <crypto/algapi.h>
 #include <linux/scatterlist.h>
 #include <crypto/b128ops.h>
 
@@ -437,7 +438,7 @@ static void random_work(struct work_struct *work)
 
 	swap128(res, confirm);
 
-	if (memcmp(smp->pcnf, confirm, sizeof(smp->pcnf)) != 0) {
+	if (crypto_memneq(smp->pcnf, confirm, sizeof(smp->pcnf)) != 0) {
 		BT_ERR("Pairing failed (confirmation values mismatch)");
 		reason = SMP_CONFIRM_FAILED;
 		goto error;
