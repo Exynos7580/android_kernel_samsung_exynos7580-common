@@ -21,8 +21,8 @@
 */
 
 #include <linux/crypto.h>
-#include <crypto/algapi.h>
 #include <linux/scatterlist.h>
+#include <crypto/algapi.h>
 #include <crypto/b128ops.h>
 
 #include <net/bluetooth/bluetooth.h>
