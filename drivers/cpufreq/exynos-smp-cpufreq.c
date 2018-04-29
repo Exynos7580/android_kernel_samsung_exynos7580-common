@@ -122,8 +122,8 @@ static unsigned int exynos_bus_table[] = {
 	825000, /* 1.7GHz */
 	825000, /* 1.6GHz */
 	825000, /* 1.5GHz */
-	825000, /* 1.4GHz */
-	825000, /* 1.3GHz */
+	741000, /* 1.4GHz */
+	741000, /* 1.3GHz */
 	728000, /* 1.2GHz */
 	728000, /* 1.1GHz */
 	667000, /* 1.0GHz */
@@ -132,10 +132,10 @@ static unsigned int exynos_bus_table[] = {
 	416000, /* 700MHz */
 	416000, /* 600MHz */
 	416000, /* 500MHz */
-	0,	/* 400MHz */
-	0,	/* 300MHz */
-	0,	/* 200MHz */
-	0	/* 100MHz */
+	338000, /* 400MHz */
+	273000, /* 300MHz */
+	273000, /* 200MHz */
+	200000, /* 100MHz */
 };
 
 static unsigned int voltage_tolerance;	/* in percentage */
