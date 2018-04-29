@@ -29,8 +29,8 @@
 
 #include "cpu_load_metric.h"
 
-#define MIN_FREQ 200000
-#define MAX_FREQ 1600000
+#define MIN_FREQ 100000
+#define MAX_FREQ 1700000
 
 struct cpu_load
 {

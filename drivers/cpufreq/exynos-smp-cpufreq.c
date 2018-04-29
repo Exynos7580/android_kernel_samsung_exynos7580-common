@@ -52,8 +52,8 @@
 #define LIMIT_COLD_VOLTAGE	1350000
 #define MIN_COLD_VOLTAGE 	825000
 #define COLD_VOLT_OFFSET	37500
-#define USE_MAX_FREQ		1600000
-#define USE_MIN_FREQ		200000
+#define USE_MAX_FREQ		1700000
+#define USE_MIN_FREQ		100000
 
 #define APLL_FREQ(f, a0, a1, a2, a3, a4, a5, a6, b0, b1, m, p, s) \
 	{ \
@@ -98,7 +98,7 @@ static struct {
 	 * PLL M, P, S
 	 */
 	//APLL_FREQ(1800000, 0, 0, 7, 7, 2, 7, 3, 7, 7, 276, 4, 0),		// gives random reboots, probably caused by temp
-	//APLL_FREQ(1700000, 0, 0, 7, 7, 2, 7, 3, 7, 7, 262, 4, 0),		// we don't use it yet
+	APLL_FREQ(1700000, 0, 0, 7, 7, 2, 7, 3, 7, 7, 262, 4, 0),
 	APLL_FREQ(1600000, 0, 0, 7, 7, 2, 7, 3, 7, 7, 246, 4, 0),
 	APLL_FREQ(1500000, 0, 0, 7, 7, 2, 7, 3, 7, 7, 230, 4, 0),
 	APLL_FREQ(1400000, 0, 0, 7, 7, 2, 7, 3, 7, 7, 216, 4, 0),
@@ -114,12 +114,12 @@ static struct {
 	APLL_FREQ(400000,  0, 0, 7, 7, 2, 7, 3, 2, 7, 248, 4, 2),
 	APLL_FREQ(300000,  0, 0, 7, 7, 2, 7, 3, 1, 7, 368, 4, 3),
 	APLL_FREQ(200000,  0, 0, 7, 7, 2, 7, 3, 1, 7, 256, 4, 3),
-	//APLL_FREQ(100000,  0, 0, 7, 7, 2, 7, 3, 1, 7, 240, 4, 4),		// lags
+	APLL_FREQ(100000,  0, 0, 7, 7, 2, 7, 3, 1, 7, 240, 4, 4),
 };
 
 static unsigned int exynos_bus_table[] = {
 	//825000, /* 1.8GHz */
-	//825000, /* 1.7GHz */
+	825000, /* 1.7GHz */
 	825000, /* 1.6GHz */
 	825000, /* 1.5GHz */
 	825000, /* 1.4GHz */
@@ -135,7 +135,7 @@ static unsigned int exynos_bus_table[] = {
 	0,	/* 400MHz */
 	0,	/* 300MHz */
 	0,	/* 200MHz */
-	//0	/* 100MHz */
+	0	/* 100MHz */
 };
 
 static unsigned int voltage_tolerance;	/* in percentage */
