@@ -370,8 +370,13 @@ int __ref cpu_down(unsigned int cpu)
 {
 	int err;
 
+#if 0	// We will use only stay online CPU cores 0 and 4 at anytime instead of a whole cluster.
 	/* kthreads require one little-cluster CPU to stay online */
 	if (!cpu)
+		return -EINVAL;
+#endif
+	// AP: Keep CPU cores 0 and 4 always on
+	if ((cpu == 0) || (cpu == 4))
 		return -EINVAL;
 
 	cpu_maps_update_begin();
@@ -388,6 +393,26 @@ out:
 	return err;
 }
 EXPORT_SYMBOL(cpu_down);
+
+// this cpu down function also allows cpu cores 0 and 4 to be shut down
+int __ref cpu_down_nocheck(unsigned int cpu)
+{
+	int err;
+
+	cpu_maps_update_begin();
+
+	if (cpu_hotplug_disabled) {
+		err = -EBUSY;
+		goto out;
+	}
+
+	err = _cpu_down(cpu, 0);
+
+out:
+	cpu_maps_update_done();
+	return err;
+}
+EXPORT_SYMBOL(cpu_down_nocheck);
 #endif /*CONFIG_HOTPLUG_CPU*/
 
 /* Requires cpu_add_remove_lock to be held */
