@@ -1021,10 +1021,10 @@ static ssize_t store_cpufreq_self_discharging(struct kobject *kobj, struct attri
 	}
 	else {
 		self_discharging = 0;
-     idleCtl = false;
+	idleCtl = false;
 	}
 
-  cpu_idle_poll_ctrl(idleCtl);
+	cpu_idle_poll_ctrl(idleCtl);
 
 	/* Isla Quad(A53 quad) need cpufreq min limit */
 	for (i = 0; i < CL_END; i++) {

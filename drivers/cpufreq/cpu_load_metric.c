@@ -25,8 +25,6 @@
 
 #include <trace/events/power.h>
 
-#include <linux/powersuspend.h>
-
 #include "cpu_load_metric.h"
 
 #define MIN_FREQ 100000
