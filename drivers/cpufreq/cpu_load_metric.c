@@ -20,21 +20,29 @@
 #include <linux/kernel.h>
 #include <linux/percpu.h>
 #include <linux/types.h>
+#include <linux/tick.h>
+#include <linux/sched.h>
 
 #include <trace/events/power.h>
 
+#include <linux/powersuspend.h>
+
 #include "cpu_load_metric.h"
+
+#define MIN_FREQ 100000
+#define MAX_FREQ 1700000
 
 struct cpu_load
 {
 	unsigned int frequency;
 	unsigned int load;
-	u64 last_update;
+	u64 prev_idle_timestamp;
+	u64 prev_idle_time;
 };
 static DEFINE_PER_CPU(struct cpu_load, cpuload);
 
-void update_cpu_metric(int cpu, u64 now, u64 delta_idle, u64 delta_time,
-		       struct cpufreq_policy *policy)
+void update_cpu_metric_f(int cpu, u64 now, u64 delta_idle, u64 delta_time,
+				unsigned int freq)
 {
 	struct cpu_load *pcpuload = &per_cpu(cpuload, cpu);
 	unsigned int load;
@@ -47,14 +55,35 @@ void update_cpu_metric(int cpu, u64 now, u64 delta_idle, u64 delta_time,
 	if (delta_time <= delta_idle)
 		load = 0;
 	else
-		load = div64_u64((100 * (delta_time - delta_idle)), delta_time);
+		load = (unsigned int)(div64_u64((100 * (delta_time - delta_idle)), delta_time));
 
 	pcpuload->load = load;
-	pcpuload->frequency = policy->cur;
-	pcpuload->last_update = now;
+	pcpuload->frequency = freq;
+	pcpuload->prev_idle_timestamp = now;
 #ifdef CONFIG_CPU_THERMAL_IPA_DEBUG
-	trace_printk("cpu_load: cpu: %d freq: %u load: %u\n", cpu, policy->cur, load);
+	trace_printk("cpu_load: cpu: %d freq: %u load: %u\n", cpu, freq, load);
 #endif
+}
+
+void update_cpu_metric(int cpu, u64 now, u64 delta_idle, u64 delta_time,
+		       struct cpufreq_policy *policy)
+{
+	update_cpu_metric_f(cpu, now, delta_idle, delta_time, policy->cur);
+}
+
+u64 update_cpu_load_metric(int cpu)
+{
+	struct cpu_load *pcpuload = &per_cpu(cpuload, cpu);
+	u64 now, now_idle, delta_idle, delta_time;
+
+	now_idle = get_cpu_idle_time_us(cpu, &now);
+	delta_idle = now_idle - pcpuload->prev_idle_time;
+	delta_time = now - pcpuload->prev_idle_timestamp;
+
+	update_cpu_metric_f(cpu, now, delta_idle, delta_time, cpufreq_quick_get(cpu));
+
+	pcpuload->prev_idle_time = now_idle;
+	return now;
 }
 
 void cpu_load_metric_get(int *load, int *freq)
@@ -71,6 +100,72 @@ void cpu_load_metric_get(int *load, int *freq)
 
 	*load = _load;
 	*freq = _freq;
+}
+
+unsigned int cpu_get_load(int cpu)
+{
+	struct cpu_load *pcpuload = &per_cpu(cpuload, cpu);
+
+	return pcpuload->load;
+}
+
+unsigned int cpu_get_loadfreq(int cpu)
+{
+	unsigned int load, freq;
+	struct cpu_load *pcpuload = &per_cpu(cpuload, cpu);
+
+	load = pcpuload->load;
+	freq = pcpuload->frequency;
+	freq = (100 * (freq - MIN_FREQ)) / (MAX_FREQ - MIN_FREQ);
+	load = (load + freq) / 2;
+
+	return load;
+}
+
+unsigned int cpu_get_avg_load(void)
+{
+	unsigned int avg_load = 0, avg_freq = 0;
+	int cpu, online_cpus = 0;
+
+	for_each_online_cpu(cpu) {
+		struct cpu_load *pcpuload = &per_cpu(cpuload, cpu);
+
+		avg_load += pcpuload->load;
+		avg_freq += pcpuload->frequency - MIN_FREQ;
+		online_cpus++;
+	}
+
+	avg_freq = (100 * avg_freq) / (MAX_FREQ - MIN_FREQ);
+	avg_load = (avg_load + avg_freq) / (2 * online_cpus);
+
+	// we'll use a load over 100 to automatically hotplug in another cpu
+	//if (avg_load > 100)
+	//	avg_load = 100;
+
+	return avg_load;
+}
+
+int get_least_busy_cpu(unsigned int *load)
+{
+	int least_busy_cpu = 1, cpu, min_cpu = 1;
+	unsigned int least_busy_cpu_load = 100, curr_load;
+
+	for_each_online_cpu(cpu)
+	{
+		struct cpu_load *pcpuload = &per_cpu(cpuload, cpu);
+
+		curr_load = pcpuload->load;
+
+		if((cpu > min_cpu) && (curr_load <= least_busy_cpu_load))
+		{
+			least_busy_cpu_load = curr_load;
+			least_busy_cpu = cpu;
+		}
+	}
+
+	*load = least_busy_cpu_load;
+
+	return least_busy_cpu;
 }
 
 static void get_cluster_stat(struct cluster_stats *cl)
