@@ -39,7 +39,7 @@ do { \
 
 #define GPU_DVFS_TABLE_LIST_SIZE(X)  ARRAY_SIZE(X)
 
-#if defined(CONFIG_SOC_EXYNOS7580)
+#if defined(CONFIG_SOC_EXYNOS7580)  
 #define EXYNOS7580_REVISION_0       (0x0)
 #define EXYNOS7580_REVISION_0_1     (0x01)
 #define GPU_MAX_CLOCK_REVISION_0    800
@@ -429,6 +429,9 @@ void gpu_clock_disable(struct kbase_device *kbdev);
 
 bool balance_init(struct kbase_device *kbdev);
 int exynos_gpu_init_hw(void *dev);
+
+int gpu_get_utilization(void);
+int gpu_get_load(void);
 
 #ifdef CONFIG_MALI_DVFS_USER
 bool gpu_dvfs_process_job(void *pkatom);
