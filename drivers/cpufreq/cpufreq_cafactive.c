@@ -667,7 +667,8 @@ static int cpufreq_cafactive_speedchange_task(void *data)
 
 #ifdef CONFIG_POWERSUSPEND
 			if (suspended == true)
-				if (max_freq > screen_off_max) max_freq = screen_off_max;
+				if (max_freq > screen_off_max)
+					max_freq = screen_off_max;
 #endif
 			if (max_freq != pcpu->policy->cur) {
 				__cpufreq_driver_target(pcpu->policy,
