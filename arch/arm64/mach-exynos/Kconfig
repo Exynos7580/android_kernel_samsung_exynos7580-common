@@ -128,6 +128,12 @@ config EXYNOS7580_DYNAMIC_CLUSTER_HOTPLUG
 	help
 		Enable Dynamic CLUSTER Hotplug
 
+config HOTPLUG_BOOSTED
+	bool "Boost of Dynamic CLUSTER Hotplug support"
+	depends on EXYNOS7580_DYNAMIC_CLUSTER_HOTPLUG
+	help
+		Enable boost of Dynamic CLUSTER Hotplug
+
 config EXYNOS_CONTENT_PATH_PROTECTION
 	bool "Exynos Content Path Protection"
 	depends on ARM_TRUSTZONE

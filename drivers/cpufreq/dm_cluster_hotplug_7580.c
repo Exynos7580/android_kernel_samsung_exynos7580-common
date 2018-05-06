@@ -11,7 +11,9 @@
 #include <linux/powersuspend.h>
 #endif
 
-// #define HOTPLUG_BOOSTED
+#if defined(CONFIG_HOTPLUG_BOOSTED)
+#define HOTPLUG_BOOSTED
+#endif
 
 #if defined(HOTPLUG_BOOSTED)
 #include "cpu_load_metric.h"
@@ -309,17 +311,20 @@ static enum action select_up_down(void)
 	num_online = num_online_cpus();
 	
 #if defined(HOTPLUG_BOOSTED)
-	boosted = ((gpu_get_load() >= ctrl_hotplug.gpu_load_threshold) || (cpu_get_avg_load() >= ctrl_hotplug.cpu_load_threshold));
+	boosted = ((gpu_get_load() >= ctrl_hotplug.gpu_load_threshold)
+			|| (cpu_get_avg_load() >= ctrl_hotplug.cpu_load_threshold));
 #endif
 
-	if (((c1_freq <= down_freq) && (c0_freq <= down_freq)) && ((num_online * ctrl_hotplug.down_tasks) > nr)
+	if (((c1_freq <= down_freq) && (c0_freq <= down_freq))
+			&& ((num_online * ctrl_hotplug.down_tasks) > nr)
 #if defined(HOTPLUG_BOOSTED)
 			&& !boosted
 #endif
 			) {		// down_tasks / 4
 		atomic_inc(&freq_history[DOWN]);
 		atomic_set(&freq_history[UP], 0);
-	} else if (((c0_freq >= up_freq) || (c1_freq >= up_freq)) && ((num_online * ctrl_hotplug.up_tasks) < nr)
+	} else if (((c0_freq >= up_freq) && ((num_online * ctrl_hotplug.up_tasks) < nr))
+			|| ((c1_freq >= up_freq) && ((num_online * ctrl_hotplug.up_tasks) < nr))
 #if defined(HOTPLUG_BOOSTED)
 			|| boosted
 #endif
