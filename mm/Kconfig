@@ -305,6 +305,8 @@ config MMU_NOTIFIER
 config KSM
 	bool "Enable KSM for page merging"
 	depends on MMU
+	select XXHASH
+	select LIBCRC32C
 	help
 	  Enable Kernel Samepage Merging: KSM periodically scans those areas
 	  of an application's address space that an app has advised may be
@@ -318,7 +320,7 @@ config KSM
 
 config KSM_CHECK_PAGE
 	bool "Check page before scanning"
-	depends on KSM_LEGACY
+	depends on KSM
 	default n
 	help
 	  If enabled, this will check and skip if page is already scanned in
