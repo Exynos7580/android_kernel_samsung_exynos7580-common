@@ -248,10 +248,6 @@ static bool use_deferred_timer = true;
 static unsigned long ksm_run = KSM_RUN_STOP;
 static void wait_while_offlining(void);
 
-#define KSM_MODE_NORMAL 0
-#define KSM_MODE_ALWAYS	1
-static unsigned long ksm_mode = KSM_MODE_NORMAL;
-
 static DECLARE_WAIT_QUEUE_HEAD(ksm_thread_wait);
 static DEFINE_MUTEX(ksm_thread_mutex);
 static DEFINE_SPINLOCK(ksm_mmlist_lock);
@@ -259,11 +255,6 @@ static DEFINE_SPINLOCK(ksm_mmlist_lock);
 #define KSM_KMEM_CACHE(__struct, __flags) kmem_cache_create("ksm_"#__struct,\
 		sizeof(struct __struct), __alignof__(struct __struct),\
 		(__flags), NULL)
-
-static inline int ksm_mode_always(void)
-{
-	return (ksm_mode == KSM_MODE_ALWAYS);
-}
 
 static int __init ksm_slab_init(void)
 {
@@ -1818,91 +1809,17 @@ out:
 
 static int ksmd_should_run(void)
 {
-	return (ksm_run & KSM_RUN_MERGE) &&
-		(!list_empty(&ksm_mm_head.mm_list) || ksm_mode_always());
-}
-
-
-int ksm_enter(struct mm_struct *mm, unsigned long *vm_flags)
-{
-	int err;
-
-	if (*vm_flags & (VM_MERGEABLE | VM_SHARED  | VM_MAYSHARE   |
-			 VM_PFNMAP    | VM_IO      | VM_DONTEXPAND |
-			 VM_HUGETLB | VM_MIXEDMAP))
-		return 0;
-
-#ifdef VM_SAO
-	if (*vm_flags & VM_SAO)
-		return 0;
-#endif
-
-	if (!test_bit(MMF_VM_MERGEABLE, &mm->flags)) {
-		err = __ksm_enter(mm);
-		if (err)
-			return err;
-	}
-
-	*vm_flags |= VM_MERGEABLE;
-
-	return 0;
-}
-
-/*
- * Register all vmas for all processes in the system with KSM.
- * Note that every call to ksm_madvise, for a given vma, after the first
- * does nothing but set flags.
- */
-void ksm_import_task_vma(struct task_struct *task)
-{
-	struct vm_area_struct *vma;
-	struct mm_struct *mm;
-	int error;
-
-	mm = get_task_mm(task);
-	if (!mm)
-		return;
-	down_write(&mm->mmap_sem);
-	vma = mm->mmap;
-	while (vma) {
-		error = ksm_enter(vma->vm_mm, &vma->vm_flags);
-		vma = vma->vm_next;
-	}
-	up_write(&mm->mmap_sem);
-	mmput(mm);
-	return;
+	return (ksm_run & KSM_RUN_MERGE) && !list_empty(&ksm_mm_head.mm_list);
 }
 
 static int ksm_scan_thread(void *nothing)
 {
-	pid_t last_pid = 1;
-	pid_t curr_pid;
-	struct task_struct *task;
-
 	set_freezable();
 	set_user_nice(current, 5);
 
 	while (!kthread_should_stop()) {
 		mutex_lock(&ksm_thread_mutex);
 		wait_while_offlining();
-		if (ksm_mode_always()) {
-			/*
-			 * import one task's vma per run
-			 */
-			read_lock(&tasklist_lock);
-
-			for_each_process(task) {
-				curr_pid = task_pid_nr(task);
-				if (curr_pid == last_pid)
-					break;
-			}
-
-			task = next_task(task);
-			last_pid = task_pid_nr(task);
-
-			ksm_import_task_vma(task);
-			read_unlock(&tasklist_lock);
-		}
 		if (ksmd_should_run())
 			ksm_do_scan(ksm_thread_pages_to_scan);
 		mutex_unlock(&ksm_thread_mutex);
@@ -1932,9 +1849,26 @@ int ksm_madvise(struct vm_area_struct *vma, unsigned long start,
 
 	switch (advice) {
 	case MADV_MERGEABLE:
-		err = ksm_enter(mm, vm_flags);
-		if (err)
-			return err;
+		/*
+		 * Be somewhat over-protective for now!
+		 */
+		if (*vm_flags & (VM_MERGEABLE | VM_SHARED  | VM_MAYSHARE   |
+				 VM_PFNMAP    | VM_IO      | VM_DONTEXPAND |
+				 VM_HUGETLB | VM_MIXEDMAP))
+			return 0;		/* just ignore the advice */
+
+#ifdef VM_SAO
+		if (*vm_flags & VM_SAO)
+			return 0;
+#endif
+
+		if (!test_bit(MMF_VM_MERGEABLE, &mm->flags)) {
+			err = __ksm_enter(mm);
+			if (err)
+				return err;
+		}
+
+		*vm_flags |= VM_MERGEABLE;
 		break;
 
 	case MADV_UNMERGEABLE:
@@ -2398,36 +2332,6 @@ static ssize_t pages_to_scan_store(struct kobject *kobj,
 }
 KSM_ATTR(pages_to_scan);
 
-static ssize_t mode_show(struct kobject *kobj, struct kobj_attribute *attr,
-			char *buf)
-{
-	switch (ksm_mode) {
-		case KSM_MODE_NORMAL:
-			return sprintf(buf, "always [normal]\n");
-			break;
-		case KSM_MODE_ALWAYS:
-			return sprintf(buf, "[always] normal\n");
-			break;
-	}
-
-	return sprintf(buf, "always [normal]\n");
-}
-
-static ssize_t mode_store(struct kobject *kobj, struct kobj_attribute *attr,
-			 const char *buf, size_t count)
-{
-	if (!memcmp("always", buf, min(sizeof("always")-1, count))) {
-		ksm_mode = KSM_MODE_ALWAYS;
-		wake_up_interruptible(&ksm_thread_wait);
-	} else if (!memcmp("normal", buf, min(sizeof("normal")-1, count))) {
-		ksm_mode = KSM_MODE_NORMAL;
-	} else
-		return -EINVAL;
-
-	return count;
-}
-KSM_ATTR(mode);
-
 static ssize_t run_show(struct kobject *kobj, struct kobj_attribute *attr,
 			char *buf)
 {
@@ -2623,7 +2527,6 @@ KSM_ATTR_RO(full_scans);
 static struct attribute *ksm_attrs[] = {
 	&sleep_millisecs_attr.attr,
 	&pages_to_scan_attr.attr,
-	&mode_attr.attr,
 	&run_attr.attr,
 	&pages_shared_attr.attr,
 	&pages_sharing_attr.attr,
