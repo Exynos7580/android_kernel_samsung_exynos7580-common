@@ -26,7 +26,7 @@
 	#size-cells = <2>;
 
 	arm-pmu {
-		compatible = "arm,armv8-pmuv3";
+		compatible = "arm,cortex-a53-pmu";
 		interrupts = <0 34 4>,
 			     <0 35 4>,
 			     <0 36 4>,
