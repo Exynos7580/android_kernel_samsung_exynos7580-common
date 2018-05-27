@@ -314,16 +314,7 @@ void cpu_die(void)
 	 */
 	cpu_ops[cpu]->cpu_die(cpu);
 
-	/*
-	 * Do not return to the idle loop - jump back to the secondary
-	 * cpu initialisation.  There's some initialisation which needs
-	 * to be repeated to undo the effects of taking the CPU offline.
-	 */
-
-	asm volatile("mov       sp, %0\n"
-		     "mov       x29, #0\n"
-		     "b         secondary_start_kernel"
-		     : : "r" (task_stack_page(current) + THREAD_START_SP));
+	BUG();
 }
 #endif
 
