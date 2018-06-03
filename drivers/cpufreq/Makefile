@@ -108,3 +108,6 @@ obj-$(CONFIG_UNICORE32)			+= unicore2-cpufreq.o
 
 obj-$(CONFIG_LAZYPLUG)			+= lazyplug.o
 CFLAGS_lazyplug.o			+= -finline-functions -funroll-loops
+
+obj-$(CONFIG_ALUCARD_HOTPLUG)		+= alucard_hotplug.o
+CFLAGS_alucard_hotplug.o		+= -finline-functions -funroll-loops
