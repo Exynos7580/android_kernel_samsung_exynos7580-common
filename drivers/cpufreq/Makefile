@@ -111,3 +111,9 @@ CFLAGS_lazyplug.o			+= -finline-functions -funroll-loops
 
 obj-$(CONFIG_ALUCARD_HOTPLUG)		+= alucard_hotplug.o
 CFLAGS_alucard_hotplug.o		+= -finline-functions -funroll-loops
+
+obj-$(CONFIG_INTELLI_PLUG)		+= intelli_plug.o
+CFLAGS_intelli_hotplug.o		+= -finline-functions -funroll-loops
+
+obj-$(CONFIG_ASMP)			+= autosmp.o
+CFLAGS_autosmp.o			+= -finline-functions -funroll-loops

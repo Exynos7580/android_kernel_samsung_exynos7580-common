@@ -149,6 +149,9 @@ void start_bandwidth_timer(struct hrtimer *period_timer, ktime_t period)
 
 DEFINE_MUTEX(sched_domains_mutex);
 DEFINE_PER_CPU_SHARED_ALIGNED(struct rq, runqueues);
+#ifdef CONFIG_INTELLI_PLUG
+DEFINE_PER_CPU_SHARED_ALIGNED(struct nr_stats_s, runqueue_stats);
+#endif
 
 static void update_rq_clock_task(struct rq *rq, s64 delta);
 
