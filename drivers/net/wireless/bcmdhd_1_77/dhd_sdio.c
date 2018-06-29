@@ -9822,7 +9822,6 @@ static int concate_revision_bcm4350(dhd_bus_t *bus, char *fw_path, char *nv_path
 
 static int concate_revision_bcm4354(dhd_bus_t *bus, char *fw_path, char *nv_path)
 {
-	uint32 chip_ver;
 #if defined(SUPPORT_MULTIPLE_CHIPS)
 	char chipver_tag[10] = "_4354";
 #else
@@ -9831,15 +9830,14 @@ static int concate_revision_bcm4354(dhd_bus_t *bus, char *fw_path, char *nv_path
 #endif /* !CUSTOMER_HW4 */
 #endif /* SUPPORT_MULTIPLE_CHIPS */
 
-	chip_ver = bus->sih->chiprev;
 #if !defined(SUPPORT_MULTIPLE_CHIPS) && defined(CUSTOMER_HW4)
-	DHD_INFO(("----- CHIP 4354, ver=%x -----\n", chip_ver));
+	DHD_INFO(("----- CHIP 4354, ver=%x -----\n", bus->sih->chiprev));
 #else
-	if (chip_ver == 1) {
+	if (bus->sih->chiprev == 1) {
 		DHD_ERROR(("----- CHIP 4354 A1 -----\n"));
 		strcat(chipver_tag, "_a1");
 	} else {
-		DHD_ERROR(("----- Unknown chip version, ver=%x -----\n", chip_ver));
+		DHD_ERROR(("----- Unknown chip version, ver=%x -----\n", bus->sih->chiprev));
 	}
 
 	strcat(fw_path, chipver_tag);

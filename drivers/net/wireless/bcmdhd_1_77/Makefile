@@ -63,7 +63,7 @@ endif
 	DHDCFLAGS += -DPROP_TXSTATUS -DLIMIT_BORROW
 	DHDCFLAGS += -DSUPPORT_P2P_GO_PS
 	# Debug for DPC Thread watchdog bark
-	DHDCFLAGS += -DDEBUG_DPC_THREAD_WATCHDOG
+	# DHDCFLAGS += -DDEBUG_DPC_THREAD_WATCHDOG
 	# KSO Attempts count
 	DHDCFLAGS += -DCUSTOM_MAX_KSO_ATTEMPTS=64
 endif
@@ -1186,9 +1186,10 @@ DHDCFLAGS += -include "dhd_sec_feature.h"
 # Others
 #########
 
-#EXTRA_LDFLAGS += --strip-debug
+EXTRA_LDFLAGS += --strip-debug
 
-EXTRA_CFLAGS += $(DHDCFLAGS) -DDHD_DEBUG
+#EXTRA_CFLAGS += $(DHDCFLAGS) -DDHD_DEBUG
+EXTRA_CFLAGS += $(DHDCFLAGS)
 EXTRA_CFLAGS += -DSRCBASE=\"$(src)\"
 EXTRA_CFLAGS += -I$(src)/include/ -I$(src)/
 EXTRA_CFLAGS += $(call cc-option, -Wunused-but-set-variable)
