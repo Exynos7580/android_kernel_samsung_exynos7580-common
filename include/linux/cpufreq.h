@@ -434,6 +434,9 @@ extern struct cpufreq_governor cpufreq_gov_cultivation;
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_NEXUS)
 extern struct cpufreq_governor cpufreq_gov_nexus;
 #define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_nexus)
+#elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_BIOSHOCK)
+extern struct cpufreq_governor cpufreq_gov_bioshock;
+#define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_bioshock)
 #endif
 
 
