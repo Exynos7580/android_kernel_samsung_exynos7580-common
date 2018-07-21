@@ -197,6 +197,12 @@ ARCH		?=arm64
 #CROSS_COMPILE	?=/android/RR/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-
 CROSS_COMPILE   ?=/home/alexax/build/toolchain/gcc-linaro-4.9-2016.02-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
 
+ifeq ($(shell uname -s),Linux)
+  ifeq ($(shell uname -m),x86_64)
+    override CROSS_COMPILE	:= /home/alexax/build/toolchain/aarch64-cortex_a53-linux-gnueabi-6.3.0/bin/aarch64-cortex_a53-linux-gnueabi-
+  endif
+endif
+
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
 SRCARCH 	:= $(ARCH)
@@ -349,9 +355,9 @@ endif
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-CFLAGS_MODULE   =
-AFLAGS_MODULE   =
-LDFLAGS_MODULE  =
+CFLAGS_MODULE	=
+AFLAGS_MODULE	=
+LDFLAGS_MODULE	=
 CFLAGS_KERNEL	=
 AFLAGS_KERNEL	=
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
@@ -367,7 +373,7 @@ USERINCLUDE    := \
 
 # Use LINUXINCLUDE when you must reference the include/ directory.
 # Needed to be compatible with the O= option
-LINUXINCLUDE    := \
+LINUXINCLUDE   := \
 		-I$(srctree)/arch/$(hdr-arch)/include \
 		-Iarch/$(hdr-arch)/include/generated \
 		$(if $(KBUILD_SRC), -I$(srctree)/include) \
@@ -376,19 +382,40 @@ LINUXINCLUDE    := \
 
 KBUILD_CPPFLAGS := -D__KERNEL__
 
-KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
-		   -fno-strict-aliasing -fno-common \
-		   -Werror-implicit-function-declaration \
-		   -Wno-format-security \
-		   -fno-delete-null-pointer-checks \
-		   -fdiagnostics-show-option -Werror \
-		   -std=gnu89
+# Warnings
+KBUILD_CFLAGS := -Wall -Wundef \
+		 -Wstrict-prototypes \
+		 -Wno-trigraphs \
+		 -Werror-implicit-function-declaration \
+		 -Wno-format-security \
 
-KBUILD_CFLAGS   += -mcpu=cortex-a53
+# Flags
+KBUILD_CFLAGS += -fno-strict-aliasing \
+		 -fno-common \
+		 -fno-delete-null-pointer-checks \
+		 -fdiagnostics-show-option -Werror \
+		 -std=gnu89 \
+		 -mcpu=cortex-a53 \
 
-KBUILD_AFLAGS_KERNEL :=
-KBUILD_CFLAGS_KERNEL :=
-KBUILD_AFLAGS   := -D__ASSEMBLY__
+# Linaro
+KBUILD_CFLAGS += -Wno-array-bounds \
+		 -Wno-bool-operation \
+		 -Wno-discarded-array-qualifiers \
+		 -Wno-int-in-bool-context \
+		 -Wno-format-overflow \
+		 -Wno-format-truncation \
+		 -Wno-logical-not-parentheses \
+		 -Wno-memset-elt-size \
+		 -Wno-misleading-indentation \
+		 -Wno-nonnull \
+		 -Wno-switch-unreachable \
+		 -Wno-switch-bool \
+		 -Wno-tautological-compare \
+		 -Wno-unused-const-variable
+
+KBUILD_AFLAGS_KERNEL  :=
+KBUILD_CFLAGS_KERNEL  :=
+KBUILD_AFLAGS         := -D__ASSEMBLY__
 KBUILD_AFLAGS_MODULE  := -DMODULE
 KBUILD_CFLAGS_MODULE  := -DMODULE
 KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
