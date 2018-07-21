@@ -395,7 +395,7 @@ KBUILD_CFLAGS += -fno-strict-aliasing \
 		 -fno-delete-null-pointer-checks \
 		 -fdiagnostics-show-option -Werror \
 		 -std=gnu89 \
-		 -mcpu=cortex-a53 \
+		 -mcpu=cortex-a53
 
 # Linaro
 KBUILD_CFLAGS += -Wno-array-bounds \
