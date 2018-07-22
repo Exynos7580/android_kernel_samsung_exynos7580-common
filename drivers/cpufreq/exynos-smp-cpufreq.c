@@ -392,16 +392,15 @@ static int exynos_cpufreq_scale(struct cpufreq_policy *policy,
 	}
 
 	volt = opp_get_voltage(opp);
-	if ((freqs.new > freqs.old) && !safe_volt) {
+	if ((freqs.new > freqs.old) && !safe_volt)
 		ret = exynos_regulator_set_voltage(cur_cluster, volt);
-	} else if (safe_volt) {
+	else if (safe_volt)
 		ret = exynos_regulator_set_voltage(cur_cluster, safe_volt);
-   }
 
-   if (ret) {
+	if (ret) {
 		 pr_err("failed to scale voltage up : %d\n", ret);
 		 goto out;
-   }
+	}
 
 	set_match_abb(cur_cluster, get_match_abb(cur_cluster, freqs.new * 1000));
 
@@ -945,7 +944,7 @@ static ssize_t store_cpufreq_min_limit(struct kobject *kobj, struct attribute *a
 			      const char *buf, size_t n)
 {
 	int i;
-  int freq;
+	int freq;
 
 	if (sscanf(buf, "%d", &freq) != 1)
 		return -EINVAL;
