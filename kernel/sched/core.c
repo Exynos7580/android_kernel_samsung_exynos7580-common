@@ -4869,7 +4869,6 @@ void show_state_filter(unsigned long state_filter)
 	touch_all_softlockup_watchdogs();
 
 	sysrq_sched_debug_show();
-#endif
 	rcu_read_unlock();
 	/*
 	 * Only show locks if all tasks are dumped:
