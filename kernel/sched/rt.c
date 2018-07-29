@@ -853,7 +853,8 @@ static int sched_rt_runtime_exceeded(struct rt_rq *rt_rq)
 
 			if (!once) {
 				once = true;
-				printk_deferred("sched: RT throttling activated\n");
+				printk_deferred("sched: RT throttling activated on %s(%d)\n",
+							current->comm, current->pid);
 			}
 		} else {
 			/*
