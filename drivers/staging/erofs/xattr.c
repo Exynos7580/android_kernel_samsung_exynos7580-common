@@ -289,8 +289,8 @@ static int inline_getxattr(struct inode *inode, struct getxattr_iter *it)
 
 	remaining = ret;
 	while (remaining) {
-		if ((ret = xattr_foreach(&it->it,
-			&find_xattr_handlers, &remaining)) >= 0)
+		ret = xattr_foreach(&it->it, &find_xattr_handlers, &remaining);
+		if (ret >= 0)
 			break;
 	}
 	xattr_iter_end(&it->it, true);
@@ -322,8 +322,8 @@ static int shared_getxattr(struct inode *inode, struct getxattr_iter *it)
 			it->it.blkaddr = blkaddr;
 		}
 
-		if ((ret = xattr_foreach(&it->it,
-			&find_xattr_handlers, NULL)) >= 0)
+		ret = xattr_foreach(&it->it, &find_xattr_handlers, NULL);
+		if (ret >= 0)
 			break;
 	}
 	if (vi->xattr_shared_count)
@@ -612,8 +612,8 @@ static int inline_listxattr(struct listxattr_iter *it)
 
 	remaining = ret;
 	while (remaining) {
-		if ((ret = xattr_foreach(&it->it,
-			&list_xattr_handlers, &remaining)) < 0)
+		ret = xattr_foreach(&it->it, &list_xattr_handlers, &remaining);
+		if (ret < 0)
 			break;
 	}
 	xattr_iter_end(&it->it, true);
@@ -644,8 +644,8 @@ static int shared_listxattr(struct listxattr_iter *it)
 			it->it.blkaddr = blkaddr;
 		}
 
-		if ((ret = xattr_foreach(&it->it,
-			&list_xattr_handlers, NULL)) < 0)
+		ret = xattr_foreach(&it->it, &list_xattr_handlers, NULL);
+		if (ret < 0)
 			break;
 	}
 	if (vi->xattr_shared_count)
