@@ -90,17 +90,8 @@ SECTIONS
 	}
 
 	PERCPU_SECTION(64)
-	__init_end = .;
 
-	. = ALIGN(4);
-	.altinstructions : {
-		__alt_instructions = .;
-		*(.altinstructions)
-		__alt_instructions_end = .;
-	}
-	.altinstr_replacement : {
-		*(.altinstr_replacement)
-	}
+	__init_end = .;
 
 	. = ALIGN(PAGE_SIZE);
 	_data = .;

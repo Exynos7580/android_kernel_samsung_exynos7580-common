@@ -38,7 +38,6 @@
 #include <asm/setup.h>
 #include <asm/sizes.h>
 #include <asm/tlb.h>
-#include <asm/alternative.h>
 
 #include "mm.h"
 
@@ -395,7 +394,6 @@ void free_initmem(void)
 {
 	poison_init_mem(__init_begin, __init_end - __init_begin);
 	free_initmem_default(0);
-	free_alternatives_memory();
 }
 
 #ifdef CONFIG_BLK_DEV_INITRD
