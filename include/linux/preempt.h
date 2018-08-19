@@ -10,6 +10,12 @@
 #include <linux/linkage.h>
 #include <linux/list.h>
 
+#ifdef CONFIG_PREEMPT_COUNT
+# define preemptible()  (preempt_count() == 0 && !irqs_disabled())
+#else
+# define preemptible()  0
+#endif
+
 #if defined(CONFIG_DEBUG_PREEMPT) || defined(CONFIG_PREEMPT_TRACER)
   extern void add_preempt_count(int val);
   extern void sub_preempt_count(int val);
