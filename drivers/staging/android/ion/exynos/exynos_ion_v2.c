@@ -293,8 +293,8 @@ static int __init exynos_ion_reserved_mem_setup(struct reserved_mem *rmem)
 {
 	struct exynos_ion_platform_heap *pdata;
 	struct ion_platform_heap *heap_data;
-	unsigned long len = 0;
-	__be32 *prop;
+	int len = 0;
+	const __be32 *prop;
 
 	BUG_ON(nr_heaps >= ION_NUM_HEAPS);
 
