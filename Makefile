@@ -199,7 +199,7 @@ CROSS_COMPILE   ?=/home/alexax/build/toolchain/gcc-linaro-4.9-2016.02-x86_64_aar
 
 ifeq ($(shell uname -s),Linux)
   ifeq ($(shell uname -m),x86_64)
-    override CROSS_COMPILE	:= /home/alexax/build/toolchain/aarch64-cortex_a53-linux-gnueabi-6.3.0/bin/aarch64-cortex_a53-linux-gnueabi-
+    override CROSS_COMPILE	:= /home/alexax/build/toolchain/aarch64-cortex_a53-linux-gnueabi-6.4.1/bin/aarch64-cortex_a53-linux-gnueabi-
   endif
 endif
 
