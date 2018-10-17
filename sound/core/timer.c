@@ -926,11 +926,10 @@ static int snd_timer_dev_register(struct snd_device *dev)
 	return 0;
 }
 
-
 /* just for reference in snd_timer_dev_disconnect() below */
 static void snd_timer_user_ccallback(struct snd_timer_instance *timeri,
-				    int event, struct timespec *tstamp,
-				    unsigned long resolution);
+				     int event, struct timespec *tstamp,
+				     unsigned long resolution);
 
 static int snd_timer_dev_disconnect(struct snd_device *device)
 {
@@ -1122,7 +1121,7 @@ static void snd_timer_proc_read(struct snd_info_entry *entry,
 	mutex_lock(&register_mutex);
 	list_for_each_entry(timer, &snd_timer_list, device_list) {
 		if (timer->card && timer->card->shutdown)
-			    continue;
+			continue;
 		switch (timer->tmr_class) {
 		case SNDRV_TIMER_CLASS_GLOBAL:
 			snd_iprintf(buffer, "G%i: ", timer->tmr_device);
@@ -1247,6 +1246,7 @@ static void snd_timer_user_ccallback(struct snd_timer_instance *timeri,
 		tu->tstamp = *tstamp;
 	if ((tu->filter & (1 << event)) == 0 || !tu->tread)
 		return;
+	memset(&r1, 0, sizeof(r1));
 	r1.event = event;
 	r1.tstamp = *tstamp;
 	r1.val = resolution;
@@ -1606,6 +1606,7 @@ static int snd_timer_user_tselect(struct file *file,
 	if (err < 0)
 		goto __err;
 
+	tu->qhead = tu->qtail = tu->qused = 0;
 	kfree(tu->queue);
 	tu->queue = NULL;
 	kfree(tu->tqueue);
@@ -1700,6 +1701,7 @@ static int snd_timer_user_params(struct file *file,
 			err = -EINVAL;
 			goto _end;
 		}
+
 	}
 	if (params.queue_size > 0 &&
 	    (params.queue_size < 32 || params.queue_size > 1024)) {
@@ -1965,6 +1967,7 @@ static ssize_t snd_timer_user_read(struct file *file, char __user *buffer,
 			spin_lock_irq(&tu->qlock);
 
 			remove_wait_queue(&tu->qchange_sleep, &wait);
+
 			if (tu->disconnected) {
 				err = -ENODEV;
 				break;
