@@ -535,6 +535,10 @@ config ZSWAP_LZ4
 	depends on CRYPTO_LZ4
 	bool "lz4"
 
+config ZSWAP_ZSTD
+	depends on CRYPTO_ZSTD
+	bool "zstd"
+
 endchoice
 
 config ZPOOL
