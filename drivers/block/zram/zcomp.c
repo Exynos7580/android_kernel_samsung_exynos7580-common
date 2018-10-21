@@ -51,6 +51,17 @@ static struct zcomp_backend *backends[] = {
 	NULL
 };
 
+static struct zcomp_backend *find_backend(const char *compress)
+{
+	int i = 0;
+	while (backends[i]) {
+		if (sysfs_streq(compress, backends[i]->name))
+			break;
+		i++;
+	}
+	return backends[i];
+}
+
 static void zcomp_strm_free(struct zcomp *comp, struct zcomp_strm *zstrm)
 {
 	if (zstrm->private)
@@ -256,52 +267,28 @@ static int zcomp_strm_single_create(struct zcomp *comp)
 	return 0;
 }
 
-bool zcomp_available_algorithm(const char *comp)
-{
-	int i = 0;
-	while (backends[i]) {
-		if (sysfs_streq(comp, backends[i]))
-			return true;
-		i++;
-	}
-	/*
-	 * Crypto does not ignore a trailing new line symbol,
-	 * so make sure you don't supply a string containing
-	 * one.
-	 * This also means that we permit zcomp initialisation
-	 * with any compressing algorithm known to crypto api.
-	 */
-	return crypto_has_comp(comp, 0, 0) == 1;
-}
-
 /* show available compressors */
 ssize_t zcomp_available_show(const char *comp, char *buf)
 {
-	bool known_algorithm = false;
 	ssize_t sz = 0;
 	int i = 0;
 
-	for (; backends[i]; i++) {
-		if (!strcmp(comp, backends[i])) {
-			known_algorithm = true;
+	while (backends[i]) {
+		if (sysfs_streq(comp, backends[i]->name))
 			sz += scnprintf(buf + sz, PAGE_SIZE - sz - 2,
 					"[%s] ", backends[i]->name);
-		} else {
+		else
 			sz += scnprintf(buf + sz, PAGE_SIZE - sz - 2,
 					"%s ", backends[i]->name);
-		}
+		i++;
 	}
-
-	/*
-	 * Out-of-tree module known to crypto api or a missing
-	 * entry in `backends'.
-	 */
-	if (!known_algorithm && crypto_has_comp(comp, 0, 0) == 1)
-		sz += scnprintf(buf + sz, PAGE_SIZE - sz - 2,
-				"[%s] ", comp);
-
 	sz += scnprintf(buf + sz, PAGE_SIZE - sz, "\n");
 	return sz;
+}
+
+bool zcomp_set_max_streams(struct zcomp *comp, int num_strm)
+{
+	return comp->set_max_streams(comp, num_strm);
 }
 
 struct zcomp_strm *zcomp_strm_find(struct zcomp *comp)
@@ -344,16 +331,18 @@ void zcomp_destroy(struct zcomp *comp)
 struct zcomp *zcomp_create(const char *compress, int max_strm)
 {
 	struct zcomp *comp;
+	struct zcomp_backend *backend;
 	int error;
 
-	if (!zcomp_available_algorithm(compress))
+	backend = find_backend(compress);
+	if (!backend)
 		return ERR_PTR(-EINVAL);
 
 	comp = kzalloc(sizeof(struct zcomp), GFP_KERNEL);
 	if (!comp)
 		return ERR_PTR(-ENOMEM);
 
-	comp->backend = compress;
+	comp->backend = backend;
 	if (max_strm > 1)
 		error = zcomp_strm_multi_create(comp, max_strm);
 	else
