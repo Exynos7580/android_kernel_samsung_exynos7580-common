@@ -682,6 +682,7 @@ int vnswap_bvec_read(struct vnswap *vnswap, struct bio_vec *bvec,
 	struct page *page;
 	unsigned char *user_mem, *swap_header_page_mem;
 	int nand_offset = 0, ret = 0;
+	unsigned long flags;
 
 	page = bvec->bv_page;
 
@@ -696,7 +697,7 @@ int vnswap_bvec_read(struct vnswap *vnswap, struct bio_vec *bvec,
 		return 0;
 	}
 
-	spin_lock(&vnswap_table_lock);
+	spin_lock_irqsave(&vnswap_table_lock, flags);
 	nand_offset = vnswap_table[index];
 	if (nand_offset == -1) {
 		pr_err("%s %d: vnswap_table is not mapped. " \
@@ -705,10 +706,10 @@ int vnswap_bvec_read(struct vnswap *vnswap, struct bio_vec *bvec,
 				index, nand_offset);
 		ret = -EIO;
 		atomic_inc(&vnswap_device->stats.vnswap_not_mapped_read_pages);
-		spin_unlock(&vnswap_table_lock);
+		spin_unlock_irqrestore(&vnswap_table_lock, flags);
 		goto out;
 	}
-	spin_unlock(&vnswap_table_lock);
+	spin_unlock_irqrestore(&vnswap_table_lock, flags);
 
 	dprintk("%s %d: (index, nand_offset) = (%d, %d)\n",
 			__func__, __LINE__, index, nand_offset);
@@ -726,6 +727,7 @@ int vnswap_bvec_write(struct vnswap *vnswap, struct bio_vec *bvec,
 	struct page *page;
 	unsigned char *user_mem, *swap_header_page_mem;
 	int nand_offset = 0, ret;
+	unsigned long flags;
 
 	page = bvec->bv_page;
 
@@ -739,7 +741,7 @@ int vnswap_bvec_write(struct vnswap *vnswap, struct bio_vec *bvec,
 		return 0;
 	}
 
-	spin_lock(&vnswap_table_lock);
+	spin_lock_irqsave(&vnswap_table_lock, flags);
 	nand_offset = vnswap_table[index];
 
 	/* duplicate write - remove existing mapping */
@@ -756,23 +758,23 @@ int vnswap_bvec_write(struct vnswap *vnswap, struct bio_vec *bvec,
 
 	ret = vnswap_find_free_area_in_backing_storage(&nand_offset);
 	if (ret < 0) {
-		spin_unlock(&vnswap_table_lock);
+		spin_unlock_irqrestore(&vnswap_table_lock, flags);
 		return ret;
 	}
 	set_bit(nand_offset, backing_storage_bitmap);
 	vnswap_table[index] = nand_offset;
 	atomic_inc(&vnswap_device->stats.vnswap_used_slot_num);
-	spin_unlock(&vnswap_table_lock);
+	spin_unlock_irqrestore(&vnswap_table_lock, flags);
 
 	dprintk("%s %d: (index, nand_offset) = (%d, %d)\n",
 			__func__, __LINE__, index, nand_offset);
 	ret = vnswap_submit_bio(1, nand_offset, page, bio);
 
 	if (ret) {
-		spin_lock(&vnswap_table_lock);
+		spin_lock_irqsave(&vnswap_table_lock, flags);
 		clear_bit(nand_offset, backing_storage_bitmap);
 		vnswap_table[index] = -1;
-		spin_unlock(&vnswap_table_lock);
+		spin_unlock_irqrestore(&vnswap_table_lock, flags);
 	}
 
 	return ret;
@@ -967,17 +969,18 @@ void vnswap_slot_free_notify(struct block_device *bdev, unsigned long index)
 {
 	struct vnswap *vnswap;
 	int nand_offset = 0;
+	unsigned long flags;
 
 	vnswap = bdev->bd_disk->private_data;
 
-	spin_lock(&vnswap_table_lock);
+	spin_lock_irqsave(&vnswap_table_lock, flags);
 	nand_offset = vnswap_table ? vnswap_table[index] : -1;
 
 	/* This index is not mapped to vnswap and is mapped to zswap */
 	if (nand_offset == -1) {
 		atomic_inc(&vnswap_device->stats.
 			vnswap_not_mapped_slot_free_num);
-		spin_unlock(&vnswap_table_lock);
+		spin_unlock_irqrestore(&vnswap_table_lock, flags);
 		return;
 	}
 
@@ -995,7 +998,7 @@ void vnswap_slot_free_notify(struct block_device *bdev, unsigned long index)
 		vnswap_device->bs_size) {
 		backing_storage_bitmap_last_allocated_index = nand_offset;
 	}
-	spin_unlock(&vnswap_table_lock);
+	spin_unlock_irqrestore(&vnswap_table_lock, flags);
 
 	/*
 	 * disable blkdev_issue_discard
