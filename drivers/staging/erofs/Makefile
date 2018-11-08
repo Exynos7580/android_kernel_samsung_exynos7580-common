@@ -8,7 +8,7 @@ ccflags-y := -I$(src)/include
 
 erofs-y := super.o inode.o data.o namei.o dir.o utils.o
 erofs-$(CONFIG_EROFS_FS_XATTR)	+= xattr.o
-erofs-$(CONFIG_EROFS_FS_ZIP)	+= unzip_vle.o unzip_vle_lz4.o unzip_lz4.o
+erofs-$(CONFIG_EROFS_FS_ZIP)	+= unzip_vle.o unzip_vle_lz4.o
 
 all:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
