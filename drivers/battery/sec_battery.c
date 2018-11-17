@@ -21,6 +21,12 @@ static int qos_max_class[CL_END] = {PM_QOS_CLUSTER0_FREQ_MAX, PM_QOS_CLUSTER1_FR
 static int cluster_max_freq[CL_END] = {PM_QOS_CLUSTER0_FREQ_MAX_DEFAULT_VALUE, PM_QOS_CLUSTER1_FREQ_MAX_DEFAULT_VALUE};
 #endif
 
+static unsigned int STORE_MODE_CHARGING_MAX = 90;
+static unsigned int STORE_MODE_CHARGING_MIN = 70;
+
+module_param_named(store_mode_max, STORE_MODE_CHARGING_MAX, uint, S_IWUSR | S_IRUGO);
+module_param_named(store_mode_min, STORE_MODE_CHARGING_MIN, uint, S_IWUSR | S_IRUGO);
+
 const char *charger_chip_name;
 
 static struct device_attribute sec_battery_attrs[] = {
