@@ -21,9 +21,6 @@
 #endif
 
 #ifdef CONFIG_DYNAMIC_FSYNC
-//extern bool power_suspend_active;
-//extern bool dyn_fsync_active;
-#include <linux/powersuspend.h>
 #include <linux/dyn_sync_cntrl.h>
 #endif
 
@@ -214,7 +211,7 @@ SYSCALL_DEFINE1(syncfs, int, fd)
 int vfs_fsync_range(struct file *file, loff_t start, loff_t end, int datasync)
 {
 #ifdef CONFIG_DYNAMIC_FSYNC
-	if (likely(dyn_fsync_active && power_suspend_active))
+	if (likely(dyn_fsync_active && suspend_active))
 		return 0;
 #endif
 	if (!file->f_op || !file->f_op->fsync)
@@ -350,7 +347,7 @@ no_async:
 SYSCALL_DEFINE1(fsync, unsigned int, fd)
 {
 #ifdef CONFIG_DYNAMIC_FSYNC
-	if (likely(dyn_fsync_active && power_suspend_active))
+	if (likely(dyn_fsync_active && suspend_active))
 		return 0;
 #endif
 	return do_fsync(fd, 0);
@@ -359,7 +356,7 @@ SYSCALL_DEFINE1(fsync, unsigned int, fd)
 SYSCALL_DEFINE1(fdatasync, unsigned int, fd)
 {
 #ifdef CONFIG_DYNAMIC_FSYNC
-	if (likely(dyn_fsync_active && power_suspend_active))
+	if (likely(dyn_fsync_active && suspend_active))
 		return 0;
 #endif
 	return do_fsync(fd, 1);
@@ -439,7 +436,7 @@ SYSCALL_DEFINE4(sync_file_range, int, fd, loff_t, offset, loff_t, nbytes,
 	umode_t i_mode;
 
 #ifdef CONFIG_DYNAMIC_FSYNC
-	if (likely(dyn_fsync_active && power_suspend_active))
+	if (likely(dyn_fsync_active && suspend_active))
 		return 0;
 #endif
 
@@ -524,7 +521,7 @@ SYSCALL_DEFINE4(sync_file_range2, int, fd, unsigned int, flags,
 				 loff_t, offset, loff_t, nbytes)
 {
 #ifdef CONFIG_DYNAMIC_FSYNC
-	if (likely(dyn_fsync_active && power_suspend_active))
+	if (likely(dyn_fsync_active && suspend_active))
 		return 0;
 #endif
 	return sys_sync_file_range(fd, offset, nbytes, flags);
