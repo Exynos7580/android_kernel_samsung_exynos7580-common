@@ -9,6 +9,8 @@
 #include <asm/memory.h>
 #include <asm/page.h>
 
+#include "image.h"
+
 #if (defined(CONFIG_GENERIC_BUG))
 #define ARM_EXIT_KEEP(x)        x
 #define ARM_EXIT_DISCARD(x)
@@ -91,9 +93,9 @@ SECTIONS
 
 	PERCPU_SECTION(64)
 
+	. = ALIGN(PAGE_SIZE);
 	__init_end = .;
 
-	. = ALIGN(PAGE_SIZE);
 	_data = .;
 	_sdata = .;
 	RW_DATA_SECTION(64, PAGE_SIZE, THREAD_SIZE)
@@ -103,5 +105,7 @@ SECTIONS
 	_end = .;
 
 	STABS_DEBUG
+
+	HEAD_SYMBOLS
 	.comment 0 : { *(.comment) }
 }

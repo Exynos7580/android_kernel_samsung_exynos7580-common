@@ -35,6 +35,7 @@
 #include <linux/clockchips.h>
 #include <linux/completion.h>
 #include <linux/of.h>
+#include <linux/irq_work.h>
 #include <linux/exynos-ss.h>
 
 #include <asm/atomic.h>
@@ -67,6 +68,8 @@ enum ipi_msg_type {
 	IPI_CALL_FUNC,
 	IPI_CPU_STOP,
 	IPI_TIMER,
+	IPI_IRQ_WORK,
+	IPI_WAKEUP,
 };
 
 /*
@@ -279,7 +282,7 @@ void __cpu_die(unsigned int cpu)
  * of the other hotplug-cpu capable cores, so presumably coming
  * out of idle fixes this.
  */
-void cpu_die(void)
+void __ref cpu_die(void)
 {
 	unsigned int cpu = smp_processor_id();
 
@@ -297,7 +300,16 @@ void cpu_die(void)
 	 */
 	cpu_ops[cpu]->cpu_die(cpu);
 
-	BUG();
+	/*
+	 * Do not return to the idle loop - jump back to the secondary
+	 * cpu initialisation.  There's some initialisation which needs
+	 * to be repeated to undo the effects of taking the CPU offline.
+	 */
+
+	asm volatile("mov       sp, %0\n"
+		     "mov       x29, #0\n"
+		     "b         secondary_start_kernel"
+		     : : "r" (task_stack_page(current) + THREAD_START_SP));
 }
 #endif
 
@@ -488,12 +500,27 @@ void arch_send_call_function_single_ipi(int cpu)
 	smp_cross_call(cpumask_of(cpu), IPI_CALL_FUNC);
 }
 
+void arch_send_wakeup_ipi_mask(const struct cpumask *mask)
+{
+	smp_cross_call(mask, IPI_WAKEUP);
+}
+
+#ifdef CONFIG_IRQ_WORK
+void arch_irq_work_raise(void)
+{
+	if (smp_cross_call)
+		smp_cross_call(cpumask_of(smp_processor_id()), IPI_IRQ_WORK);
+}
+#endif
+
 static const char *ipi_types[NR_IPI] = {
 #define S(x,s)	[x - IPI_RESCHEDULE] = s
 	S(IPI_RESCHEDULE, "Rescheduling interrupts"),
 	S(IPI_CALL_FUNC, "Function call interrupts"),
 	S(IPI_CPU_STOP, "CPU stop interrupts"),
 	S(IPI_TIMER, "Timer broadcast interrupts"),
+	S(IPI_IRQ_WORK, "IRQ work interrupts"),
+	S(IPI_WAKEUP, "CPU wakeup interrupts"),
 };
 
 void show_ipi_list(struct seq_file *p, int prec)
@@ -580,6 +607,17 @@ void handle_IPI(int ipinr, struct pt_regs *regs)
 	case IPI_TIMER:
 		irq_enter();
 		tick_receive_broadcast();
+		irq_exit();
+		break;
+#endif
+
+	case IPI_WAKEUP:
+		break;
+
+#ifdef CONFIG_IRQ_WORK
+	case IPI_IRQ_WORK:
+		irq_enter();
+		irq_work_run();
 		irq_exit();
 		break;
 #endif

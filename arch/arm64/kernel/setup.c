@@ -25,6 +25,7 @@
 #include <linux/utsname.h>
 #include <linux/initrd.h>
 #include <linux/console.h>
+#include <linux/cache.h>
 #include <linux/bootmem.h>
 #include <linux/seq_file.h>
 #include <linux/screen_info.h>
@@ -208,6 +209,8 @@ static void __init setup_processor(void)
 {
 	struct cpu_info *cpu_info;
 	u64 features, block;
+	u32 cwg;
+	int cls;
 
 	cpu_info = lookup_processor_type(read_cpuid_id());
 	if (!cpu_info) {
@@ -225,6 +228,18 @@ static void __init setup_processor(void)
 	elf_hwcap = 0;
 
 	cpuinfo_store_boot_cpu();
+
+	/*
+	 * Check for sane CTR_EL0.CWG value.
+	 */
+	cwg = cache_type_cwg();
+	cls = cache_line_size();
+	if (!cwg)
+		pr_warn("No Cache Writeback Granule information, assuming cache line size %d\n",
+			cls);
+	if (L1_CACHE_BYTES < cls)
+		pr_warn("L1_CACHE_BYTES smaller than the Cache Writeback Granule (%d < %d)\n",
+			L1_CACHE_BYTES, cls);
 
 	/*
 	 * ID_AA64ISAR0_EL1 contains 4-bit wide signed feature blocks.
@@ -433,11 +448,6 @@ void __init setup_arch(char **cmdline_p)
 {
 	struct machine_desc *mdesc;
 
-	/*
-	 * Unmask asynchronous aborts early to catch possible system errors.
-	 */
-	local_async_enable();
-
 	setup_processor();
 
 	mdesc = setup_machine_fdt(__fdt_pointer);
@@ -454,6 +464,12 @@ void __init setup_arch(char **cmdline_p)
 	early_ioremap_init();
 
 	parse_early_param();
+
+	/*
+	 *  Unmask asynchronous aborts after bringing up possible earlycon.
+	 * (Report possible System Errors once we can report this occurred)
+	 */
+	local_async_enable();
 
 	arm64_memblock_init();
 

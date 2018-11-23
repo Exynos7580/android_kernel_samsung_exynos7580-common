@@ -464,9 +464,11 @@ static void __cpufreq_cafactive_timer(unsigned long data, bool is_notif)
 	tunables->boosted = tunables->boost_val || now < tunables->boostpulse_endtime;
 
 #ifdef CONFIG_POWERSUSPEND
-	if ((cpu_load >= tunables->go_hispeed_load || tunables->boosted) && !power_suspend_active) {
+	if ((cpu_load >= tunables->go_hispeed_load || tunables->boosted)
+	    && ((pcpu->policy->cpu == 0) || (pcpu->policy->cpu == 4)) && !power_suspend_active) {
 #else
-	if (cpu_load >= tunables->go_hispeed_load || tunables->boosted) {
+	if ((cpu_load >= tunables->go_hispeed_load || tunables->boosted)
+	    && ((pcpu->policy->cpu == 0) || (pcpu->policy->cpu == 4))) {
 #endif
 		if (pcpu->policy->cur < tunables->hispeed_freq &&
 		    cpu_load <= MAX_LOCAL_LOAD) {
@@ -818,6 +820,37 @@ err_kfree:
 	kfree(tokenized_data);
 err:
 	return ERR_PTR(err);
+}
+
+void cafactive_boost_ondemand(int cpu, s64 miliseconds, bool static_switch)
+{
+	struct cpufreq_cafactive_cpuinfo *pcpu = &per_cpu(cpuinfo, cpu);
+	struct cpufreq_cafactive_tunables *tunables;
+
+	if(pcpu && pcpu->policy)
+		tunables = pcpu->policy->governor_data;
+	else
+		return;
+
+	if (!tunables)
+		return;
+
+	if (!miliseconds) {
+		 if (static_switch) {
+			trace_cpufreq_cafactive_boost("on");
+			if (!tunables->boosted)
+				cpufreq_cafactive_boost(tunables);
+		} else {
+			tunables->boostpulse_endtime = ktime_to_us(ktime_get());
+			trace_cpufreq_cafactive_unboost("off");
+		}
+	} else {
+		tunables->boostpulse_endtime = ktime_to_us(ktime_get()) +
+			(miliseconds * 1000);
+		trace_cpufreq_cafactive_boost("pulse");
+		if (!tunables->boosted)
+			cpufreq_cafactive_boost(tunables);
+	}
 }
 
 static ssize_t show_target_loads(

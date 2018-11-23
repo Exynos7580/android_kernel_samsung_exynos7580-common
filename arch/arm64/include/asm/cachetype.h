@@ -20,11 +20,15 @@
 
 #define CTR_L1IP_SHIFT		14
 #define CTR_L1IP_MASK		3
+#define CTR_CWG_SHIFT		24
+#define CTR_CWG_MASK		15
 
 #define ICACHE_POLICY_RESERVED	0
 #define ICACHE_POLICY_AIVIVT	1
 #define ICACHE_POLICY_VIPT	2
 #define ICACHE_POLICY_PIPT	3
+
+#ifndef __ASSEMBLY__
 
 #include <linux/bitops.h>
 
@@ -68,5 +72,12 @@ static inline int icache_is_aivivt(void)
 {
 	return test_bit(ICACHEF_AIVIVT, &__icache_flags);
 }
+
+static inline u32 cache_type_cwg(void)
+{
+	return (read_cpuid_cachetype() >> CTR_CWG_SHIFT) & CTR_CWG_MASK;
+}
+
+#endif	/* __ASSEMBLY__ */
 
 #endif	/* __ASM_CACHETYPE_H */

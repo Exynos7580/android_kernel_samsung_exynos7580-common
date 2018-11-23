@@ -265,12 +265,10 @@ static DEFINE_PCI_DEVICE_TABLE(iwl_hw_card_ids) = {
 	{IWL_PCI_DEVICE(0x0893, 0x0262, iwl135_bgn_cfg)},
 	{IWL_PCI_DEVICE(0x0892, 0x0462, iwl135_bgn_cfg)},
 
-/* 7000 Series */
+/* 7260 Series */
 	{IWL_PCI_DEVICE(0x08B1, 0x4070, iwl7260_2ac_cfg)},
 	{IWL_PCI_DEVICE(0x08B1, 0x4072, iwl7260_2ac_cfg)},
 	{IWL_PCI_DEVICE(0x08B1, 0x4170, iwl7260_2ac_cfg)},
-	{IWL_PCI_DEVICE(0x08B1, 0x4C60, iwl7260_2ac_cfg)},
-	{IWL_PCI_DEVICE(0x08B1, 0x4C70, iwl7260_2ac_cfg)},
 	{IWL_PCI_DEVICE(0x08B1, 0x4060, iwl7260_2n_cfg)},
 	{IWL_PCI_DEVICE(0x08B1, 0x406A, iwl7260_2n_cfg)},
 	{IWL_PCI_DEVICE(0x08B1, 0x4160, iwl7260_2n_cfg)},
@@ -308,8 +306,6 @@ static DEFINE_PCI_DEVICE_TABLE(iwl_hw_card_ids) = {
 	{IWL_PCI_DEVICE(0x08B1, 0xC770, iwl7260_2ac_cfg)},
 	{IWL_PCI_DEVICE(0x08B1, 0xC760, iwl7260_2n_cfg)},
 	{IWL_PCI_DEVICE(0x08B2, 0xC270, iwl7260_2ac_cfg)},
-	{IWL_PCI_DEVICE(0x08B1, 0xCC70, iwl7260_2ac_cfg)},
-	{IWL_PCI_DEVICE(0x08B1, 0xCC60, iwl7260_2ac_cfg)},
 	{IWL_PCI_DEVICE(0x08B2, 0xC272, iwl7260_2ac_cfg)},
 	{IWL_PCI_DEVICE(0x08B2, 0xC260, iwl7260_2n_cfg)},
 	{IWL_PCI_DEVICE(0x08B2, 0xC26A, iwl7260_n_cfg)},
@@ -364,15 +360,15 @@ static int iwl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	int ret;
 
 	iwl_trans = iwl_trans_pcie_alloc(pdev, ent, cfg);
-	if (iwl_trans == NULL)
-		return -ENOMEM;
+	if (IS_ERR(iwl_trans))
+		return PTR_ERR(iwl_trans);
 
 	pci_set_drvdata(pdev, iwl_trans);
 
 	trans_pcie = IWL_TRANS_GET_PCIE_TRANS(iwl_trans);
 	trans_pcie->drv = iwl_drv_start(iwl_trans, cfg);
 
-	if (IS_ERR_OR_NULL(trans_pcie->drv)) {
+	if (IS_ERR(trans_pcie->drv)) {
 		ret = PTR_ERR(trans_pcie->drv);
 		goto out_free_trans;
 	}
@@ -388,7 +384,6 @@ out_free_drv:
 	iwl_drv_stop(trans_pcie->drv);
 out_free_trans:
 	iwl_trans_pcie_free(iwl_trans);
-	pci_set_drvdata(pdev, NULL);
 	return ret;
 }
 
@@ -399,29 +394,25 @@ static void iwl_pci_remove(struct pci_dev *pdev)
 
 	iwl_drv_stop(trans_pcie->drv);
 	iwl_trans_pcie_free(trans);
-
-	pci_set_drvdata(pdev, NULL);
 }
 
 #ifdef CONFIG_PM_SLEEP
 
 static int iwl_pci_suspend(struct device *device)
 {
-	struct pci_dev *pdev = to_pci_dev(device);
-	struct iwl_trans *iwl_trans = pci_get_drvdata(pdev);
-
 	/* Before you put code here, think about WoWLAN. You cannot check here
 	 * whether WoWLAN is enabled or not, and your code will run even if
 	 * WoWLAN is enabled - don't kill the NIC, someone may need it in Sx.
 	 */
 
-	return iwl_trans_suspend(iwl_trans);
+	return 0;
 }
 
 static int iwl_pci_resume(struct device *device)
 {
 	struct pci_dev *pdev = to_pci_dev(device);
-	struct iwl_trans *iwl_trans = pci_get_drvdata(pdev);
+	struct iwl_trans *trans = pci_get_drvdata(pdev);
+	bool hw_rfkill;
 
 	/* Before you put code here, think about WoWLAN. You cannot check here
 	 * whether WoWLAN is enabled or not, and your code will run even if
@@ -434,7 +425,15 @@ static int iwl_pci_resume(struct device *device)
 	 */
 	pci_write_config_byte(pdev, PCI_CFG_RETRY_TIMEOUT, 0x00);
 
-	return iwl_trans_resume(iwl_trans);
+	if (!trans->op_mode)
+		return 0;
+
+	iwl_enable_rfkill_int(trans);
+
+	hw_rfkill = iwl_is_rfkill_set(trans);
+	iwl_op_mode_hw_rf_kill(trans->op_mode, hw_rfkill);
+
+	return 0;
 }
 
 static SIMPLE_DEV_PM_OPS(iwl_dev_pm_ops, iwl_pci_suspend, iwl_pci_resume);
