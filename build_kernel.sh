@@ -22,10 +22,6 @@ case "$1" in
 	    VARIANT="s5neolte"
 	    ;;
 
-    twrp-a3)
-	    VARIANT="twrp_a3"
-	    ;;
-
 	*)
 	    VARIANT="a3xelte"
 esac
@@ -38,5 +34,7 @@ if [ ! -d $(pwd)/output ];
 
 make -C $(pwd) O=output ARCH=arm64 "lineageos_"$VARIANT"_defconfig"
 make -j7 -C $(pwd) O=output ARCH=arm64
+
+cp output/arch/arm64/boot/Image  output/arch/arm64/boot/boot.img-kernel
 
 exit
