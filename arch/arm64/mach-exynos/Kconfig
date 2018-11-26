@@ -302,6 +302,44 @@ config MACH_UNIVERSAL7580
 	  Machine support for Samsung EXYNOS7580 machine with device tree enabled.
 	  Select this if a fdt blob is available for the EXYNOS7580 SoC based board.
 
+choice
+	prompt "Exynos7580 device target"
+	default MACH_EXYNOS7580_UNIVERSAL
+
+config MACH_EXYNOS7580_UNIVERSAL
+	bool "Universal (for test only)"
+	depends on MACH_UNIVERSAL7580
+
+config MACH_EXYNOS7580_A3XELTE
+	bool "SAMSUNG Galaxy A3 (SM-A310F)"
+	depends on MACH_UNIVERSAL7580
+
+config MACH_EXYNOS7580_A5XELTE
+	bool "SAMSUNG Galaxy A5 (SM-A510F)"
+	depends on MACH_UNIVERSAL7580
+
+config MACH_EXYNOS7580_A7XELTE
+	bool "SAMSUNG Galaxy A7 (SM-A710F)"
+	depends on MACH_UNIVERSAL7580
+
+config MACH_EXYNOS7580_S5NEOLTE
+	bool "SAMSUNG Galaxy J7 (SM-G903F)"
+	depends on MACH_UNIVERSAL7580
+
+config MACH_EXYNOS7580_J7ELTE
+	bool "SAMSUNG Galaxy J7 (SM-J700F)"
+	depends on MACH_UNIVERSAL7580
+
+config MACH_EXYNOS7580_GVWIFI
+	bool "SAMSUNG Galaxy View WIFI (SM-T670)"
+	depends on MACH_UNIVERSAL7580
+
+config MACH_EXYNOS7580_GVLTE
+	bool "SAMSUNG Galaxy View LTE (SM-T677)"
+	depends on MACH_UNIVERSAL7580
+
+endchoice
+
 config SEC_FACTORY
 	bool "SAMSUNG Factory build option"
 	default n
