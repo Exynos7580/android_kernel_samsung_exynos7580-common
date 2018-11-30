@@ -1194,6 +1194,27 @@ static void __cpuinit start_cpu_timer(int cpu)
 	schedule_delayed_work_on(cpu, work, __round_jiffies_relative(HZ, cpu));
 }
 
+static void __init init_cpu_node_state(void)
+{
+	int node;
+
+	for_each_online_node(node) {
+		if (cpumask_weight(cpumask_of_node(node)) > 0)
+			node_set_state(node, N_CPU);
+	}
+}
+
+static void vmstat_cpu_dead(int node)
+{
+	const struct cpumask *node_cpus;
+
+	node_cpus = cpumask_of_node(node);
+	if (cpumask_weight(node_cpus) > 0)
+		return;
+
+	node_clear_state(node, N_CPU);
+}
+
 /*
  * Use the cpu notifier to insure that the thresholds are recalculated
  * when necessary.
@@ -1223,6 +1244,7 @@ static int __cpuinit vmstat_cpuup_callback(struct notifier_block *nfb,
 	case CPU_DEAD:
 	case CPU_DEAD_FROZEN:
 		refresh_zone_stat_thresholds();
+		vmstat_cpu_dead(cpu_to_node(cpu));
 		break;
 	default:
 		break;
@@ -1240,9 +1262,12 @@ static int __init setup_vmstat(void)
 	int cpu;
 
 	register_cpu_notifier(&vmstat_notifier);
+	init_cpu_node_state();
 
-	for_each_online_cpu(cpu)
+	for_each_online_cpu(cpu) {
 		start_cpu_timer(cpu);
+		node_set_state(cpu_to_node(cpu), N_CPU);
+	}
 #endif
 #ifdef CONFIG_PROC_FS
 	proc_create("buddyinfo", S_IRUGO, NULL, &fragmentation_file_operations);

@@ -43,15 +43,16 @@
 
 #include "libfdt.h"
 
-#define PAGE_SIZE_DEF  2048
+/* max amount of scanned dtb files */
+#define DTB_MAX 100
+
+/* defaults if not set by args */
+#define DTBH_PAGE_SIZE_DEF	2048
+#define DTBH_PLATFORM_CODE_DEF	0x50a6
+#define DTBH_SUBTYPE_CODE_DEF	0x217584da
 
 #define DTBH_MAGIC		"DTBH"
 #define DTBH_VERSION	2
-#define DTBH_PLATFORM	"android"
-#define DTBH_SUBTYPE	"samsung"
-/* Hardcoded entry */
-#define DTBH_PLATFORM_CODE 0x50a6
-#define DTBH_SUBTYPE_CODE  0x217584da
 
 struct dt_blob;
 
@@ -86,37 +87,74 @@ struct dt_blob {
 	struct dt_blob *next;
 };
 
+#define error(fmt, ...) fprintf(stderr, "error: " fmt "\n", ##__VA_ARGS__)
+#define fail(fmt, ...) do { error(fmt,  ##__VA_ARGS__); exit(1); } while (0)
+
 static void *load_file(const char *fn, unsigned *_sz)
 {
-	char *data;
+	char *data = 0;
 	int sz;
 	int fd;
 
-	data = 0;
 	fd = open(fn, O_RDONLY);
-	if(fd < 0) return 0;
+	if (fd < 0) return 0;
 
 	sz = lseek(fd, 0, SEEK_END);
-	if(sz < 0) goto oops;
+	if (sz < 0) goto oops;
 
-	if(lseek(fd, 0, SEEK_SET) != 0) goto oops;
+	if (lseek(fd, 0, SEEK_SET)) goto oops;
 
-	data = (char*) malloc(sz);
-	if(data == 0) goto oops;
+	data = malloc(sz);
+	if (!data) goto oops;
 
-	if(read(fd, data, sz) != sz) goto oops;
+	if (read(fd, data, sz) != sz) goto oops;
 	close(fd);
 
-	if(_sz) *_sz = sz;
+	*_sz = sz;
 	return data;
 
 oops:
 	close(fd);
-	if(data != 0) free(data);
+	if (data) free(data);
 	return 0;
 }
 
-static void *load_dtbh_block(const char *dtb_path, unsigned pagesize, unsigned *_sz)
+static void *scan_dtb_path(char **dtb_files, const char *dtb_path)
+{
+	struct dirent **de;
+	int i, f, files, namlen;
+	const int dlen = strlen(dtb_path);
+
+	files = scandir(dtb_path, &de, NULL, alphasort);
+	if (files < 0)
+		error("failed to open '%s': %s", dtb_path, strerror(errno));
+
+	for (f = 0, i = 0; f < files; f++) {
+		namlen = strlen(de[f]->d_name);
+		if (namlen < 4 || strcmp(&de[f]->d_name[namlen - 4], ".dtb"))
+			goto next_f;
+
+		/* skip over already allocated file names */
+		for (; dtb_files[i]; i++)
+			if (i >= DTB_MAX)
+				fail("reached dtb file limit (%d)", DTB_MAX);
+
+		namlen += dlen + 2; /* / and NULL terminator */
+		dtb_files[i] = calloc(namlen, sizeof(char));
+		if (!dtb_files[i])
+			fail("failed to allocate memory");
+
+		snprintf(dtb_files[i], namlen, "%s/%s", dtb_path, de[f]->d_name);
+next_f:
+		free(de[f]);
+	}
+
+	return 0;
+}
+
+static void *load_dtbh_block(char **dtb_files, unsigned pagesize,
+			     uint32_t platform_code, uint32_t subtype_code,
+			     unsigned *_sz)
 {
 	const unsigned pagemask = pagesize - 1;
 	struct dt_entry *new_entries;
@@ -125,47 +163,30 @@ static void *load_dtbh_block(const char *dtb_path, unsigned pagesize, unsigned *
 	struct dt_blob *blob;
 	struct dt_blob *blob_list = NULL;
 	struct dt_blob *last_blob = NULL;
-	struct dirent **de;
 	unsigned new_count;
 	unsigned entry_count = 0;
 	unsigned offset;
-	unsigned dtb_sz;
+	unsigned dtb_sz = 0;
 	unsigned hdr_sz = DT_HEADER_PHYS_SIZE;
 	uint32_t version = DTBH_VERSION;
 	unsigned blob_sz = 0;
-	char fname[PATH_MAX];
 	const unsigned *prop_chip;
-	const unsigned *prop_platform;
-	const unsigned *prop_subtype;
 	const unsigned *prop_hw_rev;
 	const unsigned *prop_hw_rev_end;
 	const unsigned *prop_compatible;
-	int namlen;
 	int len;
-	int f, files;
 	void *dtb;
 	char *dtbh;
+	char **fname;
 	unsigned c;
 
-	files = scandir(dtb_path, &de, NULL, alphasort);
-	if (files < 0)
-		err(1, "failed to open '%s'", dtb_path);
-
-	for (f = 0; f < files; f++) {
-		namlen = strlen(de[f]->d_name);
-		if (namlen < 4 || strcmp(&de[f]->d_name[namlen - 4], ".dtb"))
-			continue;
-
-		snprintf(fname, sizeof(fname), "%s/%s", dtb_path, de[f]->d_name);
-
-		free(de[f]);
-
-		dtb = load_file(fname, &dtb_sz);
-		if (dtb == NULL)
-			err(1, "failed to read dtb '%s'", fname);
+	for (fname = dtb_files; *fname; fname++) {
+		dtb = load_file(*fname, &dtb_sz);
+		if (!dtb || !dtb_sz)
+			error("failed to read dtb '%s'", *fname);
 
 		if (fdt_check_header(dtb) != 0) {
-			warnx("'%s' is not a valid dtb, skipping", fname);
+			warnx("'%s' is not a valid dtb, skipping", *fname);
 			free(dtb);
 			continue;
 		}
@@ -173,43 +194,29 @@ static void *load_dtbh_block(const char *dtb_path, unsigned pagesize, unsigned *
 		offset = fdt_path_offset(dtb, "/");
 
 		prop_chip = fdt_getprop(dtb, offset, "model_info-chip", &len);
-		if (len % (sizeof(uint32_t)) != 0) {
-			warnx("model_info-chip of %s is of invalid size, skipping", fname);
-			free(dtb);
-			continue;
-		}
-
-		prop_platform = fdt_getprop(dtb, offset, "model_info-platform", &len);
-		if (strcmp((char *)&prop_platform[0], DTBH_PLATFORM)) {
-			warnx("model_info-platform of %s is invalid, skipping", fname);
-			free(dtb);
-			continue;
-		}
-
-		prop_subtype = fdt_getprop(dtb, offset, "model_info-subtype", &len);
-		if (strcmp((char *)&prop_subtype[0], DTBH_SUBTYPE)) {
-			warnx("model_info-subtype of %s is invalid, skipping", fname);
+		if (len % (sizeof(uint32_t))) {
+			warnx("model_info-chip of %s is of invalid size, skipping", *fname);
 			free(dtb);
 			continue;
 		}
 
 		prop_hw_rev = fdt_getprop(dtb, offset, "model_info-hw_rev", &len);
-		if (len % (sizeof(uint32_t)) != 0) {
-			warnx("model_info-hw_rev of %s is of invalid size, skipping", fname);
+		if (len % (sizeof(uint32_t))) {
+			warnx("model_info-hw_rev of %s is of invalid size, skipping", *fname);
 			free(dtb);
 			continue;
 		}
 
 		prop_hw_rev_end = fdt_getprop(dtb, offset, "model_info-hw_rev_end", &len);
-		if (len % (sizeof(uint32_t)) != 0) {
-			warnx("model_info-hw_rev_end of %s is of invalid size, skipping", fname);
+		if (len % (sizeof(uint32_t))) {
+			warnx("model_info-hw_rev_end of %s is of invalid size, skipping", *fname);
 			free(dtb);
 			continue;
 		}
 
-		prop_compatible = fdt_getprop(dtb, offset, "compatible", NULL);
+		prop_compatible = fdt_getprop(dtb, offset, "compatible", 0);
 		if (!prop_compatible) {
-			warnx("compatible field of %s is missing, skipping", fname);
+			warnx("compatible field of %s is missing, skipping", *fname);
 			free(dtb);
 			continue;
 		}
@@ -220,12 +227,12 @@ static void *load_dtbh_block(const char *dtb_path, unsigned pagesize, unsigned *
 				ntohl(prop_hw_rev[0]), ntohl(prop_hw_rev_end[0]));
 
 		blob = calloc(1, sizeof(struct dt_blob));
-		if (blob == NULL)
-			err(1, "failed to allocate memory");
+		if (!blob)
+			error("failed to allocate memory");
 
 		blob->payload = dtb;
 		blob->size = dtb_sz;
-		if (blob_list == NULL) {
+		if (!blob_list) {
 			blob_list = blob;
 			last_blob = blob;
 		} else {
@@ -236,15 +243,15 @@ static void *load_dtbh_block(const char *dtb_path, unsigned pagesize, unsigned *
 		blob_sz += (blob->size + pagemask) & ~pagemask;
 		new_count = entry_count + 1;
 		new_entries = realloc(entries, new_count * sizeof(struct dt_entry));
-		if (new_entries == NULL)
-			err(1, "failed to allocate memory");
+		if (!new_entries)
+			error("failed to allocate memory");
 
 		entries = new_entries;
 		entry = &entries[entry_count];
 		memset(entry, 0, sizeof(*entry));
 		entry->chip = ntohl(prop_chip[0]);
-		entry->platform = DTBH_PLATFORM_CODE;
-		entry->subtype = DTBH_SUBTYPE_CODE;
+		entry->platform = platform_code;
+		entry->subtype = subtype_code;
 		entry->hw_rev = ntohl(prop_hw_rev[0]);
 		entry->hw_rev_end = ntohl(prop_hw_rev_end[0]);
 		entry->space = 0x20; /* space delimiter */
@@ -255,11 +262,9 @@ static void *load_dtbh_block(const char *dtb_path, unsigned pagesize, unsigned *
 		hdr_sz += entry_count * DT_ENTRY_PHYS_SIZE;
 	}
 
-	free(de);
-
-	if (entry_count == 0) {
+	if (!entry_count) {
 		warnx("unable to locate any dtbs in the given path");
-		return NULL;
+		return 0;
 	}
 
 	hdr_sz += sizeof(uint32_t); /* eot marker */
@@ -284,8 +289,8 @@ static void *load_dtbh_block(const char *dtb_path, unsigned pagesize, unsigned *
 	 * All parts are now gathered, so build the dt block
 	 */
 	dtbh = calloc(hdr_sz + blob_sz, 1);
-	if (dtbh == NULL)
-			err(1, "failed to allocate memory");
+	if (!dtbh)
+		fail("failed to allocate memory");
 
 	offset = 0;
 
@@ -315,75 +320,90 @@ static void *load_dtbh_block(const char *dtb_path, unsigned pagesize, unsigned *
 	return dtbh;
 }
 
-int usage(void)
+static int usage(void)
 {
-	fprintf(stderr,"usage: dtbTool\n"
-			"      [ -s|--pagesize <pagesize> ]\n"
-			"      -d|--dtb <dtb path>\n"
+	fprintf(stderr, "usage: dtbtool\n"
 			"      -o|--output <filename>\n"
+			"      [ -s|--pagesize <pagesize> ]\n"
+			"      [ --platform <hex platform code> ]\n"
+			"      [ --subtype <hex subtype code> ]\n"
+			"      [ -d|--dtb <dtb path> ]...\n"
+			"      [ <dtb file> ]...\n"
 			);
-	return 1;
+	exit(1);
 }
+
+#define read_val { if (argc < 2) return usage(); val = argv[1]; argc--; argv++; }
 
 int main(int argc, char **argv)
 {
+	char *arg, *val;
 	char *dt_img = 0;
-	char *dt_dir = 0;
 	void *dt_data = 0;
-	unsigned pagesize = PAGE_SIZE_DEF;
-	int fd;
+	char **dtb_files = 0;
+	int fd, dt_count = 0;
+	unsigned pagesize = DTBH_PAGE_SIZE_DEF;
+	uint32_t dt_platform_code = DTBH_PLATFORM_CODE_DEF;
+	uint32_t dt_subtype_code = DTBH_SUBTYPE_CODE_DEF;
 	unsigned dt_size;
 
-	argc--;
-	argv++;
+	dtb_files = malloc(sizeof(char*) * DTB_MAX);
+	if (!dtb_files)
+		error("failed to allocate memory");
 
-	while(argc > 0){
-		char *arg = argv[0];
-		char *val = argv[1];
-		if(argc < 2) {
-			return usage();
-		}
-		argc -= 2;
-		argv += 2;
+	while (argc > 0) {
+		argc--;
+		argv++;
+		if (argc < 1)
+			break;
+		arg = argv[0];
+		val = 0;
 
 		if (!strcmp(arg,"--pagesize") || !strcmp(arg,"-s")) {
+			read_val;
 			pagesize = strtoul(val, 0, 10);
-			if ((pagesize != 2048) && (pagesize != 4096) && (pagesize != 8192) && (pagesize != 16384) && (pagesize != 32768) && (pagesize != 65536) && (pagesize != 131072)) {
-				fprintf(stderr,"error: unsupported page size %d\n", pagesize);
-				return -1;
-			}
-		}
-		else if (!strcmp(arg, "--dtb") || !strcmp(arg, "-d"))
-			dt_dir = val;
-		else if (!strcmp(arg, "--output") || !strcmp(arg, "-o"))
+			if ((pagesize != 2048) && (pagesize != 4096) && (pagesize != 8192) && (pagesize != 16384) && (pagesize != 32768) && (pagesize != 65536) && (pagesize != 131072))
+				fail("unsupported page size %d\n", pagesize);
+		} else if (!strcmp(arg, "--dtb") || !strcmp(arg, "-d")) {
+			read_val;
+			scan_dtb_path(dtb_files, val);
+		} else if (!strcmp(arg, "--output") || !strcmp(arg, "-o")) {
+			read_val;
 			dt_img = val;
-		else
-			return usage();
+		} else if (!strcmp(arg, "--platform")) {
+			read_val;
+			dt_platform_code = strtoul(val, 0, 16);
+		} else if (!strcmp(arg, "--subtype")) {
+			read_val;
+			dt_subtype_code = strtoul(val, 0, 16);
+		} else if (*arg != '-') {
+			/* skip over already allocated file names */
+			for (; dtb_files[dt_count]; dt_count++)
+				if (dt_count >= DTB_MAX)
+					fail("reached dtb file limit (%d)", DTB_MAX);
+
+			dtb_files[dt_count] = strdup(arg);
+			if (!dtb_files[dt_count])
+				fail("failed to allocate memory");
+		} else
+			usage();
 	}
 
-	if (dt_img == 0) {
-		fprintf(stderr,"error: no output filename specified\n");
-		return usage();
+	if (!dt_img) {
+		error("no output filename specified");
+		usage();
 	}
 
-	if (dt_dir == 0) {
-		fprintf(stderr,"error: no dtb input directory specified\n");
-		return usage();
-	}
+	if (!dtb_files[0])
+		fail("no dtb files found");
 
-	if (dt_dir) {
-		dt_data = load_dtbh_block(dt_dir, pagesize, &dt_size);
-		if (dt_data == 0) {
-			fprintf(stderr, "error: could not load device tree blobs '%s'\n", dt_dir);
-			return 1;
-		}
-	}
+	dt_data = load_dtbh_block(dtb_files, pagesize, dt_platform_code, dt_subtype_code, &dt_size);
+	if (!dt_data)
+		fail("could not load device tree blobs");
 
 	fd = open(dt_img, O_CREAT | O_TRUNC | O_WRONLY, 0644);
-	if(fd < 0) {
-		fprintf(stderr,"error: could not create '%s'\n", dt_img);
-		return 1;
-	}
+	if (fd < 0)
+		fail("could not create output file '%s': %s", dt_img, strerror(errno));
 
 	if (write(fd, dt_data, dt_size) != dt_size) goto fail;
 
@@ -394,7 +414,5 @@ int main(int argc, char **argv)
 fail:
 	unlink(dt_img);
 	close(fd);
-	fprintf(stderr,"error: failed writing '%s': %s\n", dt_img, strerror(errno));
-
-	return 1;
+	fail("failed writing '%s': %s", dt_img, strerror(errno));
 }

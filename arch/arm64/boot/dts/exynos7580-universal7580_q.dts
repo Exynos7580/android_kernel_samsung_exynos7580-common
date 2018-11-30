@@ -14,6 +14,11 @@
 
 / {
 	model = "Samsung Universal7580 board based on EXYNOS7580";
+	model_info-chip = <7580>;
+	model_info-platform = "android";
+	model_info-subtype = "samsung";
+	model_info-hw_rev = <0>;
+	model_info-hw_rev_end = <0>;
 	compatible = "samsung,exynos7580-universal7580", "samsung,exynos7580";
 
 	chosen {
