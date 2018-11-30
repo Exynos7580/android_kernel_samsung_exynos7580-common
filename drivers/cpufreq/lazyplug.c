@@ -39,8 +39,6 @@
  * the next poll determines 1 core isn’t enough, it fires up all CPU cores
  * (instead of selective CPU cores; which is the traditional intelli_plug’s
  * method).
- * Lazyplug also takes touch-screen input events to fire up CPU cores to
- * minimize noticeable performance degradation.
  * There’s also a “lazy mode” for *not* aggressively turning on CPU cores
  * on scenario such as video playback. For example, if you hook up
  * lazyplug_enter_lazy() to the video session open function, Lazyplug won’t
@@ -71,14 +69,13 @@
 #include <linux/mutex.h>
 #include <linux/module.h>
 #include <linux/slab.h>
-#include <linux/input.h>
 #include <linux/cpufreq.h>
 
 //#define DEBUG_LAZYPLUG
 #undef DEBUG_LAZYPLUG
 
 #define LAZYPLUG_MAJOR_VERSION	1
-#define LAZYPLUG_MINOR_VERSION	7
+#define LAZYPLUG_MINOR_VERSION	8
 
 #define DEF_SAMPLING_MS			(100)
 #define DEF_IDLE_COUNT			(19) /* 268 * 19 = 5092, almost equals to 5 seconds */
@@ -96,9 +93,6 @@ static struct workqueue_struct *lazyplug_cac_wq;
 
 static unsigned int __read_mostly lazyplug_active = 1;
 module_param(lazyplug_active, uint, 0664);
-
-static unsigned int __read_mostly touch_boost_active = 1;
-module_param(touch_boost_active, uint, 0664);
 
 static unsigned int __read_mostly nr_run_profile_sel = 0;
 module_param(nr_run_profile_sel, uint, 0664);
@@ -444,16 +438,13 @@ static void lazyplug_resume(void)
 }
 
 static unsigned int Lnr_run_profile_sel = 0;
-static unsigned int Ltouch_boost_active = true;
 void lazyplug_enter_lazy(bool enter)
 {
 	mutex_lock(&lazymode_mutex);
 	if (enter && !lazymode) {
 		pr_info("lazyplug: entering lazy mode\n");
 		Lnr_run_profile_sel = nr_run_profile_sel;
-		Ltouch_boost_active = touch_boost_active;
 		nr_run_profile_sel = 6; /* lazy profile */
-		touch_boost_active = false;
 		lazymode = true;
 
 		/* take down all cpu except for CPU 0 and 4 */
@@ -465,7 +456,6 @@ void lazyplug_enter_lazy(bool enter)
 		cpu_down_nocheck(1);
 	} else if (!enter && lazymode) {
 		pr_info("lazyplug: exiting lazy mode\n");
-		touch_boost_active = Ltouch_boost_active;
 		nr_run_profile_sel = Lnr_run_profile_sel;
 		lazymode = false;
 
@@ -475,85 +465,6 @@ void lazyplug_enter_lazy(bool enter)
 	}
 	mutex_unlock(&lazymode_mutex);
 }
-
-static void lazyplug_input_event(struct input_handle *handle,
-		unsigned int type, unsigned int code, int value)
-{
-#ifdef DEBUG_LAZYPLUG
-	pr_info("lazyplug touched!\n");
-#endif
-
-	if (lazyplug_active && touch_boost_active && !suspended) {
-		idle_count = 0;
-		cac_bool = true;
-		queue_delayed_work(lazyplug_wq, &lazyplug_cac,
-			msecs_to_jiffies(10));
-	}
-}
-
-static int lazyplug_input_connect(struct input_handler *handler,
-		struct input_dev *dev, const struct input_device_id *id)
-{
-	struct input_handle *handle;
-	int error;
-
-	handle = kzalloc(sizeof(struct input_handle), GFP_KERNEL);
-	if (!handle)
-		return -ENOMEM;
-
-	handle->dev = dev;
-	handle->handler = handler;
-	handle->name = "lazyplug";
-
-	error = input_register_handle(handle);
-	if (error)
-		goto err2;
-
-	error = input_open_device(handle);
-	if (error)
-		goto err1;
-	pr_info("%s found and connected!\n", dev->name);
-	return 0;
-err1:
-	input_unregister_handle(handle);
-err2:
-	kfree(handle);
-	return error;
-}
-
-static void lazyplug_input_disconnect(struct input_handle *handle)
-{
-	input_close_device(handle);
-	input_unregister_handle(handle);
-	kfree(handle);
-}
-
-static const struct input_device_id lazyplug_ids[] = {
-	{
-		.flags = INPUT_DEVICE_ID_MATCH_EVBIT |
-			 INPUT_DEVICE_ID_MATCH_ABSBIT,
-		.evbit = { BIT_MASK(EV_ABS) },
-		.absbit = { [BIT_WORD(ABS_MT_POSITION_X)] =
-			    BIT_MASK(ABS_MT_POSITION_X) |
-			    BIT_MASK(ABS_MT_POSITION_Y) },
-	}, /* multi-touch touchscreen */
-	{
-		.flags = INPUT_DEVICE_ID_MATCH_KEYBIT |
-			 INPUT_DEVICE_ID_MATCH_ABSBIT,
-		.keybit = { [BIT_WORD(BTN_TOUCH)] = BIT_MASK(BTN_TOUCH) },
-		.absbit = { [BIT_WORD(ABS_X)] =
-			    BIT_MASK(ABS_X) | BIT_MASK(ABS_Y) },
-	}, /* touchpad */
-	{ },
-};
-
-static struct input_handler lazyplug_input_handler = {
-	.event          = lazyplug_input_event,
-	.connect        = lazyplug_input_connect,
-	.disconnect     = lazyplug_input_disconnect,
-	.name           = "lazyplug_handler",
-	.id_table       = lazyplug_ids,
-};
 
 static int fb_state_change(struct notifier_block *nb,
 		unsigned long event, void *data)
@@ -584,7 +495,7 @@ static struct notifier_block fb_block = {
 
 int __init lazyplug_init(void)
 {
-	int rc,ret;
+	int ret;
 
 	pr_info("lazyplug: version %d.%d by arter97\n"
 		"          based on intelli_plug by faux123\n",
@@ -601,8 +512,6 @@ int __init lazyplug_init(void)
 		nr_run_hysteresis = NR_RUN_HYSTERESIS_DUAL;
 		nr_run_profile_sel = NR_RUN_ECO_MODE_PROFILE;
 	}
-
-	rc = input_register_handler(&lazyplug_input_handler);
 
 	ret = fb_register_client(&fb_block);
 	if (ret) {
