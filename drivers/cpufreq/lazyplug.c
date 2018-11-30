@@ -78,7 +78,7 @@
 #undef DEBUG_LAZYPLUG
 
 #define LAZYPLUG_MAJOR_VERSION	1
-#define LAZYPLUG_MINOR_VERSION	6
+#define LAZYPLUG_MINOR_VERSION	7
 
 #define DEF_SAMPLING_MS			(100)
 #define DEF_IDLE_COUNT			(19) /* 268 * 19 = 5092, almost equals to 5 seconds */
@@ -404,7 +404,7 @@ static void lazyplug_work_fn(struct work_struct *work)
 #endif
 	}
 	old_nr = nr_possible_cores;
-	queue_delayed_work_on(0, lazyplug_wq, &lazyplug_work,
+	queue_delayed_work(lazyplug_wq, &lazyplug_work,
 		msecs_to_jiffies(sampling_time));
 }
 
@@ -420,7 +420,7 @@ static void lazyplug_suspend(void)
 
 		/* put rest of the cores to sleep unconditionally! */
 		cac_bool = false;
-		queue_delayed_work_on(0, lazyplug_wq, &lazyplug_cac,
+		queue_delayed_work(lazyplug_wq, &lazyplug_cac,
 			msecs_to_jiffies(0));
 	}
 }
@@ -436,10 +436,10 @@ static void lazyplug_resume(void)
 		mutex_unlock(&lazyplug_mutex);
 
 		cac_bool = true;
-		queue_delayed_work_on(0, lazyplug_wq, &lazyplug_cac,
+		queue_delayed_work(lazyplug_wq, &lazyplug_cac,
 			msecs_to_jiffies(10));
 	}
-	queue_delayed_work_on(0, lazyplug_wq, &lazyplug_work,
+	queue_delayed_work(lazyplug_wq, &lazyplug_work,
 		msecs_to_jiffies(0));
 }
 
@@ -470,7 +470,7 @@ void lazyplug_enter_lazy(bool enter)
 		lazymode = false;
 
 		cac_bool = true;
-		queue_delayed_work_on(0, lazyplug_wq, &lazyplug_cac,
+		queue_delayed_work(lazyplug_wq, &lazyplug_cac,
 			msecs_to_jiffies(10));
 	}
 	mutex_unlock(&lazymode_mutex);
@@ -486,7 +486,7 @@ static void lazyplug_input_event(struct input_handle *handle,
 	if (lazyplug_active && touch_boost_active && !suspended) {
 		idle_count = 0;
 		cac_bool = true;
-		queue_delayed_work_on(0, lazyplug_wq, &lazyplug_cac,
+		queue_delayed_work(lazyplug_wq, &lazyplug_cac,
 			msecs_to_jiffies(10));
 	}
 }
@@ -614,7 +614,7 @@ int __init lazyplug_init(void)
 	INIT_DELAYED_WORK(&lazyplug_work, lazyplug_work_fn);
 	INIT_DELAYED_WORK(&lazyplug_cac, lazyplug_cac_fn);
 
-	queue_delayed_work_on(0, lazyplug_wq, &lazyplug_work,
+	queue_delayed_work(lazyplug_wq, &lazyplug_work,
 		msecs_to_jiffies(10));
 
 	return 0;
