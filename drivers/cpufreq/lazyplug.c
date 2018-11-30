@@ -74,8 +74,8 @@
 //#define DEBUG_LAZYPLUG
 #undef DEBUG_LAZYPLUG
 
-#define LAZYPLUG_MAJOR_VERSION	1
-#define LAZYPLUG_MINOR_VERSION	9
+#define LAZYPLUG_MAJOR_VERSION	2
+#define LAZYPLUG_MINOR_VERSION	0
 
 #define DEF_SAMPLING_MS			(100)
 #define DEF_IDLE_COUNT			(19) /* 268 * 19 = 5092, almost equals to 5 seconds */
@@ -183,6 +183,7 @@ static unsigned int __read_mostly *nr_run_profiles[] = {
 
 #define NR_RUN_ECO_MODE_PROFILE	3
 #define NR_RUN_HYSTERESIS_OCTA	16
+#define NR_RUN_HYSTERESIS_HEXA	12
 #define NR_RUN_HYSTERESIS_QUAD	8
 #define NR_RUN_HYSTERESIS_DUAL	4
 
@@ -510,8 +511,11 @@ int __init lazyplug_init(void)
 		 LAZYPLUG_MAJOR_VERSION,
 		 LAZYPLUG_MINOR_VERSION);
 
-	if (nr_possible_cores > 4) {
+	if (nr_possible_cores > 6) {
 		nr_run_hysteresis = NR_RUN_HYSTERESIS_OCTA;
+		nr_run_profile_sel = 0;
+	} else if (nr_possible_cores > 4) {
+		nr_run_hysteresis = NR_RUN_HYSTERESIS_HEXA;
 		nr_run_profile_sel = 0;
 	} else if (nr_possible_cores > 2) {
 		nr_run_hysteresis = NR_RUN_HYSTERESIS_QUAD;
