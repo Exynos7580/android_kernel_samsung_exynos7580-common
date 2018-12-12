@@ -4665,9 +4665,9 @@ void bnx2x_tx_timeout(struct net_device *dev)
 		bnx2x_panic();
 #endif
 
-	smp_mb__before_clear_bit();
+	smp_mb__before_atomic();
 	set_bit(BNX2X_SP_RTNL_TX_TIMEOUT, &bp->sp_rtnl_state);
-	smp_mb__after_clear_bit();
+	smp_mb__after_atomic();
 
 	/* This allows the netif to be shutdown gracefully before resetting */
 	schedule_delayed_work(&bp->sp_rtnl_task, 0);

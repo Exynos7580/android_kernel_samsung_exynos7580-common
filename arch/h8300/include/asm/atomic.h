@@ -3,6 +3,7 @@
 
 #include <linux/types.h>
 #include <asm/cmpxchg.h>
+#include <asm/barrier.h>
 
 /*
  * Atomic operations that C can't guarantee us.  Useful for
@@ -136,11 +137,5 @@ static __inline__ void atomic_set_mask(unsigned long mask, unsigned long *v)
 	                     "ldc r1l,ccr" 
                              : "=m" (*v) : "g" (mask) :"er0","er1");
 }
-
-/* Atomic operations are already serializing */
-#define smp_mb__before_atomic_dec()    barrier()
-#define smp_mb__after_atomic_dec() barrier()
-#define smp_mb__before_atomic_inc()    barrier()
-#define smp_mb__after_atomic_inc() barrier()
 
 #endif /* __ARCH_H8300_ATOMIC __ */

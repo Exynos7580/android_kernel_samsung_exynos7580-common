@@ -45,4 +45,9 @@
 #define set_mb(var, value) do { var = value; mb(); } while (0)
 #define smp_read_barrier_depends()	read_barrier_depends()
 
+#define smp_mb__before_atomic()	barrier()
+#define smp_mb__after_atomic()	barrier()
+
+#include <asm-generic/barrier.h>
+
 #endif /* _BLACKFIN_BARRIER_H */

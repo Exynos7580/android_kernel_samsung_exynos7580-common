@@ -3832,9 +3832,9 @@ static void bnx2x_fan_failure(struct bnx2x *bp)
 	 * This is due to some boards consuming sufficient power when driver is
 	 * up to overheat if fan fails.
 	 */
-	smp_mb__before_clear_bit();
+	smp_mb__before_atomic();
 	set_bit(BNX2X_SP_RTNL_FAN_FAILURE, &bp->sp_rtnl_state);
-	smp_mb__after_clear_bit();
+	smp_mb__after_atomic();
 	schedule_delayed_work(&bp->sp_rtnl_task, 0);
 
 }
@@ -5114,10 +5114,10 @@ static void bnx2x_eq_int(struct bnx2x *bp)
 				 * sp_rtnl task as all Queue SP operations
 				 * should run under rtnl_lock.
 				 */
-				smp_mb__before_clear_bit();
+				smp_mb__before_atomic();
 				set_bit(BNX2X_SP_RTNL_AFEX_F_UPDATE,
 					&bp->sp_rtnl_state);
-				smp_mb__after_clear_bit();
+				smp_mb__after_atomic();
 
 				schedule_delayed_work(&bp->sp_rtnl_task, 0);
 			}
@@ -11741,10 +11741,10 @@ void bnx2x_set_rx_mode(struct net_device *dev)
 			 * called from non sleepable context we must schedule
 			 * a work item for this purpose
 			 */
-			smp_mb__before_clear_bit();
+			smp_mb__before_atomic();
 			set_bit(BNX2X_SP_RTNL_VFPF_MCAST,
 				&bp->sp_rtnl_state);
-			smp_mb__after_clear_bit();
+			smp_mb__after_atomic();
 			schedule_delayed_work(&bp->sp_rtnl_task, 0);
 		}
 	}
@@ -11768,10 +11768,10 @@ void bnx2x_set_rx_mode(struct net_device *dev)
 		 * called from non sleepable context we must schedule
 		 * a work item for this purpose
 		 */
-		smp_mb__before_clear_bit();
+		smp_mb__before_atomic();
 		set_bit(BNX2X_SP_RTNL_VFPF_STORM_RX_MODE,
 			&bp->sp_rtnl_state);
-		smp_mb__after_clear_bit();
+		smp_mb__after_atomic();
 		schedule_delayed_work(&bp->sp_rtnl_task, 0);
 	}
 }

@@ -4,6 +4,7 @@
 #include <linux/compiler.h>
 #include <linux/types.h>
 #include <asm/cmpxchg.h>
+#include <asm/barrier.h>
 
 #if defined(CONFIG_METAG_ATOMICITY_IRQSOFF)
 /* The simple UP case. */
@@ -39,11 +40,6 @@
 
 #define atomic_inc_not_zero(v) atomic_add_unless((v), 1, 0)
 #define atomic_dec_if_positive(v)       atomic_sub_if_positive(1, v)
-
-#define smp_mb__before_atomic_dec()	barrier()
-#define smp_mb__after_atomic_dec()	barrier()
-#define smp_mb__before_atomic_inc()	barrier()
-#define smp_mb__after_atomic_inc()	barrier()
 
 #endif
 

@@ -46,11 +46,7 @@
 #include <asm/asm-compat.h>
 #include <asm/synch.h>
 
-/*
- * clear_bit doesn't imply a memory barrier
- */
-#define smp_mb__before_clear_bit()	smp_mb()
-#define smp_mb__after_clear_bit()	smp_mb()
+#include <asm/barrier.h>
 
 /* Macro for generating the ***_bits() functions */
 #define DEFINE_BITOP(fn, op, prefix)		\

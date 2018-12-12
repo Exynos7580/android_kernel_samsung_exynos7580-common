@@ -129,20 +129,21 @@ mb_incoherent(void)
 #define mb()		fast_mb()
 #define iob()		fast_iob()
 
-#ifdef CONFIG_SMP
-#define smp_mb()	mb()
-#define smp_rmb()	rmb()
-#define smp_wmb()	wmb()
-#define smp_read_barrier_depends()	read_barrier_depends()
-#else
-#define smp_mb()	barrier()
-#define smp_rmb()	barrier()
-#define smp_wmb()	barrier()
-#define smp_read_barrier_depends()	do { } while (0)
+#ifndef __tilegx__ /* 32 bit */
+/*
+ * We need to barrier before modifying the word, since the _atomic_xxx()
+ * routines just tns the lock and then read/modify/write of the word.
+ * But after the word is updated, the routine issues an "mf" before returning,
+ * and since it's a function call, we don't even need a compiler barrier.
+ */
+#define smp_mb__before_atomic()	smp_mb()
+#define smp_mb__after_atomic()	do { } while (0)
+#else /* 64 bit */
+#define smp_mb__before_atomic()	smp_mb()
+#define smp_mb__after_atomic()	smp_mb()
 #endif
 
-#define set_mb(var, value) \
-	do { var = value; mb(); } while (0)
+#include <asm-generic/barrier.h>
 
 #endif /* !__ASSEMBLY__ */
 #endif /* _ASM_TILE_BARRIER_H */
