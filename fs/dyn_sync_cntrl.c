@@ -1,22 +1,10 @@
 /*
  * Dynamic sync control driver V2
- *
- * Authors:	Paul Reioux aka Faux123 <reioux@gmail.com>
- *		Lord Boeffla aka andip71
- *
- * Copyright 2012 Paul Reioux
- * Copyright 2013 Paul Reioux
- * Copyright 2016 Lord Boeffla
- *
- * This software is licensed under the terms of the GNU General Public
- * License version 2, as published by the Free Software Foundation, and
- * may be copied, distributed, and modified under those terms.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
+ * 
+ * by andip71 (alias Lord Boeffla)
+ * 
+ * All credits for original implemenation to faux123
+ * 
  */
 
 #include <linux/module.h>
@@ -29,29 +17,18 @@
 #include <linux/writeback.h>
 #include <linux/dyn_sync_cntrl.h>
 
-// Declarations
-
-/*
- * fsync_mutex protects dyn_fsync_active during suspend / late resume transitions
- */
+// fsync_mutex protects dyn_fsync_active during suspend / late resume transitions
 static DEFINE_MUTEX(fsync_mutex);
 
-bool suspend_active __read_mostly = false;
+
+// Declarations
+
+//bool power_suspend_active __read_mostly = false;
 bool dyn_fsync_active __read_mostly = DYN_FSYNC_ACTIVE_DEFAULT;
 
-/*
- * debug = 1 will print all
- */
-static unsigned int debug = 0;
-module_param_named(debug_mask, debug, uint, 0644);
-
-#define dprintk(msg...)		\
-do { 				\
-	if (debug)		\
-	    pr_info(msg);	\
-} while (0)
 
 extern void sync_filesystems(int wait);
+
 
 // Functions
 
@@ -67,17 +44,23 @@ static ssize_t dyn_fsync_active_store(struct kobject *kobj,
 {
 	unsigned int data;
 
-	if(sscanf(buf, "%u\n", &data) == 1) {
-		if (data == 1) {
-			dprintk("%s: dynamic fsync enabled\n", __FUNCTION__);
+	if(sscanf(buf, "%u\n", &data) == 1)
+	{
+		if (data == 1) 
+		{
+			pr_info("%s: dynamic fsync enabled\n", __FUNCTION__);
 			dyn_fsync_active = true;
-		} else if (data == 0) {
-				dprintk("%s: dynamic fsync disabled\n", __FUNCTION__);
-				dyn_fsync_active = false;
-			} else
-				dprintk("%s: bad value: %u\n", __FUNCTION__, data);
-	} else
-		dprintk("%s: unknown input!\n", __FUNCTION__);
+		}
+		else if (data == 0) 
+		{
+			pr_info("%s: dynamic fsync disabled\n", __FUNCTION__);
+			dyn_fsync_active = false;
+		}
+		else
+			pr_info("%s: bad value: %u\n", __FUNCTION__, data);
+	} 
+	else
+		pr_info("%s: unknown input!\n", __FUNCTION__);
 
 	return count;
 }
@@ -95,7 +78,7 @@ static ssize_t dyn_fsync_version_show(struct kobject *kobj,
 static ssize_t dyn_fsync_powersuspend_show(struct kobject *kobj,
 		struct kobj_attribute *attr, char *buf)
 {
-	return sprintf(buf, "power suspend active: %u\n", suspend_active);
+	return sprintf(buf, "power suspend active: %u\n", power_suspend_active);
 }
 
 
@@ -109,7 +92,7 @@ static void dyn_fsync_suspend(struct power_suspend *p)
 {
 	mutex_lock(&fsync_mutex);
 	if (dyn_fsync_active) {
-		suspend_active = true;
+		power_suspend_active = true;
 		dyn_fsync_force_flush();
 	}
 	mutex_unlock(&fsync_mutex);
@@ -118,21 +101,22 @@ static void dyn_fsync_suspend(struct power_suspend *p)
 static void dyn_fsync_resume(struct power_suspend *p)
 {
 	mutex_lock(&fsync_mutex);
-	suspend_active = false;
+	power_suspend_active = false;
 	mutex_unlock(&fsync_mutex);
 }
 
-static struct power_suspend dyn_fsync_power_suspend_handler = {
-	.suspend = dyn_fsync_suspend,
-	.resume = dyn_fsync_resume,
-};
+static struct power_suspend dyn_fsync_power_suspend_handler =
+	{
+		.suspend = dyn_fsync_suspend,
+		.resume = dyn_fsync_resume,
+	};
 
 static int dyn_fsync_panic_event(struct notifier_block *this,
 		unsigned long event, void *ptr)
 {
-	suspend_active = true;
+	power_suspend_active = true;
 	dyn_fsync_force_flush();
-	dprintk("dynamic fsync: panic - force flush!\n");
+//	pr_warn("dynamic fsync: panic - force flush!\n");
 
 	return NOTIFY_DONE;
 }
@@ -140,43 +124,48 @@ static int dyn_fsync_panic_event(struct notifier_block *this,
 static int dyn_fsync_notify_sys(struct notifier_block *this, unsigned long code,
 				void *unused)
 {
-	if (code == SYS_DOWN || code == SYS_HALT) {
-		suspend_active = true;
+	if (code == SYS_DOWN || code == SYS_HALT) 
+	{
+		power_suspend_active = true;
 		dyn_fsync_force_flush();
-		dprintk("dynamic fsync: reboot - force flush!\n");
+//		pr_warn("dynamic fsync: reboot - force flush!\n");
 	}
 	return NOTIFY_DONE;
 }
 
 // Module structures
 
-static struct notifier_block dyn_fsync_notifier = {
+static struct notifier_block dyn_fsync_notifier = 
+{
 	.notifier_call = dyn_fsync_notify_sys,
 };
 
-static struct kobj_attribute dyn_fsync_active_attribute =
+static struct kobj_attribute dyn_fsync_active_attribute = 
 	__ATTR(Dyn_fsync_active, 0666,
 		dyn_fsync_active_show,
 		dyn_fsync_active_store);
 
-static struct kobj_attribute dyn_fsync_version_attribute =
+static struct kobj_attribute dyn_fsync_version_attribute = 
 	__ATTR(Dyn_fsync_version, 0444, dyn_fsync_version_show, NULL);
 
 static struct kobj_attribute dyn_fsync_powersuspend_attribute =
 	__ATTR(Dyn_fsync_suspend, 0444, dyn_fsync_powersuspend_show, NULL);
 
-static struct attribute *dyn_fsync_active_attrs[] = {
+static struct attribute *dyn_fsync_active_attrs[] =
+{
 	&dyn_fsync_active_attribute.attr,
 	&dyn_fsync_version_attribute.attr,
 	&dyn_fsync_powersuspend_attribute.attr,
 	NULL,
 };
 
-static struct attribute_group dyn_fsync_active_attr_group = {
+static struct attribute_group dyn_fsync_active_attr_group =
+{
 	.attrs = dyn_fsync_active_attrs,
 };
 
-static struct notifier_block dyn_fsync_panic_block = {
+static struct notifier_block dyn_fsync_panic_block = 
+{
 	.notifier_call  = dyn_fsync_panic_event,
 	.priority       = INT_MAX,
 };
@@ -198,15 +187,17 @@ static int dyn_fsync_init(void)
 
 	dyn_fsync_kobj = kobject_create_and_add("dyn_fsync", kernel_kobj);
 
-	if (!dyn_fsync_kobj) {
+	if (!dyn_fsync_kobj) 
+	{
 		pr_err("%s dyn_fsync_kobj create failed!\n", __FUNCTION__);
 		return -ENOMEM;
-	}
+    }
 
 	sysfs_result = sysfs_create_group(dyn_fsync_kobj,
 			&dyn_fsync_active_attr_group);
 
-	if (sysfs_result) {
+	if (sysfs_result) 
+	{
 		pr_err("%s dyn_fsync sysfs create failed!\n", __FUNCTION__);
 		kobject_put(dyn_fsync_kobj);
 	}
@@ -234,7 +225,7 @@ static void dyn_fsync_exit(void)
 module_init(dyn_fsync_init);
 module_exit(dyn_fsync_exit);
 
-MODULE_AUTHOR("Faux123, andip71");
+MODULE_AUTHOR("andip71");
 MODULE_DESCRIPTION("dynamic fsync - automatic fs sync optimizaition using"
 		"Power_suspend driver!");
 MODULE_LICENSE("GPL v2");
