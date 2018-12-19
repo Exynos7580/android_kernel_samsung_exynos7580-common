@@ -2239,7 +2239,7 @@ int f2fs_migrate_page(struct address_space *mapping,
 	}
 
 	rc = migrate_page_move_mapping(mapping, newpage,
-				page, NULL, mode);
+				page, NULL, mode, 0);
 	if (rc != MIGRATEPAGE_SUCCESS) {
 		if (atomic_written)
 			mutex_unlock(&fi->inmem_lock);
