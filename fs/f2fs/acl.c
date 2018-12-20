@@ -53,6 +53,9 @@ static struct posix_acl *f2fs_acl_from_disk(const char *value, size_t size)
 	struct f2fs_acl_entry *entry = (struct f2fs_acl_entry *)(hdr + 1);
 	const char *end = value + size;
 
+	if (size < sizeof(struct f2fs_acl_header))
+		return ERR_PTR(-EINVAL);
+
 	if (hdr->a_version != cpu_to_le32(F2FS_ACL_VERSION))
 		return ERR_PTR(-EINVAL);
 
@@ -219,6 +222,7 @@ static int f2fs_set_acl(struct inode *inode, int type,
 	void *value = NULL;
 	size_t size = 0;
 	int error;
+	umode_t mode = inode->i_mode;
 
 	if (!test_opt(sbi, POSIX_ACL))
 		return 0;
@@ -229,10 +233,10 @@ static int f2fs_set_acl(struct inode *inode, int type,
 	case ACL_TYPE_ACCESS:
 		name_index = F2FS_XATTR_INDEX_POSIX_ACL_ACCESS;
 		if (acl && !ipage) {
-			error = posix_acl_update_mode(inode, &inode->i_mode, &acl);
+			error = posix_acl_update_mode(inode, &mode, &acl);
 			if (error)
 				return error;
-			set_acl_inode(inode, inode->i_mode);
+			set_acl_inode(inode, mode);
 		}
 		break;
 
