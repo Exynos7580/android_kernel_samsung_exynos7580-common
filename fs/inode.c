@@ -17,7 +17,6 @@
 #include <linux/prefetch.h>
 #include <linux/buffer_head.h> /* for inode_has_buffers */
 #include <linux/ratelimit.h>
-#include <trace/events/writeback.h>
 #include "internal.h"
 
 /*
@@ -1455,7 +1454,6 @@ retry:
 			atomic_inc(&inode->i_count);
 			inode->i_state &= ~I_DIRTY_TIME;
 			spin_unlock(&inode->i_lock);
-			trace_writeback_lazytime_iput(inode);
 			mark_inode_dirty_sync(inode);
 			goto retry;
 		}
