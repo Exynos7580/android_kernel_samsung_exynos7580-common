@@ -116,7 +116,7 @@ struct __attribute__((__packed__)) fifo_frame {
 #define MAX_ACCEL_4G            32768
 
 #define MODEL_NAME		"BHA250"
-#define FIRMWARE_REVISION	16041100
+#define FIRMWARE_REVISION	16061400
 
 
 /* CRYSTAL 32000 = 1 SEC */
@@ -219,6 +219,7 @@ struct bhy_client_data {
 	unsigned int last_total_step;
 	unsigned int step_count;
 	unsigned int last_step_count;
+	bool late_step_report;
 	unsigned char start_index;
 	unsigned char current_index;
 	unsigned short acc_delay;

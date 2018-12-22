@@ -127,7 +127,7 @@ static const struct dev_pm_ops bhy_pm_ops = {
 /*!
  * @brief	bhy version of i2c_probe
  */
-static __devinit int bhy_i2c_probe(struct i2c_client *client,
+static int bhy_i2c_probe(struct i2c_client *client,
 	const struct i2c_device_id *dev_id) {
 	struct bhy_data_bus data_bus = {
 		.read = bhy_i2c_read,
@@ -177,7 +177,7 @@ static struct i2c_driver bhy_i2c_driver = {
 	.id_table = bhy_i2c_id,
 	.probe = bhy_i2c_probe,
 	.shutdown = bhy_i2c_shutdown,
-	.remove = __devexit_p(bhy_i2c_remove),
+	.remove = bhy_i2c_remove,
 };
 
 module_i2c_driver(bhy_i2c_driver);
