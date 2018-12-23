@@ -14,8 +14,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, you can access it online at
+ * http://www.gnu.org/licenses/gpl-2.0.html.
  *
  * Copyright Red Hat, 2009
  * Copyright IBM Corporation, 2009
@@ -145,15 +145,6 @@ long rcu_batches_completed(void)
 	return rcu_batches_completed_preempt();
 }
 EXPORT_SYMBOL_GPL(rcu_batches_completed);
-
-/*
- * Force a quiescent state for preemptible RCU.
- */
-void rcu_force_quiescent_state(void)
-{
-	force_quiescent_state(&rcu_preempt_state);
-}
-EXPORT_SYMBOL_GPL(rcu_force_quiescent_state);
 
 /*
  * Record a preemptible-RCU quiescent state for the specified CPU.  Note
@@ -677,20 +668,6 @@ void call_rcu(struct rcu_head *head, void (*func)(struct rcu_head *rcu))
 }
 EXPORT_SYMBOL_GPL(call_rcu);
 
-/*
- * Queue an RCU callback for lazy invocation after a grace period.
- * This will likely be later named something like "call_rcu_lazy()",
- * but this change will require some way of tagging the lazy RCU
- * callbacks in the list of pending callbacks.  Until then, this
- * function may only be called from __kfree_rcu().
- */
-void kfree_call_rcu(struct rcu_head *head,
-		    void (*func)(struct rcu_head *rcu))
-{
-	__call_rcu(head, func, &rcu_preempt_state, -1, 1);
-}
-EXPORT_SYMBOL_GPL(kfree_call_rcu);
-
 /**
  * synchronize_rcu - wait until a grace period has elapsed.
  *
@@ -956,16 +933,6 @@ long rcu_batches_completed(void)
 EXPORT_SYMBOL_GPL(rcu_batches_completed);
 
 /*
- * Force a quiescent state for RCU, which, because there is no preemptible
- * RCU, becomes the same as rcu-sched.
- */
-void rcu_force_quiescent_state(void)
-{
-	rcu_sched_force_quiescent_state();
-}
-EXPORT_SYMBOL_GPL(rcu_force_quiescent_state);
-
-/*
  * Because preemptible RCU does not exist, we never have to check for
  * CPUs being in quiescent states.
  */
@@ -1043,22 +1010,6 @@ static int rcu_preempt_offline_tasks(struct rcu_state *rsp,
 static void rcu_preempt_check_callbacks(int cpu)
 {
 }
-
-/*
- * Queue an RCU callback for lazy invocation after a grace period.
- * This will likely be later named something like "call_rcu_lazy()",
- * but this change will require some way of tagging the lazy RCU
- * callbacks in the list of pending callbacks.  Until then, this
- * function may only be called from __kfree_rcu().
- *
- * Because there is no preemptible RCU, we use RCU-sched instead.
- */
-void kfree_call_rcu(struct rcu_head *head,
-		    void (*func)(struct rcu_head *rcu))
-{
-	__call_rcu(head, func, &rcu_sched_state, -1, 1);
-}
-EXPORT_SYMBOL_GPL(kfree_call_rcu);
 
 /*
  * Wait for an rcu-preempt grace period, but make it happen quickly.
@@ -1914,12 +1865,11 @@ static void print_cpu_stall_info(struct rcu_state *rsp, int cpu)
 		ticks_value = rsp->gpnum - rdp->gpnum;
 	}
 	print_cpu_stall_fast_no_hz(fast_no_hz, cpu);
-	pr_err("\t%d: (%lu %s) idle=%03x/%llx/%d softirq=%u/%u fqs=%ld %s\n",
+	printk(KERN_ERR "\t%d: (%lu %s) idle=%03x/%llx/%d softirq=%u/%u %s\n",
 	       cpu, ticks_value, ticks_title,
 	       atomic_read(&rdtp->dynticks) & 0xfff,
 	       rdtp->dynticks_nesting, rdtp->dynticks_nmi_nesting,
 	       rdp->softirq_snap, kstat_softirqs_cpu(RCU_SOFTIRQ, cpu),
-	       ACCESS_ONCE(rsp->n_force_qs) - rsp->n_force_qs_gpstart,
 	       fast_no_hz);
 }
 
@@ -2011,19 +1961,6 @@ static int __init parse_rcu_nocb_poll(char *arg)
 	return 0;
 }
 early_param("rcu_nocb_poll", parse_rcu_nocb_poll);
-
-/*
- * Do any no-CBs CPUs need another grace period?
- *
- * Interrupts must be disabled.  If the caller does not hold the root
- * rnp_node structure's ->lock, the results are advisory only.
- */
-static int rcu_nocb_needs_gp(struct rcu_state *rsp)
-{
-	struct rcu_node *rnp = rcu_get_root(rsp);
-
-	return rnp->need_future_gp[(ACCESS_ONCE(rnp->completed) + 1) & 0x1];
-}
 
 /*
  * Wake up any no-CBs CPUs' kthreads that were waiting on the just-ended
@@ -2291,11 +2228,6 @@ static bool init_nocb_callback_list(struct rcu_data *rdp)
 }
 
 #else /* #ifdef CONFIG_RCU_NOCB_CPU */
-
-static int rcu_nocb_needs_gp(struct rcu_state *rsp)
-{
-	return 0;
-}
 
 static void rcu_nocb_gp_cleanup(struct rcu_state *rsp, struct rcu_node *rnp)
 {
