@@ -15,21 +15,30 @@
 #ifndef __EXYNOS_MFC_MEDIA_H
 #define __EXYNOS_MFC_MEDIA_H __FILE__
 
+/*      Pixel format          FOURCC                     depth  Description  */
+
 /* RGB formats */
 #define V4L2_PIX_FMT_RGB32X    v4l2_fourcc('R', 'G', 'B', 'X') /* 32  RGB-8-8-8-8   */
+#define V4L2_PIX_FMT_ARGB32    v4l2_fourcc('A', 'R', 'G', 'B') /* 32  ARGB-8-8-8-8   */
 
 /* two planes -- one Y, one Cr + Cb interleaved  */
+#define V4L2_PIX_FMT_YUV444_2P v4l2_fourcc('Y', 'U', '2', 'P') /* 24  Y/CbCr */
 #define V4L2_PIX_FMT_YUV444_2P v4l2_fourcc('Y', 'U', '2', 'P') /* 24  Y/CbCr */
 #define V4L2_PIX_FMT_YVU444_2P v4l2_fourcc('Y', 'V', '2', 'P') /* 24  Y/CrCb */
 
 /* three planes -- one Y, one Cr, one Cb */
 #define V4L2_PIX_FMT_YUV444_3P v4l2_fourcc('Y', 'U', '3', 'P') /* 24  Y/Cb/Cr */
+#define V4L2_PIX_FMT_YUV422V_3P v4l2_fourcc('Y', 'U', 'V', '3') /* 16  Y/Cb/Cr */
 
 /* two non contiguous planes - one Y, one Cr + Cb interleaved  */
 /* 21  Y/CrCb 4:2:0  */
 #define V4L2_PIX_FMT_NV21M    v4l2_fourcc('N', 'M', '2', '1')
 /* 12  Y/CbCr 4:2:0 16x16 macroblocks */
 #define V4L2_PIX_FMT_NV12MT_16X16 v4l2_fourcc('V', 'M', '1', '2')
+
+/* three non contiguous planes - Y, Cb, Cr */
+/* 12  YVU420 planar */
+//#define V4L2_PIX_FMT_YVU420M  v4l2_fourcc('Y', 'V', 'U', 'M')
 
 /* compressed formats */
 #define V4L2_PIX_FMT_H264_MVC v4l2_fourcc('M', '2', '6', '4') /* H264 MVC */
@@ -277,6 +286,8 @@ enum v4l2_mpeg_video_hevc_hierarchical_coding_type {
 					(V4L2_CID_MPEG_MFC_BASE + 117)
 #define V4L2_CID_MPEG_VIDEO_HEVC_HIERARCHICAL_CODING_LAYER_QP   \
 					(V4L2_CID_MPEG_MFC_BASE + 118)
+#define V4L2_CID_MPEG_VIDEO_HEVC_HIERARCHICAL_CODING_LAYER_BIT  \
+                                        (V4L2_CID_MPEG_MFC_BASE + 119)
 #define V4L2_CID_MPEG_VIDEO_HEVC_PROFILE			\
 					(V4L2_CID_MPEG_MFC_BASE + 120)
 #define V4L2_CID_MPEG_VIDEO_HEVC_LEVEL				\
