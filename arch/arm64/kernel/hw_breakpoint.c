@@ -680,7 +680,7 @@ unlock:
 		if (debug_info->wps_disabled)
 			return 0;
 
-		if (test_thread_flag(TIF_SINGLESTEP))
+		if (test_thread_flag_relaxed(TIF_SINGLESTEP))
 			debug_info->suspended_step = 1;
 		else
 			user_enable_single_step(current);
