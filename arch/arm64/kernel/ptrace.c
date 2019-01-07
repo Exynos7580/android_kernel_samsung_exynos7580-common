@@ -1176,7 +1176,7 @@ asmlinkage int syscall_trace_enter(struct pt_regs *regs)
 		 * a value set to x0 here is not used in this case, we may
 		 * neglect the case.
 		 */
-		if (!test_thread_flag(TIF_SYSCALL_TRACE) ||
+		if (!test_thread_flag_relaxed(TIF_SYSCALL_TRACE) ||
 				(IS_SKIP_SYSCALL(saved_syscallno)))
 			regs->regs[0] = -ENOSYS;
 	}
