@@ -4542,8 +4542,8 @@ select_task_rq_fair(struct task_struct *p, int sd_flag, int wake_flags)
 	}
 
 	if (!sd) {
-	    if (sd_flag & SD_BALANCE_WAKE) /* XXX always ? */
-		    new_cpu = select_idle_sibling(p, new_cpu);
+		if (sd_flag & SD_BALANCE_WAKE) /* XXX always ? */
+			new_cpu = select_idle_sibling(p, new_cpu);
 
 	} else while (sd) {
 		int load_idx = sd->forkexec_idx;
