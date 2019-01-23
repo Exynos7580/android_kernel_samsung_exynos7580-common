@@ -1053,7 +1053,8 @@ static int cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 	 */
 	ret = cpufreq_driver->init(policy);
 	if (ret) {
-		pr_debug("initialization failed\n");
+		pr_debug("%s: failed to add policy: %d\n", __func__,
+			 ret);
 		goto err_set_policy_cpu;
 	}
 
