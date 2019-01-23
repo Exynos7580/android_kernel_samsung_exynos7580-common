@@ -772,6 +772,7 @@ static ssize_t store_target_loads(
 	tunables->target_loads = new_target_loads;
 	tunables->ntarget_loads = ntokens;
 	spin_unlock_irqrestore(&tunables->target_loads_lock, flags);
+
 	return count;
 }
 
@@ -821,6 +822,7 @@ static ssize_t store_above_hispeed_delay(
 	tunables->above_hispeed_delay = new_above_hispeed_delay;
 	tunables->nabove_hispeed_delay = ntokens;
 	spin_unlock_irqrestore(&tunables->above_hispeed_delay_lock, flags);
+
 	return count;
 
 }
@@ -837,10 +839,12 @@ static ssize_t store_hispeed_freq(struct cpufreq_interactive_tunables *tunables,
 	int ret;
 	long unsigned int val;
 
-	ret = kstrtoul(buf, 0, &val);
+	ret = strict_strtoul(buf, 0, &val);
 	if (ret < 0)
 		return ret;
+
 	tunables->hispeed_freq = val;
+
 	return count;
 }
 
@@ -856,10 +860,12 @@ static ssize_t store_go_hispeed_load(struct cpufreq_interactive_tunables
 	int ret;
 	unsigned long val;
 
-	ret = kstrtoul(buf, 0, &val);
+	ret = strict_strtoul(buf, 0, &val);
 	if (ret < 0)
 		return ret;
+
 	tunables->go_hispeed_load = val;
+
 	return count;
 }
 
@@ -875,10 +881,12 @@ static ssize_t store_min_sample_time(struct cpufreq_interactive_tunables
 	int ret;
 	unsigned long val;
 
-	ret = kstrtoul(buf, 0, &val);
+	ret = strict_strtoul(buf, 0, &val);
 	if (ret < 0)
 		return ret;
+
 	tunables->min_sample_time = val;
+
 	return count;
 }
 
@@ -894,7 +902,7 @@ static ssize_t store_timer_rate(struct cpufreq_interactive_tunables *tunables,
 	int ret;
 	unsigned long val, val_round;
 
-	ret = kstrtoul(buf, 0, &val);
+	ret = strict_strtoul(buf, 0, &val);
 	if (ret < 0)
 		return ret;
 
@@ -906,6 +914,7 @@ static ssize_t store_timer_rate(struct cpufreq_interactive_tunables *tunables,
 	val_round = usecs_to_jiffies(val_round);
 
 	tunables->timer_rate = val_round;
+
 	return count;
 }
 
@@ -926,6 +935,7 @@ static ssize_t store_timer_slack(struct cpufreq_interactive_tunables *tunables,
 		return ret;
 
 	tunables->timer_slack_val = usecs_to_jiffies(val);
+
 	return count;
 }
 
@@ -974,6 +984,7 @@ static ssize_t store_boostpulse(struct cpufreq_interactive_tunables *tunables,
 	trace_cpufreq_interactive_boost("pulse");
 	if (!tunables->boosted)
 		cpufreq_interactive_boost(tunables);
+
 	return count;
 }
 
@@ -994,6 +1005,7 @@ static ssize_t store_boostpulse_duration(struct cpufreq_interactive_tunables
 		return ret;
 
 	tunables->boostpulse_duration_val = val;
+
 	return count;
 }
 
@@ -1016,7 +1028,9 @@ static ssize_t store_io_is_busy(struct cpufreq_interactive_tunables *tunables,
 	/* Prevent ROM to set 1 here */
 	if (val == 1)
 		val = 0;
+
 	tunables->io_is_busy = val;
+
 	return count;
 }
 
@@ -1581,6 +1595,7 @@ static int __init cpufreq_interactive_init(void)
 	pm_qos_add_notifier(PM_QOS_CLUSTER0_FREQ_MAX, &cpufreq_interactive_cluster0_max_qos_notifier);
 #endif
 #endif
+
 	return cpufreq_register_governor(&cpufreq_gov_interactive);
 }
 
