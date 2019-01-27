@@ -526,10 +526,8 @@ static void cpufreq_interactive_idle_start(void)
 		 * min indefinitely.  This should probably be a quirk of
 		 * the CPUFreq driver.
 		 */
-		if (!pending) {
-			pcpu->last_evaluated_jiffy = get_jiffies_64();
+		if (!pending)
 			cpufreq_interactive_timer_resched(smp_processor_id());
-		}
 	}
 
 	up_read(&pcpu->enable_sem);
