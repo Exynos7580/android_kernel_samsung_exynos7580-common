@@ -186,7 +186,7 @@ static void cpufreq_interactive_timer_resched(unsigned long cpu)
  * function.
  */
 static void cpufreq_interactive_timer_start(
-       struct cpufreq_interactive_tunables *tunables, int cpu)
+	struct cpufreq_interactive_tunables *tunables, int cpu)
 {
 	struct cpufreq_interactive_cpuinfo *pcpu = &per_cpu(cpuinfo, cpu);
 	u64 expires = round_to_nw_start(pcpu->last_evaluated_jiffy, tunables);
