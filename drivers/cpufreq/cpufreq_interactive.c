@@ -1281,6 +1281,9 @@ static int cpufreq_governor_interactive(struct cpufreq_policy *policy,
 			return rc;
 		}
 
+		if (config_enabled(CONFIG_SOC_EXYNOS7580))
+			kobject_uevent(&policy->kobj, KOBJ_CHANGE);
+
 		if (!policy->governor->initialized) {
 			idle_notifier_register(&cpufreq_interactive_idle_nb);
 			cpufreq_register_notifier(&cpufreq_notifier_block,
