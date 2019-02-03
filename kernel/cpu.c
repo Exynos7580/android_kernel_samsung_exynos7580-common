@@ -432,16 +432,14 @@ int __ref cpu_down(unsigned int cpu)
 {
 	int err;
 
-#if 0	// We will use only stay online CPU cores 0 and 4 at anytime instead of a whole cluster.
-	/* kthreads require one little-cluster CPU to stay online */
-	if (!cpu)
-		return -EINVAL;
-#endif
+	cpu_maps_update_begin();
+
 	// AP: Keep CPU cores 0 and 4 always on
 	if ((cpu == 0) || (cpu == 4))
-		return -EINVAL;
-
-	cpu_maps_update_begin();
+	{
+		err = -EBUSY;
+		goto out;
+	}
 
 	if (cpu_hotplug_disabled) {
 		err = -EBUSY;
