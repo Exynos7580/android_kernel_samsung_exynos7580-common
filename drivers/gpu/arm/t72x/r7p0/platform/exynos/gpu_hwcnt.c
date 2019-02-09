@@ -90,7 +90,7 @@ mali_error exynos_gpu_hwcnt_update(void *dev)
 	if (kbdev->hwcnt.is_powered && kbdev->hwcnt.kctx) {
 		err = hwcnt_dump(kbdev->hwcnt.kctx);
 		if (err != MALI_ERROR_NONE) {
-			GPU_LOG(DVFS_INFO, DUMMY, 0u, 0u, "hwcnt dump error in %s %d \n", __FUNCTION__, err);
+			GPU_LOG(DVFS_INFO, DUMMY, 0u, 0u, "hwcnt dump error in %s %d \n", __func__, err);
 			goto out;
 		}
 	}
@@ -415,7 +415,7 @@ mali_error hwcnt_dump(struct kbase_context *kctx)
 	struct kbase_device *kbdev;
 
 	if (kctx == NULL) {
-		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "kctx is NULL error in %s %d \n", __FUNCTION__, err);
+		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "kctx is NULL error in %s %d \n", __func__, err);
 		goto out;
 	}
 
@@ -429,14 +429,14 @@ mali_error hwcnt_dump(struct kbase_context *kctx)
 	err = kbase_instr_hwcnt_dump(kbdev->hwcnt.kctx);
 
 	if (err != MALI_ERROR_NONE) {
-		GPU_LOG(DVFS_INFO, DUMMY, 0u, 0u, "kbase_instr_hwcnt_dump error in %s %d \n", __FUNCTION__, err);
+		GPU_LOG(DVFS_INFO, DUMMY, 0u, 0u, "kbase_instr_hwcnt_dump error in %s %d \n", __func__, err);
 		goto out;
 	}
 
 	err = kbase_instr_hwcnt_clear(kbdev->hwcnt.kctx);
 
 	if (err != MALI_ERROR_NONE) {
-		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "kbase_instr_hwcnt_clear error in %s %d \n", __FUNCTION__, err);
+		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "kbase_instr_hwcnt_clear error in %s %d \n", __func__, err);
 		goto out;
 	}
 

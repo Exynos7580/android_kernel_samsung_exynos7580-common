@@ -104,7 +104,7 @@ dhd_deferred_work_init(void *dhd_info)
 	gfp_t	flags = CAN_SLEEP()? GFP_KERNEL : GFP_ATOMIC;
 
 	if (!dhd_info) {
-		DHD_ERROR(("%s: dhd info not initialized\n", __FUNCTION__));
+		DHD_ERROR(("%s: dhd info not initialized\n", __func__));
 		goto return_null;
 	}
 
@@ -112,7 +112,7 @@ dhd_deferred_work_init(void *dhd_info)
 		flags);
 
 	if (!work) {
-		DHD_ERROR(("%s: work queue creation failed \n", __FUNCTION__));
+		DHD_ERROR(("%s: work queue creation failed \n", __func__));
 		goto return_null;
 	}
 
@@ -126,7 +126,7 @@ dhd_deferred_work_init(void *dhd_info)
 	fifo_size = is_power_of_2(fifo_size)? fifo_size : roundup_pow_of_two(fifo_size);
 	buf = (u8*)kzalloc(fifo_size, flags);
 	if (!buf) {
-		DHD_ERROR(("%s: prio work fifo allocation failed \n", __FUNCTION__));
+		DHD_ERROR(("%s: prio work fifo allocation failed \n", __func__));
 		goto return_null;
 	}
 
@@ -142,7 +142,7 @@ dhd_deferred_work_init(void *dhd_info)
 	fifo_size = is_power_of_2(fifo_size)? fifo_size : roundup_pow_of_two(fifo_size);
 	buf = (u8*)kzalloc(fifo_size, flags);
 	if (!buf) {
-		DHD_ERROR(("%s: work fifo allocation failed \n", __FUNCTION__));
+		DHD_ERROR(("%s: work fifo allocation failed \n", __func__));
 		goto return_null;
 	}
 
@@ -155,7 +155,7 @@ dhd_deferred_work_init(void *dhd_info)
 
 	work->dhd_info = dhd_info;
 	deferred_wq = work;
-	DHD_ERROR(("%s: work queue initialized \n", __FUNCTION__));
+	DHD_ERROR(("%s: work queue initialized \n", __func__));
 	return work;
 
 return_null:
@@ -173,7 +173,7 @@ dhd_deferred_work_deinit(void *work)
 
 
 	if (!deferred_work) {
-		DHD_ERROR(("%s: deferred work has been freed alread \n", __FUNCTION__));
+		DHD_ERROR(("%s: deferred work has been freed alread \n", __func__));
 		return;
 	}
 
@@ -207,13 +207,13 @@ dhd_deferred_schedule_work(void *event_data, u8 event, event_handler_t event_han
 	int	status;
 
 	if (!deferred_wq) {
-		DHD_ERROR(("%s: work queue not initialized \n", __FUNCTION__));
+		DHD_ERROR(("%s: work queue not initialized \n", __func__));
 		ASSERT(0);
 		return DHD_WQ_STS_UNINITIALIZED;
 	}
 
 	if (!event || (event >= DHD_MAX_WQ_EVENTS)) {
-		DHD_ERROR(("%s: Unknown event \n", __FUNCTION__));
+		DHD_ERROR(("%s: Unknown event \n", __func__));
 		return DHD_WQ_STS_UNKNOWN_EVENT;
 	}
 
@@ -251,7 +251,7 @@ dhd_get_scheduled_work(struct dhd_deferred_event_t *event)
 	int	status = 0;
 
 	if (!deferred_wq) {
-		DHD_ERROR(("%s: work queue not initialized \n", __FUNCTION__));
+		DHD_ERROR(("%s: work queue not initialized \n", __func__));
 		return DHD_WQ_STS_UNINITIALIZED;
 	}
 
@@ -288,20 +288,20 @@ dhd_deferred_work_handler(struct work_struct *work)
 	int				status;
 
 	if (!deferred_work) {
-		DHD_ERROR(("%s: work queue not initialized\n", __FUNCTION__));
+		DHD_ERROR(("%s: work queue not initialized\n", __func__));
 		return;
 	}
 
 	do {
 		status = dhd_get_scheduled_work(&work_event);
-		DHD_TRACE(("%s: event to handle %d \n", __FUNCTION__, status));
+		DHD_TRACE(("%s: event to handle %d \n", __func__, status));
 		if (!status) {
-			DHD_TRACE(("%s: No event to handle %d \n", __FUNCTION__, status));
+			DHD_TRACE(("%s: No event to handle %d \n", __func__, status));
 			break;
 		}
 
 		if (work_event.event > DHD_MAX_WQ_EVENTS) {
-			DHD_TRACE(("%s: Unknown event %d \n", __FUNCTION__, work_event.event));
+			DHD_TRACE(("%s: Unknown event %d \n", __func__, work_event.event));
 			break;
 		}
 
@@ -309,7 +309,7 @@ dhd_deferred_work_handler(struct work_struct *work)
 			work_event.event_handler(deferred_work->dhd_info,
 				work_event.event_data, work_event.event);
 		} else {
-			DHD_ERROR(("%s: event not defined %d\n", __FUNCTION__, work_event.event));
+			DHD_ERROR(("%s: event not defined %d\n", __func__, work_event.event));
 		}
 	} while (1);
 	return;

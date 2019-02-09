@@ -530,19 +530,19 @@ typedef struct {
 
 #define DHD_NULL_CHK_AND_RET(cond) \
 	if (!cond) { \
-		DHD_ERROR(("%s " #cond " is NULL\n", __FUNCTION__)); \
+		DHD_ERROR(("%s " #cond " is NULL\n", __func__)); \
 		return; \
 	}
 
 #define DHD_NULL_CHK_AND_RET_VAL(cond, value) \
 	if (!cond) { \
-		DHD_ERROR(("%s " #cond " is NULL\n", __FUNCTION__)); \
+		DHD_ERROR(("%s " #cond " is NULL\n", __func__)); \
 		return value; \
 	}
 
 #define DHD_NULL_CHK_AND_GOTO(cond, label) \
 	if (!cond) { \
-		DHD_ERROR(("%s " #cond " is NULL\n", __FUNCTION__)); \
+		DHD_ERROR(("%s " #cond " is NULL\n", __func__)); \
 		goto label; \
 	}
 
@@ -1147,7 +1147,7 @@ WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(dhd_workitem_context_t, dhd_get_dhd_workitem_
 	#define DHD_PM_RESUME_RETURN_ERROR(a)   do { \
 			if (dhd_mmc_suspend) { \
 				printf("%s[%d]: mmc is still in suspend state!!!\n", \
-					__FUNCTION__, __LINE__); \
+					__func__, __LINE__); \
 				return a; \
 			} \
 		} while (0)
@@ -1245,10 +1245,10 @@ inline static void MUTEX_UNLOCK_SOFTAP_SET(dhd_pub_t * dhdp)
 
 #ifdef DHD_DEBUG_WAKE_LOCK
 #define PRINT_CALL_INFO(str) printf("%s: %s %d\n", \
-	str, __FUNCTION__, __LINE__)
+	str, __func__, __LINE__)
 
 #define PRINT_CALL_INFO_TIMEOUT(str, val) \
-	printf("%s[%d]: %s %d\n", str, val, __FUNCTION__, __LINE__)
+	printf("%s[%d]: %s %d\n", str, val, __func__, __LINE__)
 
 #else
 #define PRINT_CALL_INFO(str)
@@ -1341,7 +1341,7 @@ inline static void MUTEX_UNLOCK_SOFTAP_SET(dhd_pub_t * dhdp)
 #ifdef DHD_USE_SCAN_WAKELOCK
 #ifdef DHD_DEBUG_SCAN_WAKELOCK
 #define PRINT_SCAN_CALL(str) printf("%s: %s %d\n", \
-		str, __FUNCTION__, __LINE__)
+		str, __func__, __LINE__)
 #else
 #define PRINT_SCAN_CALL(str)
 #endif /* DHD_DEBUG_SCAN_WAKELOCK */
@@ -1533,7 +1533,7 @@ extern void dhd_os_ioctl_resp_unlock(dhd_pub_t * pub);
 extern void dhd_wakeup_ioctl_event(dhd_pub_t *pub, dhd_ioctl_recieved_status_t reason);
 #else
 static INLINE void dhd_wakeup_ioctl_event(dhd_pub_t *pub, dhd_ioctl_recieved_status_t reason)
-{ printf("%s is NOT implemented for SDIO", __FUNCTION__); return; }
+{ printf("%s is NOT implemented for SDIO", __func__); return; }
 #endif
 #ifdef SHOW_LOGTRACE
 extern int dhd_os_read_file(void *file, char *buf, uint32 size);
@@ -1814,7 +1814,7 @@ extern int dhd_os_ds_enter_wait(dhd_pub_t * pub, uint * condition);
 extern int dhd_os_ds_enter_wake(dhd_pub_t * pub);
 #else
 static INLINE int dhd_os_ds_enter_wait(dhd_pub_t * pub, uint * condition)
-{ printf("%s is Not supported for this platform", __FUNCTION__); return 0; }
+{ printf("%s is Not supported for this platform", __func__); return 0; }
 static INLINE int dhd_os_ds_enter_wake(dhd_pub_t * pub)
 { return 0; }
 #endif /* DHD_EFI */

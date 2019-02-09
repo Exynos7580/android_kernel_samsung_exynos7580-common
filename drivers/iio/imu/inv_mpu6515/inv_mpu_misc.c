@@ -1762,7 +1762,7 @@ int inv_get_shealth_cadence(struct inv_mpu_state *st, u8 start, u8 end, s32 cade
 	return 0;
 
 read_fail:
-	pr_err("[SHEALTH] %s error\n", __FUNCTION__);
+	pr_err("[SHEALTH] %s error\n", __func__);
 	return result;
 }
 

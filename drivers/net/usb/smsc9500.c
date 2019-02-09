@@ -69,7 +69,7 @@
 	{                               \
 	    if((A) < 0)			\
 	    {                           \
-		SMSC_WARNING("Failure in %s(), line: %d\n", __FUNCTION__,__LINE__);    \
+		SMSC_WARNING("Failure in %s(), line: %d\n", __func__,__LINE__);    \
 		goto DONE;              \
 	    }                           \
 	}

@@ -961,7 +961,7 @@ wl_probe_wdev_all(struct bcm_cfg80211 *cfg)
 	BCM_LIST_FOR_EACH_ENTRY_SAFE(_net_info, next,
 		&cfg->net_list, list) {
 		WL_ERR(("%s: net_list[%d] bssidx: %d, "
-			"ndev: %p, wdev: %p \n", __FUNCTION__,
+			"ndev: %p, wdev: %p \n", __func__,
 			idx++, _net_info->bssidx,
 			_net_info->ndev, _net_info->wdev));
 	}

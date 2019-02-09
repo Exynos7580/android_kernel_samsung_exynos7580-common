@@ -138,7 +138,7 @@ dbg_ring_poll_worker(struct work_struct *work)
 
 	buf = MALLOCZ(dhdp->osh, buflen);
 	if (!buf) {
-		DHD_ERROR(("%s failed to allocate read buf\n", __FUNCTION__));
+		DHD_ERROR(("%s failed to allocate read buf\n", __func__));
 		sched = FALSE;
 		goto exit;
 	}
@@ -209,7 +209,7 @@ dhd_os_start_logging(dhd_pub_t *dhdp, char *ring_name, int log_level,
 		return BCME_UNSUPPORTED;
 
 	DHD_DBGIF(("%s , log_level : %d, time_intval : %d, threshod %d Bytes\n",
-		__FUNCTION__, log_level, time_intval, threshold));
+		__func__, log_level, time_intval, threshold));
 
 	/* change the configuration */
 	ret = dhd_dbg_set_configuration(dhdp, ring_id, log_level, flags, threshold);
@@ -227,7 +227,7 @@ dhd_os_start_logging(dhd_pub_t *dhdp, char *ring_name, int log_level,
 		ring_info->tsoffset = local_clock();
 		if (dhd_wl_ioctl_get_intiovar(dhdp, "rte_timesync", &ms, WLC_GET_VAR,
 				FALSE, 0))
-			DHD_ERROR(("%s rte_timesync failed\n", __FUNCTION__));
+			DHD_ERROR(("%s rte_timesync failed\n", __func__));
 		do_div(ring_info->tsoffset, 1000000);
 		ring_info->tsoffset -= ms;
 	}
@@ -256,7 +256,7 @@ dhd_os_reset_logging(dhd_pub_t *dhdp)
 
 	/* Stop all rings */
 	for (ring_id = DEBUG_RING_ID_INVALID + 1; ring_id < DEBUG_RING_ID_MAX; ring_id++) {
-		DHD_DBGIF(("%s: Stop ring buffer %d\n", __FUNCTION__, ring_id));
+		DHD_DBGIF(("%s: Stop ring buffer %d\n", __func__, ring_id));
 
 		ring_info = &os_priv[ring_id];
 		/* cancel any pending work */
@@ -324,7 +324,7 @@ dhd_os_trigger_get_ring_data(dhd_pub_t *dhdp, char *ring_name)
 		}
 		schedule_delayed_work(&ring_info->work, 0);
 	} else {
-		DHD_ERROR(("%s : os_priv is NULL\n", __FUNCTION__));
+		DHD_ERROR(("%s : os_priv is NULL\n", __func__));
 		ret = BCME_ERROR;
 	}
 	return ret;
@@ -368,7 +368,7 @@ dhd_os_push_push_ring_data(dhd_pub_t *dhdp, int ring_id, void *data, int32 data_
 	ret = dhd_dbg_push_to_ring(dhdp, ring_id, &msg_hdr, event_data);
 	if (ret) {
 		DHD_ERROR(("%s : failed to push data into the ring (%d) with ret(%d)\n",
-			__FUNCTION__, ring_id, ret));
+			__func__, ring_id, ret));
 	}
 
 	return ret;

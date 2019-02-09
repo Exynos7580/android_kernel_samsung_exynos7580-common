@@ -116,7 +116,7 @@ dhd_clear_cis(dhd_pub_t *dhdp)
 	if (g_cis_buf) {
 		MFREE(dhdp->osh, g_cis_buf, CIS_BUF_SIZE);
 		g_cis_buf = NULL;
-		DHD_ERROR(("%s: Local CIS buffer is freed\n", __FUNCTION__));
+		DHD_ERROR(("%s: Local CIS buffer is freed\n", __func__));
 	}
 
 	g_have_cis_dump = FALSE;
@@ -131,18 +131,18 @@ dhd_read_cis(dhd_pub_t *dhdp)
 	int length = strlen("cisdump");
 
 	if (length >= buf_size) {
-		DHD_ERROR(("%s: check CIS_BUF_SIZE\n", __FUNCTION__));
+		DHD_ERROR(("%s: check CIS_BUF_SIZE\n", __func__));
 		return BCME_BADLEN;
 	}
 
 	/* Try reading out from CIS */
 	g_cis_buf = MALLOCZ(dhdp->osh, buf_size);
 	if (!g_cis_buf) {
-		DHD_ERROR(("%s: Failed to alloc buffer for CIS\n", __FUNCTION__));
+		DHD_ERROR(("%s: Failed to alloc buffer for CIS\n", __func__));
 		g_have_cis_dump = FALSE;
 		return BCME_NOMEM;
 	} else {
-		DHD_ERROR(("%s: Local CIS buffer is alloced\n", __FUNCTION__));
+		DHD_ERROR(("%s: Local CIS buffer is alloced\n", __func__));
 		memset(g_cis_buf, 0, buf_size);
 	}
 
@@ -171,7 +171,7 @@ dhd_alloc_tuple_entry(dhd_pub_t *dhdp, const int idx)
 
 	entry = MALLOCZ(dhdp->osh, sizeof(tuple_entry_t));
 	if (!entry) {
-		DHD_ERROR(("%s: failed to alloc entry\n", __FUNCTION__));
+		DHD_ERROR(("%s: failed to alloc entry\n", __func__));
 		return NULL;
 	}
 
@@ -204,7 +204,7 @@ dhd_find_tuple_list_from_otp(dhd_pub_t *dhdp, int req_tup,
 
 	if (!g_have_cis_dump) {
 		DHD_ERROR(("%s: Couldn't find cis info from"
-			" local buffer\n", __FUNCTION__));
+			" local buffer\n", __func__));
 		return BCME_ERROR;
 	}
 
@@ -285,7 +285,7 @@ dhd_create_random_mac(char *buf, unsigned int buf_len)
 		(uint32)random_mac[0], (uint32)random_mac[1], (uint32)random_mac[2]);
 
 	DHD_ERROR(("%s: The Random Generated MAC ID: %s\n",
-		__FUNCTION__, random_mac));
+		__func__, random_mac));
 }
 
 int
@@ -305,7 +305,7 @@ dhd_set_macaddr_from_file(dhd_pub_t *dhdp)
 		dhd = dhdp->info;
 		mac = &dhdp->mac;
 	} else {
-		DHD_ERROR(("%s: dhd is NULL\n", __FUNCTION__));
+		DHD_ERROR(("%s: dhd is NULL\n", __func__));
 		return BCME_ERROR;
 	}
 
@@ -326,21 +326,21 @@ dhd_set_macaddr_from_file(dhd_pub_t *dhdp)
 		/* Write random MAC address to the file */
 		if (dhd_write_file(filepath_efs, mac_buf, sizeof(mac_buf)) < 0) {
 			DHD_ERROR(("%s: MAC address [%s] Failed to write into File:"
-				" %s\n", __FUNCTION__, mac_buf, filepath_efs));
+				" %s\n", __func__, mac_buf, filepath_efs));
 			return BCME_ERROR;
 		} else {
 			DHD_ERROR(("%s: MAC address [%s] written into File: %s\n",
-				__FUNCTION__, mac_buf, filepath_efs));
+				__func__, mac_buf, filepath_efs));
 		}
 	}
 #ifdef PLATFORM_SLP
 	/* Write random MAC address for framework */
 	if (dhd_write_file(filepath_mac, mac_buf, sizeof(mac_buf)) < 0) {
 		DHD_ERROR(("%s: MAC address [%s] Failed to write into File:"
-			" %s\n", __FUNCTION__, mac_buf, filepath_mac));
+			" %s\n", __func__, mac_buf, filepath_mac));
 	} else {
 		DHD_ERROR(("%s: MAC address [%s] written into File: %s\n",
-			__FUNCTION__, mac_buf, filepath_mac));
+			__func__, mac_buf, filepath_mac));
 	}
 #endif /* PLATFORM_SLP */
 
@@ -353,9 +353,9 @@ dhd_set_macaddr_from_file(dhd_pub_t *dhdp)
 		(uint32 *)&(mac->octet[4]), (uint32 *)&(mac->octet[5]));
 
 	if (_dhd_set_mac_address(dhd, 0, mac) == 0) {
-		DHD_INFO(("%s: MAC Address is overwritten\n", __FUNCTION__));
+		DHD_INFO(("%s: MAC Address is overwritten\n", __func__));
 	} else {
-		DHD_ERROR(("%s: _dhd_set_mac_address() failed\n", __FUNCTION__));
+		DHD_ERROR(("%s: _dhd_set_mac_address() failed\n", __func__));
 	}
 
 	return 0;
@@ -371,7 +371,7 @@ dhd_set_default_macaddr(dhd_pub_t *dhdp)
 	int ret;
 
 	if (!dhdp) {
-		DHD_ERROR(("%s: dhdp is NULL\n", __FUNCTION__));
+		DHD_ERROR(("%s: dhdp is NULL\n", __func__));
 		return BCME_BADARG;
 	}
 
@@ -381,7 +381,7 @@ dhd_set_default_macaddr(dhd_pub_t *dhdp)
 	ret = dhd_iovar(dhdp, 0, "cur_etheraddr", NULL, 0, iovbuf, sizeof(iovbuf),
 			FALSE);
 	if (ret < 0) {
-		DHD_ERROR(("%s: Can't get the default MAC address\n", __FUNCTION__));
+		DHD_ERROR(("%s: Can't get the default MAC address\n", __func__));
 		return BCME_NOTUP;
 	}
 
@@ -423,13 +423,13 @@ dhd_check_module_mac(dhd_pub_t *dhdp)
 	struct dhd_info *dhd;
 
 	if (!dhdp) {
-		DHD_ERROR(("%s: dhdp is NULL\n", __FUNCTION__));
+		DHD_ERROR(("%s: dhdp is NULL\n", __func__));
 		return BCME_BADARG;
 	}
 
 	dhd = dhdp->info;
 	if (!dhd) {
-		DHD_ERROR(("%s: dhd is NULL\n", __FUNCTION__));
+		DHD_ERROR(("%s: dhd is NULL\n", __func__));
 		return BCME_BADARG;
 	}
 
@@ -441,12 +441,12 @@ dhd_check_module_mac(dhd_pub_t *dhdp)
 	}
 
 	if (!g_have_cis_dump) {
-		DHD_INFO(("%s: Couldn't read CIS information\n", __FUNCTION__));
+		DHD_INFO(("%s: Couldn't read CIS information\n", __func__));
 
 		/* Read the MAC address from the specified file */
 		if (dhd_read_file(filepath_efs, otp_mac_buf, sizeof(otp_mac_buf)) < 0) {
 			DHD_ERROR(("%s: Couldn't read the file, "
-				"use the default MAC Address\n", __FUNCTION__));
+				"use the default MAC Address\n", __func__));
 			if (dhd_set_default_macaddr(dhdp) < 0) {
 				return BCME_BADARG;
 			}
@@ -491,7 +491,7 @@ dhd_check_module_mac(dhd_pub_t *dhdp)
 				(uint32)g_cis_buf[idx + 2], (uint32)g_cis_buf[idx + 3],
 				(uint32)g_cis_buf[idx + 4], (uint32)g_cis_buf[idx + 5]);
 			DHD_ERROR(("%s: MAC address is taken from OTP: " MACDBG "\n",
-				__FUNCTION__, MAC2STRDBG(&g_cis_buf[idx])));
+				__func__, MAC2STRDBG(&g_cis_buf[idx])));
 		} else {
 			/* Not found MAC address info from the OTP, use the default value */
 			if (dhd_set_default_macaddr(dhdp) < 0) {
@@ -504,7 +504,7 @@ dhd_check_module_mac(dhd_pub_t *dhdp)
 				(uint32)mac->octet[4], (uint32)mac->octet[5]);
 			DHD_ERROR(("%s: Cannot find MAC address info from OTP,"
 				" Check module mac by initial value: " MACDBG "\n",
-				__FUNCTION__, MAC2STRDBG(mac->octet)));
+				__func__, MAC2STRDBG(mac->octet)));
 		}
 
 		dhd_free_tuple_entry(dhdp, &mac_list);
@@ -512,9 +512,9 @@ dhd_check_module_mac(dhd_pub_t *dhdp)
 	}
 
 	if (_dhd_set_mac_address(dhd, 0, mac) == 0) {
-		DHD_INFO(("%s: MAC Address is set\n", __FUNCTION__));
+		DHD_INFO(("%s: MAC Address is set\n", __func__));
 	} else {
-		DHD_ERROR(("%s: Failed to set MAC address\n", __FUNCTION__));
+		DHD_ERROR(("%s: Failed to set MAC address\n", __func__));
 	}
 
 	return 0;
@@ -548,11 +548,11 @@ dhd_write_macaddr(struct ether_addr *mac)
 
 		if (ret < 0) {
 			DHD_ERROR(("%s: MAC address [%s] Failed to write into"
-				" File: %s\n", __FUNCTION__, mac_buf, filepath_data));
+				" File: %s\n", __func__, mac_buf, filepath_data));
 			return BCME_ERROR;
 		}
 	} else {
-		DHD_ERROR(("%s: filepath_data doesn't exist\n", __FUNCTION__));
+		DHD_ERROR(("%s: filepath_data doesn't exist\n", __func__));
 	}
 
 	if (filepath_efs) {
@@ -566,11 +566,11 @@ dhd_write_macaddr(struct ether_addr *mac)
 
 		if (ret < 0) {
 			DHD_ERROR(("%s: MAC address [%s] Failed to write into"
-				" File: %s\n", __FUNCTION__, mac_buf, filepath_efs));
+				" File: %s\n", __func__, mac_buf, filepath_efs));
 			return BCME_ERROR;
 		}
 	} else {
-		DHD_ERROR(("%s: filepath_efs doesn't exist\n", __FUNCTION__));
+		DHD_ERROR(("%s: filepath_efs doesn't exist\n", __func__));
 	}
 
 	return ret;
@@ -761,7 +761,7 @@ dhd_find_tuple_idx_from_otp(dhd_pub_t *dhdp, int req_tup, unsigned char *req_tup
 
 	if (!g_have_cis_dump) {
 		DHD_ERROR(("%s: Couldn't find cis info from"
-			" local buffer\n", __FUNCTION__));
+			" local buffer\n", __func__));
 		return BCME_ERROR;
 	}
 
@@ -825,11 +825,11 @@ dhd_check_module_cid(dhd_pub_t *dhdp)
 
 	/* Try reading out from CIS */
 	if (!g_have_cis_dump) {
-		DHD_INFO(("%s: Couldn't read CIS info\n", __FUNCTION__));
+		DHD_INFO(("%s: Couldn't read CIS info\n", __func__));
 		return BCME_ERROR;
 	}
 
-	DHD_INFO(("%s: Reading CIS from local buffer\n", __FUNCTION__));
+	DHD_INFO(("%s: Reading CIS from local buffer\n", __func__));
 #ifdef DUMP_CIS
 	dhd_dump_cis_buf(48);
 #endif /* DUMP_CIS */
@@ -863,7 +863,7 @@ dhd_check_module_cid(dhd_pub_t *dhdp)
 	}
 
 	/* find default nvram, if exist */
-	DHD_ERROR(("%s: cannot find CIS TUPLE set as default\n", __FUNCTION__));
+	DHD_ERROR(("%s: cannot find CIS TUPLE set as default\n", __func__));
 	max = sizeof(vid_info) / sizeof(vid_info_t);
 	for (idx = 0; idx < max; idx++) {
 		cur_info = &vid_info[idx];
@@ -871,7 +871,7 @@ dhd_check_module_cid(dhd_pub_t *dhdp)
 			goto write_cid;
 		}
 	}
-	DHD_ERROR(("%s: cannot find default CID\n", __FUNCTION__));
+	DHD_ERROR(("%s: cannot find default CID\n", __func__));
 	return BCME_ERROR;
 
 check_board_type:
@@ -880,7 +880,7 @@ check_board_type:
 	if (idx > 0) {
 		btype_start = &g_cis_buf[idx];
 		boardtype_len = tuple_length;
-		DHD_INFO(("%s: board type found.\n", __FUNCTION__));
+		DHD_INFO(("%s: board type found.\n", __func__));
 	} else {
 		boardtype_len = 0;
 	}
@@ -906,7 +906,7 @@ check_board_type:
 				(memcmp(cur_b_info->btype, btype_start,
 					cur_b_info->b_len - 1) == 0)) {
 				DHD_INFO(("%s : board type name : %s\n",
-					__FUNCTION__, cur_b_info->bname));
+					__func__, cur_b_info->bname));
 				break;
 			}
 			cur_b_info = NULL;
@@ -924,7 +924,7 @@ write_cid:
 #endif /* SUPPORT_MULTIPLE_BOARDTYPE */
 		strcpy(cid_info, cur_info->cid_info);
 
-	DHD_INFO(("%s: CIS MATCH FOUND : %s\n", __FUNCTION__, cid_info));
+	DHD_INFO(("%s: CIS MATCH FOUND : %s\n", __func__, cid_info));
 	dhd_write_file(cidfilepath, cid_info, strlen(cid_info) + 1);
 
 #ifdef BCM4334_CHIP
@@ -941,7 +941,7 @@ write_cid:
 		sizeof(otp_buf), 0, 0);
 	if (ret < 0) {
 		DHD_ERROR(("%s: OTP reading failed, err=%d\n",
-			__FUNCTION__, ret));
+			__func__, ret));
 		return ret;
 	}
 
@@ -950,21 +950,21 @@ write_cid:
 	flag_b3 = bcm_atoi(&otp_buf[33]);
 	if (flag_b3 & 0x1) {
 		DHD_ERROR(("%s: REV MATCH FOUND : 4334B3, %c\n",
-			__FUNCTION__, otp_buf[33]));
+			__func__, otp_buf[33]));
 		dhd_write_cid_file(revfilepath, "4334B3", 6);
 	}
 #endif /* BCM4334_CHIP */
 #ifdef BCM4335_CHIP
-	DHD_TRACE(("%s: BCM4335 Multiple Revision Check\n", __FUNCTION__));
+	DHD_TRACE(("%s: BCM4335 Multiple Revision Check\n", __func__));
 	if (concate_revision(dhdp->bus, rev_str, rev_str) < 0) {
-		DHD_ERROR(("%s: fail to concate revision\n", __FUNCTION__));
+		DHD_ERROR(("%s: fail to concate revision\n", __func__));
 		ret = -1;
 	} else {
 		if (strstr(rev_str, "_a0")) {
-			DHD_ERROR(("%s: REV MATCH FOUND : 4335A0\n", __FUNCTION__));
+			DHD_ERROR(("%s: REV MATCH FOUND : 4335A0\n", __func__));
 			dhd_write_file(revfilepath, "BCM4335A0", 9);
 		} else {
-			DHD_ERROR(("%s: REV MATCH FOUND : 4335B0\n", __FUNCTION__));
+			DHD_ERROR(("%s: REV MATCH FOUND : 4335B0\n", __func__));
 			dhd_write_file(revfilepath, "BCM4335B0", 9);
 		}
 	}
@@ -986,7 +986,7 @@ dhd_check_module(char *module_name)
 	if (ret < 0) {
 		return FALSE;
 	}
-	DHD_INFO(("%s: This module is %s \n", __FUNCTION__, vname));
+	DHD_INFO(("%s: This module is %s \n", __func__, vname));
 	return strstr(vname, module_name) ? TRUE : FALSE;
 }
 
@@ -997,10 +997,10 @@ dhd_check_module_b85a(void)
 	char *vname_b85a = "_b85a";
 
 	if (dhd_check_module(vname_b85a)) {
-		DHD_INFO(("%s: It's a b85a module\n", __FUNCTION__));
+		DHD_INFO(("%s: It's a b85a module\n", __func__));
 		ret = 1;
 	} else {
-		DHD_INFO(("%s: It is not a b85a module\n", __FUNCTION__));
+		DHD_INFO(("%s: It is not a b85a module\n", __func__));
 		ret = -1;
 	}
 
@@ -1015,13 +1015,13 @@ dhd_check_module_b90(void)
 	char *vname_b90s = "_b90s";
 
 	if (dhd_check_module(vname_b90b)) {
-		DHD_INFO(("%s: It's a b90b module \n", __FUNCTION__));
+		DHD_INFO(("%s: It's a b90b module \n", __func__));
 		ret = BCM4359_MODULE_TYPE_B90B;
 	} else if (dhd_check_module(vname_b90s)) {
-		DHD_INFO(("%s: It's a b90s module\n", __FUNCTION__));
+		DHD_INFO(("%s: It's a b90s module\n", __func__));
 		ret = BCM4359_MODULE_TYPE_B90S;
 	} else {
-		DHD_ERROR(("%s: It's neither b90b nor b90s\n", __FUNCTION__));
+		DHD_ERROR(("%s: It's neither b90b nor b90s\n", __func__));
 		ret = BCME_ERROR;
 	}
 
@@ -1045,7 +1045,7 @@ dhd_check_module_bcm4361(char *module_type, int index, bool *is_murata_fem)
 	ret = dhd_read_file(cidfilepath, vname, sizeof(vname)-1);
 	if (ret < 0) {
 		DHD_ERROR(("%s: failed to get module infomaion from .cid.info\n",
-			__FUNCTION__));
+			__func__));
 		return ret;
 	}
 
@@ -1063,11 +1063,11 @@ dhd_check_module_bcm4361(char *module_type, int index, bool *is_murata_fem)
 	if (ptr) {
 		memcpy(module_type, ptr, strlen(ptr));
 	} else {
-		DHD_ERROR(("%s: failed to get module infomaion\n", __FUNCTION__));
+		DHD_ERROR(("%s: failed to get module infomaion\n", __func__));
 		return BCME_ERROR;
 	}
 
-	DHD_INFO(("%s: module type = %s \n", __FUNCTION__, module_type));
+	DHD_INFO(("%s: module type = %s \n", __func__, module_type));
 
 	return ret;
 }

@@ -236,7 +236,7 @@ int get_roam_channel_list(int target_chan,
 	channels[0] = (target_chan & WL_CHANSPEC_CHAN_MASK) |
 		(target_chan <= CH_MAX_2G_CHANNEL ? band2G : band5G) | band_bw;
 
-	WL_DBG((" %s: %03d 0x%04X\n", __FUNCTION__, target_chan, channels[0]));
+	WL_DBG((" %s: %03d 0x%04X\n", __func__, target_chan, channels[0]));
 
 #if defined(CUSTOMER_HW4) && defined(WES_SUPPORT)
 	if (roamscan_mode == ROAMSCAN_MODE_WES) {
@@ -250,7 +250,7 @@ int get_roam_channel_list(int target_chan,
 
 			ch = CHSPEC_CHANNEL(ch) | (is_2G ? band2G : band5G) | band_bw;
 			if (band_match && !is_duplicated_channel(channels, n, ch)) {
-				WL_DBG((" %s: %03d(0x%X)\n", __FUNCTION__, CHSPEC_CHANNEL(ch), ch));
+				WL_DBG((" %s: %03d(0x%X)\n", __func__, CHSPEC_CHANNEL(ch), ch));
 				channels[n++] = ch;
 			}
 		}
@@ -272,7 +272,7 @@ int get_roam_channel_list(int target_chan,
 			band_match && !is_duplicated_channel(channels, n, ch) &&
 			(memcmp(roam_cache[i].ssid, ssid->SSID, ssid->SSID_len) == 0)) {
 			/* match found, add it */
-			WL_DBG((" %s: %03d(0x%04X)\n", __FUNCTION__,
+			WL_DBG((" %s: %03d(0x%04X)\n", __func__,
 				CHSPEC_CHANNEL(ch), ch));
 			channels[n++] = ch;
 		}

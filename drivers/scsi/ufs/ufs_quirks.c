@@ -43,7 +43,7 @@ int ufs_get_device_info(struct ufs_hba *hba, struct ufs_card_info *card_data)
 	err = ufshcd_read_health_desc(hba, health_buf,
 					QUERY_DESC_HEALTH_MAX_SIZE);
 	if (err)
-		printk("%s: DEVICE_HEALTH desc read fail, err  = %d\n", __FUNCTION__, err);
+		printk("%s: DEVICE_HEALTH desc read fail, err  = %d\n", __func__, err);
 
 	/* getting Life Time at Device Health DESC*/
 	card_data->lifetime = health_buf[HEALTH_DEVICE_DESC_PARAM_LIFETIMEA];
@@ -99,7 +99,7 @@ int ufs_get_device_info(struct ufs_hba *hba, struct ufs_card_info *card_data)
 	/* Null terminate the unique number string */
 	hba->unique_number[UFS_UNIQUE_NUMBER_LEN - 1] = '\0';
 
-	printk("%s: UNIQUE NUMBER = %s , Lifetime: 0x%02x \n", __FUNCTION__, hba->unique_number, health_buf[3]<<4|health_buf[4]);
+	printk("%s: UNIQUE NUMBER = %s , Lifetime: 0x%02x \n", __func__, hba->unique_number, health_buf[3]<<4|health_buf[4]);
 
 out:
 	return err;

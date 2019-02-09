@@ -82,25 +82,25 @@ dhd_wifi_init_gpio(void)
 
 	/* ========== WLAN_PWR_EN ============ */
 	wlan_reg_on = of_get_named_gpio(root_node, WIFI_WL_REG_ON_PROPNAME, 0);
-	printk(KERN_INFO "%s: gpio_wlan_power : %d\n", __FUNCTION__, wlan_reg_on);
+	printk(KERN_INFO "%s: gpio_wlan_power : %d\n", __func__, wlan_reg_on);
 
 	if (gpio_request_one(wlan_reg_on, GPIOF_OUT_INIT_LOW, "WL_REG_ON")) {
 		printk(KERN_ERR "%s: Faiiled to request gpio %d for WL_REG_ON\n",
-			__FUNCTION__, wlan_reg_on);
+			__func__, wlan_reg_on);
 	} else {
 		printk(KERN_ERR "%s: gpio_request WL_REG_ON done - WLAN_EN: GPIO %d\n",
-			__FUNCTION__, wlan_reg_on);
+			__func__, wlan_reg_on);
 	}
 
 	if (gpio_direction_output(wlan_reg_on, 1)) {
-		printk(KERN_ERR "%s: WL_REG_ON failed to pull up\n", __FUNCTION__);
+		printk(KERN_ERR "%s: WL_REG_ON failed to pull up\n", __func__);
 	} else {
-		printk(KERN_ERR "%s: WL_REG_ON is pulled up\n", __FUNCTION__);
+		printk(KERN_ERR "%s: WL_REG_ON is pulled up\n", __func__);
 	}
 
 	if (gpio_get_value(wlan_reg_on)) {
 		printk(KERN_INFO "%s: Initial WL_REG_ON: [%d]\n",
-			__FUNCTION__, gpio_get_value(wlan_reg_on));
+			__func__, gpio_get_value(wlan_reg_on));
 	}
 
 	/* Wait for WIFI_TURNON_DELAY due to power stability */
@@ -109,16 +109,16 @@ dhd_wifi_init_gpio(void)
 #ifdef CONFIG_BCMDHD_OOB_HOST_WAKE
 	/* ========== WLAN_HOST_WAKE ============ */
 	wlan_host_wake_up = of_get_named_gpio(root_node, WIFI_WLAN_HOST_WAKE_PROPNAME, 0);
-	printk(KERN_INFO "%s: gpio_wlan_host_wake : %d\n", __FUNCTION__, wlan_host_wake_up);
+	printk(KERN_INFO "%s: gpio_wlan_host_wake : %d\n", __func__, wlan_host_wake_up);
 
 	if (gpio_request_one(wlan_host_wake_up, GPIOF_IN, "WLAN_HOST_WAKE")) {
 		printk(KERN_ERR "%s: Faiiled to request gpio %d for WLAN_HOST_WAKE\n",
-			__FUNCTION__, wlan_host_wake_up);
+			__func__, wlan_host_wake_up);
 			return -ENODEV;
 	} else {
 		printk(KERN_ERR "%s: gpio_request WLAN_HOST_WAKE done"
 			" - WLAN_HOST_WAKE: GPIO %d\n",
-			__FUNCTION__, wlan_host_wake_up);
+			__func__, wlan_host_wake_up);
 	}
 
 	gpio_direction_input(wlan_host_wake_up);
@@ -126,7 +126,7 @@ dhd_wifi_init_gpio(void)
 #endif /* CONFIG_BCMDHD_OOB_HOST_WAKE */
 
 #if defined(CONFIG_BCM4359) || defined(CONFIG_BCM4361)
-	printk(KERN_INFO "%s: Call msm_pcie_enumerate\n", __FUNCTION__);
+	printk(KERN_INFO "%s: Call msm_pcie_enumerate\n", __func__);
 	msm_pcie_enumerate(MSM_PCIE_CH_NUM);
 #endif /* CONFIG_BCM4359 || CONFIG_BCM4361 */
 
@@ -142,7 +142,7 @@ dhd_wlan_power(int onoff)
 
 	if (onoff) {
 		if (gpio_direction_output(wlan_reg_on, 1)) {
-			printk(KERN_ERR "%s: WL_REG_ON is failed to pull up\n", __FUNCTION__);
+			printk(KERN_ERR "%s: WL_REG_ON is failed to pull up\n", __func__);
 			return -EIO;
 		}
 		if (gpio_get_value(wlan_reg_on)) {
@@ -157,7 +157,7 @@ dhd_wlan_power(int onoff)
 		}
 	} else {
 		if (gpio_direction_output(wlan_reg_on, 0)) {
-			printk(KERN_ERR "%s: WL_REG_ON is failed to pull up\n", __FUNCTION__);
+			printk(KERN_ERR "%s: WL_REG_ON is failed to pull up\n", __func__);
 			return -EIO;
 		}
 		if (gpio_get_value(wlan_reg_on)) {
@@ -209,11 +209,11 @@ dhd_wlan_init(void)
 {
 	int ret;
 
-	printk(KERN_INFO"%s: START.......\n", __FUNCTION__);
+	printk(KERN_INFO"%s: START.......\n", __func__);
 	ret = dhd_wifi_init_gpio();
 	if (ret < 0) {
 		printk(KERN_ERR "%s: failed to initiate GPIO, ret=%d\n",
-			__FUNCTION__, ret);
+			__func__, ret);
 		goto fail;
 	}
 
@@ -226,12 +226,12 @@ dhd_wlan_init(void)
 	ret = dhd_init_wlan_mem();
 	if (ret < 0) {
 		printk(KERN_ERR "%s: failed to alloc reserved memory,"
-			" ret=%d\n", __FUNCTION__, ret);
+			" ret=%d\n", __func__, ret);
 	}
 #endif /* CONFIG_BROADCOM_WIFI_RESERVED_MEM */
 
 fail:
-	printk(KERN_INFO"%s: FINISH.......\n", __FUNCTION__);
+	printk(KERN_INFO"%s: FINISH.......\n", __func__);
 	return ret;
 }
 #if defined(CONFIG_ARCH_MSM8996) || defined(CONFIG_ARCH_MSM8998) || \

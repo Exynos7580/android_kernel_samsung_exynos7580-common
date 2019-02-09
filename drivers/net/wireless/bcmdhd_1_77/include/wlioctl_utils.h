@@ -55,7 +55,7 @@ extern const char * wl_get_reinit_rc_name(int rc);
 #define CHK_CNTBUF_DATALEN(cntbuf, ioctl_buflen) do {					\
 	if (((wl_cnt_info_t *)cntbuf)->datalen +			\
 		OFFSETOF(wl_cnt_info_t, data) > ioctl_buflen)	\
-		printf("%s: IOVAR buffer short!\n", __FUNCTION__);	\
+		printf("%s: IOVAR buffer short!\n", __func__);	\
 } while (0)
 
 #endif /* _wlioctl_utils_h_ */

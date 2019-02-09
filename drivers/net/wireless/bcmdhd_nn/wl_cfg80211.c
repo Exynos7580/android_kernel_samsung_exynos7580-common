@@ -3331,7 +3331,7 @@ wl_set_set_wapi_ie(struct net_device *dev, struct cfg80211_connect_params *sme)
 		return BCME_ERROR;
 	}
 
-	WL_DBG((" %s \n", __FUNCTION__));
+	WL_DBG((" %s \n", __func__));
 
 	if (sme->crypto.wpa_versions & NL80211_WAPI_VERSION_1) {
 		err = wldev_iovar_setbuf_bsscfg(dev, "wapiie", sme->ie, sme->ie_len,
@@ -3847,7 +3847,7 @@ static bool wl_get_chan_isvht80(struct net_device *net, dhd_pub_t *dhd)
 		chanspec = wl_chspec_driver_to_host(chanspec);
 
 	isvht80 = chanspec & WL_CHANSPEC_BW_80;
-	WL_INFO(("%s: chanspec(%x:%d)\n", __FUNCTION__, chanspec, isvht80));
+	WL_INFO(("%s: chanspec(%x:%d)\n", __func__, chanspec, isvht80));
 
 	return isvht80;
 }
@@ -4992,7 +4992,7 @@ void wl_cfg80211_update_power_mode(struct net_device *dev)
 
 	err = wldev_ioctl_get(dev, WLC_GET_PM, &pm, sizeof(pm));
 	if (err)
-		WL_ERR(("%s:error (%d)\n", __FUNCTION__, err));
+		WL_ERR(("%s:error (%d)\n", __func__, err));
 	else if (pm != -1 && dev->ieee80211_ptr)
 		dev->ieee80211_ptr->ps = (pm == PM_OFF) ? false : true;
 }
@@ -5406,7 +5406,7 @@ wl_cfg80211_cancel_remain_on_channel(struct wiphy *wiphy,
 			wl_to_p2p_bss_bssidx(cfg, P2PAPI_BSSCFG_DEVICE));
 	} else {
 		WL_ERR(("%s : ignore, request cookie(%llu) is not matched. (cur : %llu)\n",
-			__FUNCTION__, cookie, cfg->last_roc_id));
+			__func__, cookie, cfg->last_roc_id));
 	}
 
 	return err;
@@ -8808,7 +8808,7 @@ int wl_get_bss_info(struct bcm_cfg80211 *cfg, struct net_device *dev, uint8 *mac
 						if (vndrie->len < (VNDR_IE_MIN_LEN + 1)) {
 							WL_ERR(("%s: invalid vndr ie."
 								"length is too small %d\n",
-								__FUNCTION__, vndrie->len));
+								__func__, vndrie->len));
 							break;
 						}
 
@@ -9094,7 +9094,7 @@ wl_notify_connect_status(struct bcm_cfg80211 *cfg, bcm_struct_cfgdev *cfgdev,
 			if (wl_get_drv_status(cfg, CONNECTING, ndev))
 				wl_bss_connect_done(cfg, ndev, e, data, false);
 		} else {
-			WL_DBG(("%s nothing\n", __FUNCTION__));
+			WL_DBG(("%s nothing\n", __func__));
 		}
 	}
 		else {
@@ -12983,7 +12983,7 @@ static void wl_update_hidden_ap_ie(struct wl_bss_info *bi, u8 *ie_stream, u32 *i
 	remaining_ie_buf_len = available_buffer_len - (int)ssidie[1];
 	unused_buf_len = WL_EXTRA_BUF_MAX - (4 + bi->length + *ie_size);
 	if (ssidie[1] > available_buffer_len) {
-		WL_ERR(("%s: skip wl_update_hidden_ap_ie : overflow\n", __FUNCTION__));
+		WL_ERR(("%s: skip wl_update_hidden_ap_ie : overflow\n", __func__));
 		return;
 	}
 
@@ -12991,7 +12991,7 @@ static void wl_update_hidden_ap_ie(struct wl_bss_info *bi, u8 *ie_stream, u32 *i
 	if (ssidie[1] != ssid_len) {
 		if (ssidie[1]) {
 			WL_INFO(("%s: Wrong SSID len: %d != %d\n",
-				__FUNCTION__, ssidie[1], bi->SSID_len));
+				__func__, ssidie[1], bi->SSID_len));
 		}
 		if ((roam && (ssid_len > ssidie[1])) && (unused_buf_len > ssid_len)) {
 			WL_INFO(("Changing the SSID Info.\n"));
@@ -13003,7 +13003,7 @@ static void wl_update_hidden_ap_ie(struct wl_bss_info *bi, u8 *ie_stream, u32 *i
 			ssidie[1] = ssid_len;
 		} else if (ssid_len < ssidie[1]) {
 			WL_ERR(("%s: Invalid SSID len: %d < %d\n",
-				__FUNCTION__, ssidie[1], bi->SSID_len));
+				__func__, ssidie[1], bi->SSID_len));
 		}
 		return;
 	}
@@ -14153,7 +14153,7 @@ wl_cfg80211_set_mac_acl(struct wiphy *wiphy, bcm_struct_cfgdev *cfgdev,
 	/* if acl == NULL, macmode is still disabled.. */
 	if (macmode == MACLIST_MODE_DISABLED) {
 		if ((ret = wl_android_set_ap_mac_list(cfgdev, macmode, NULL)) != 0)
-			WL_ERR(("%s : Setting MAC list failed error=%d\n", __FUNCTION__, ret));
+			WL_ERR(("%s : Setting MAC list failed error=%d\n", __func__, ret));
 
 		return ret;
 	}
@@ -14161,7 +14161,7 @@ wl_cfg80211_set_mac_acl(struct wiphy *wiphy, bcm_struct_cfgdev *cfgdev,
 	macnum = acl->n_acl_entries;
 	if (macnum < 0 || macnum > MAX_NUM_MAC_FILT) {
 		WL_ERR(("%s : invalid number of MAC address entries %d\n",
-			__FUNCTION__, macnum));
+			__func__, macnum));
 		return -1;
 	}
 
@@ -14169,7 +14169,7 @@ wl_cfg80211_set_mac_acl(struct wiphy *wiphy, bcm_struct_cfgdev *cfgdev,
 	list = (struct maclist*)kmalloc(sizeof(int) +
 		sizeof(struct ether_addr) * macnum, GFP_KERNEL);
 	if (!list) {
-		WL_ERR(("%s : failed to allocate memory\n", __FUNCTION__));
+		WL_ERR(("%s : failed to allocate memory\n", __func__));
 		return -1;
 	}
 
@@ -14180,7 +14180,7 @@ wl_cfg80211_set_mac_acl(struct wiphy *wiphy, bcm_struct_cfgdev *cfgdev,
 	}
 	/* set the list */
 	if ((ret = wl_android_set_ap_mac_list(cfgdev, macmode, list)) != 0)
-		WL_ERR(("%s : Setting MAC list failed error=%d\n", __FUNCTION__, ret));
+		WL_ERR(("%s : Setting MAC list failed error=%d\n", __func__, ret));
 
 	kfree(list);
 

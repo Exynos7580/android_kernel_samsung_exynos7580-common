@@ -418,8 +418,8 @@ extern uint64 osl_sysuptime_us(void);
 
 /* packet primitives */
 #ifdef BCM_OBJECT_TRACE
-#define	PKTGET(osh, len, send)		osl_pktget((osh), (len), __LINE__, __FUNCTION__)
-#define	PKTDUP(osh, skb)		osl_pktdup((osh), (skb), __LINE__, __FUNCTION__)
+#define	PKTGET(osh, len, send)		osl_pktget((osh), (len), __LINE__, __func__)
+#define	PKTDUP(osh, skb)		osl_pktdup((osh), (skb), __LINE__, __func__)
 #else
 #define	PKTGET(osh, len, send)		osl_pktget((osh), (len))
 #define	PKTDUP(osh, skb)		osl_pktdup((osh), (skb))
@@ -427,7 +427,7 @@ extern uint64 osl_sysuptime_us(void);
 #define PKTLIST_DUMP(osh, buf)		BCM_REFERENCE(osh)
 #define PKTDBG_TRACE(osh, pkt, bit)	BCM_REFERENCE(osh)
 #if defined(BCM_OBJECT_TRACE)
-#define	PKTFREE(osh, skb, send)		osl_pktfree((osh), (skb), (send), __LINE__, __FUNCTION__)
+#define	PKTFREE(osh, skb, send)		osl_pktfree((osh), (skb), (send), __LINE__, __func__)
 #else
 #define	PKTFREE(osh, skb, send)		osl_pktfree((osh), (skb), (send))
 #endif /* BCM_OBJECT_TRACE */

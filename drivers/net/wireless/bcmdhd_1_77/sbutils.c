@@ -757,7 +757,7 @@ sb_admatch(si_info_t *sii, uint asidx)
 		break;
 
 	default:
-		SI_ERROR(("%s: Address space index (%d) out of range\n", __FUNCTION__, asidx));
+		SI_ERROR(("%s: Address space index (%d) out of range\n", __func__, asidx));
 		return 0;
 	}
 
@@ -857,7 +857,7 @@ sb_core_disable(si_t *sih, uint32 bits)
 	OSL_DELAY(1);
 	SPINWAIT((R_SBREG(sii, &sb->sbtmstatehigh) & SBTMH_BUSY), 100000);
 	if (R_SBREG(sii, &sb->sbtmstatehigh) & SBTMH_BUSY)
-		SI_ERROR(("%s: target state still busy\n", __FUNCTION__));
+		SI_ERROR(("%s: target state still busy\n", __func__));
 
 	if (R_SBREG(sii, &sb->sbidlow) & SBIDL_INIT) {
 		OR_SBREG(sii, &sb->sbimstate, SBIM_RJ);

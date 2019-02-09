@@ -613,12 +613,12 @@ static inline bool binary_sema_up(tsk_ctl_t *tsk)
 	(tsk_ctl)->p_task  = kthread_run(thread_func, tsk_ctl, (char*)name); \
 	if (IS_ERR((tsk_ctl)->p_task)) { \
 		(tsk_ctl)->thr_pid = -1; \
-		DBG_THR(("%s(): thread:%s create failed\n", __FUNCTION__, \
+		DBG_THR(("%s(): thread:%s create failed\n", __func__, \
 			(tsk_ctl)->proc_name)); \
 	} else { \
 		(tsk_ctl)->thr_pid = (tsk_ctl)->p_task->pid; \
 		spin_lock_init(&((tsk_ctl)->spinlock)); \
-		DBG_THR(("%s(): thread:%s:%lx started\n", __FUNCTION__, \
+		DBG_THR(("%s(): thread:%s:%lx started\n", __func__, \
 			(tsk_ctl)->proc_name, (tsk_ctl)->thr_pid)); \
 	}; \
 }
@@ -629,7 +629,7 @@ static inline bool binary_sema_up(tsk_ctl_t *tsk)
 	smp_wmb(); \
 	up(&((tsk_ctl)->sema));	\
 	wait_for_completion(&((tsk_ctl)->completed)); \
-	DBG_THR(("%s(): thread:%s:%lx terminated OK\n", __FUNCTION__, \
+	DBG_THR(("%s(): thread:%s:%lx terminated OK\n", __func__, \
 			 (tsk_ctl)->proc_name, (tsk_ctl)->thr_pid)); \
 	(tsk_ctl)->thr_pid = -1; \
 }

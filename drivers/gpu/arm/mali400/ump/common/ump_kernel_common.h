@@ -53,7 +53,7 @@
 
 #define MSG_ERR(args) do{ /* args should be in brackets */ \
 	 _mali_osk_dbgmsg("UMP: ERR: %s\n" ,__FILE__); \
-	 _mali_osk_dbgmsg( "           %s()%4d\n", __FUNCTION__, __LINE__) ; \
+	 _mali_osk_dbgmsg( "           %s()%4d\n", __func__, __LINE__) ; \
 	 _mali_osk_dbgmsg args ; \
 	 _mali_osk_dbgmsg("\n"); \
 	} while(0)

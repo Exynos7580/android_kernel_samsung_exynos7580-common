@@ -53,7 +53,7 @@ static DEFINE_SPINLOCK(noti_list_lock);
 #define NULL_CHECK(p, s, err)  \
 			do { \
 				if (!(p)) { \
-					printf("NULL POINTER (%s) : %s\n", __FUNCTION__, (s)); \
+					printf("NULL POINTER (%s) : %s\n", __func__, (s)); \
 					err = BCME_ERROR; \
 					return err; \
 				} \
@@ -686,7 +686,7 @@ rtt_do_get_ioctl(dhd_pub_t *dhd, wl_proxd_iov_t *p_proxd_iov, uint16 proxd_iovsi
 			proxd_iovsize, (char **)&p_iovresp, WLC_IOCTL_SMLEN);
 	if (status != BCME_OK) {
 		DHD_ERROR(("%s: failed to send getbuf proxd iovar (CMD ID : %d), status=%d\n",
-			__FUNCTION__, p_subcmd_info->cmdid, status));
+			__func__, p_subcmd_info->cmdid, status));
 		return status;
 	}
 	if (p_subcmd_info->cmdid == WL_PROXD_CMD_GET_VERSION) {
@@ -698,7 +698,7 @@ rtt_do_get_ioctl(dhd_pub_t *dhd, wl_proxd_iov_t *p_proxd_iov, uint16 proxd_iovsi
 	tlvs_len = ltoh16(p_iovresp->len) - WL_PROXD_IOV_HDR_SIZE;
 	if (tlvs_len < 0) {
 		DHD_ERROR(("%s: alert, p_iovresp->len(%d) should not be smaller than %d\n",
-			__FUNCTION__, ltoh16(p_iovresp->len), (int) WL_PROXD_IOV_HDR_SIZE));
+			__func__, ltoh16(p_iovresp->len), (int) WL_PROXD_IOV_HDR_SIZE));
 		tlvs_len = 0;
 	}
 
@@ -760,7 +760,7 @@ dhd_rtt_common_get_handler(dhd_pub_t *dhd, ftm_subcmd_info_t *p_subcmd_info,
 	wl_proxd_iov_t *p_proxd_iov;
 #ifdef RTT_DEBUG
 	DHD_RTT(("enter %s: method=%d, session_id=%d, cmdid=%d(%s)\n",
-		__FUNCTION__, method, session_id, p_subcmd_info->cmdid,
+		__func__, method, session_id, p_subcmd_info->cmdid,
 		ftm_cmdid_to_str(p_subcmd_info->cmdid)));
 #endif
 	/* alloc mem for ioctl headr + reserved 0 bufsize for tlvs (initialize to zero) */
@@ -773,7 +773,7 @@ dhd_rtt_common_get_handler(dhd_pub_t *dhd, ftm_subcmd_info_t *p_subcmd_info,
 	status = rtt_do_get_ioctl(dhd, p_proxd_iov, proxd_iovsize, p_subcmd_info);
 
 	if (status != BCME_OK) {
-		DHD_RTT(("%s failed: status=%d\n", __FUNCTION__, status));
+		DHD_RTT(("%s failed: status=%d\n", __func__, status));
 	}
 	kfree(p_proxd_iov);
 	return status;
@@ -805,7 +805,7 @@ dhd_rtt_common_set_handler(dhd_pub_t *dhd, const ftm_subcmd_info_t *p_subcmd_inf
 
 #ifdef RTT_DEBUG
 	DHD_RTT(("enter %s: method=%d, session_id=%d, cmdid=%d(%s)\n",
-		__FUNCTION__, method, session_id, p_subcmd_info->cmdid,
+		__func__, method, session_id, p_subcmd_info->cmdid,
 		ftm_cmdid_to_str(p_subcmd_info->cmdid)));
 #endif
 
@@ -931,7 +931,7 @@ rtt_handle_config_options(wl_proxd_session_id_t session_id, wl_proxd_tlv_t **p_t
 		type, sizeof(uint32), &flags_mask, BCM_XTLV_OPTION_ALIGN32);
 	if (ret != BCME_OK) {
 		DHD_ERROR(("%s : bcm_pack_xltv_entry() for mask flags failed, status=%d\n",
-			__FUNCTION__, ret));
+			__func__, ret));
 		goto exit;
 	}
 
@@ -943,7 +943,7 @@ rtt_handle_config_options(wl_proxd_session_id_t session_id, wl_proxd_tlv_t **p_t
 		if (ret != BCME_OK) {
 #ifdef RTT_DEBUG
 			DHD_RTT(("%s: bcm_pack_xltv_entry() for flags failed, status=%d\n",
-				__FUNCTION__, ret));
+				__func__, ret));
 #endif
 		}
 exit:
@@ -1007,7 +1007,7 @@ rtt_handle_config_general(wl_proxd_session_id_t session_id, wl_proxd_tlv_t **p_t
 			}
 			if (ret != BCME_OK) {
 				DHD_ERROR(("%s bad TLV ID : %d\n",
-					__FUNCTION__, p_config_param_info->tlvid));
+					__func__, p_config_param_info->tlvid));
 				break;
 			}
 
@@ -1016,7 +1016,7 @@ rtt_handle_config_general(wl_proxd_session_id_t session_id, wl_proxd_tlv_t **p_t
 				BCM_XTLV_OPTION_ALIGN32);
 			if (ret != BCME_OK) {
 				DHD_ERROR(("%s: bcm_pack_xltv_entry() failed,"
-					" status=%d\n", __FUNCTION__, ret));
+					" status=%d\n", __func__, ret));
 				break;
 			}
 
@@ -1080,7 +1080,7 @@ dhd_rtt_ftm_config(dhd_pub_t *dhd, wl_proxd_session_id_t session_id,
 
 	if (p_proxd_iov == NULL) {
 		DHD_ERROR(("%s : failed to allocate the iovar (size :%d)\n",
-			__FUNCTION__, FTM_IOC_BUFSZ));
+			__func__, FTM_IOC_BUFSZ));
 		return BCME_NOMEM;
 	}
 	/* setup TLVs */
@@ -1102,7 +1102,7 @@ dhd_rtt_ftm_config(dhd_pub_t *dhd, wl_proxd_session_id_t session_id,
 		ret = dhd_iovar(dhd, 0, "proxd", (char *)p_proxd_iov,
 				all_tlvsize + WL_PROXD_IOV_HDR_SIZE, NULL, 0, TRUE);
 		if (ret != BCME_OK) {
-			DHD_ERROR(("%s : failed to set config\n", __FUNCTION__));
+			DHD_ERROR(("%s : failed to set config\n", __func__));
 		}
 	}
 	/* clean up */
@@ -1189,7 +1189,7 @@ dhd_rtt_set_cfg(dhd_pub_t *dhd, rtt_config_params_t *params)
 		DHD_ERROR(("rtt is already started\n"));
 		return BCME_BUSY;
 	}
-	DHD_RTT(("%s enter\n", __FUNCTION__));
+	DHD_RTT(("%s enter\n", __func__));
 
 	memset(rtt_status->rtt_config.target_info, 0, TARGET_INFO_SIZE(RTT_MAX_TARGET_CNT));
 	rtt_status->rtt_config.rtt_target_cnt = params->rtt_target_cnt;
@@ -1233,7 +1233,7 @@ dhd_rtt_stop(dhd_pub_t *dhd, struct ether_addr *mac_list, int mac_cnt)
 		DHD_ERROR(("rtt is not started\n"));
 		return BCME_OK;
 	}
-	DHD_RTT(("%s enter\n", __FUNCTION__));
+	DHD_RTT(("%s enter\n", __func__));
 	mutex_lock(&rtt_status->rtt_mutex);
 	for (i = 0; i < mac_cnt; i++) {
 		for (j = 0; j < rtt_status->rtt_config.rtt_target_cnt; j++) {
@@ -1317,10 +1317,10 @@ dhd_rtt_start(dhd_pub_t *dhd)
 	rtt_status = GET_RTTSTATE(dhd);
 	NULL_CHECK(rtt_status, "rtt_status is NULL", err);
 
-	DHD_RTT(("Enter %s\n", __FUNCTION__));
+	DHD_RTT(("Enter %s\n", __func__));
 	if (rtt_status->cur_idx >= rtt_status->rtt_config.rtt_target_cnt) {
 		err = BCME_RANGE;
-		DHD_RTT(("%s : idx %d is out of range\n", __FUNCTION__, rtt_status->cur_idx));
+		DHD_RTT(("%s : idx %d is out of range\n", __func__, rtt_status->cur_idx));
 		if (rtt_status->flags == WL_PROXD_SESSION_FLAG_TARGET) {
 			DHD_ERROR(("STA is set as Target/Responder \n"));
 			return BCME_ERROR;
@@ -1348,7 +1348,7 @@ dhd_rtt_start(dhd_pub_t *dhd)
 	/* Get a target information */
 	rtt_target = &rtt_status->rtt_config.target_info[rtt_status->cur_idx];
 	mutex_unlock(&rtt_status->rtt_mutex);
-	DHD_RTT(("%s enter\n", __FUNCTION__));
+	DHD_RTT(("%s enter\n", __func__));
 	if (!RTT_IS_ENABLED(rtt_status)) {
 		/* enable ftm */
 		err = dhd_rtt_ftm_enable(dhd, TRUE);
@@ -1489,13 +1489,13 @@ dhd_rtt_start(dhd_pub_t *dhd)
 	}
 exit:
 	if (err) {
-		DHD_ERROR(("rtt is stopped %s \n", __FUNCTION__));
+		DHD_ERROR(("rtt is stopped %s \n", __func__));
 		rtt_status->status = RTT_STOPPED;
 		/* disable FTM */
 		dhd_rtt_ftm_enable(dhd, FALSE);
 		if (rtt_status->pm_restore) {
 			DHD_ERROR(("pm_restore =%d func =%s \n",
-				rtt_status->pm_restore, __FUNCTION__));
+				rtt_status->pm_restore, __func__));
 			pm = PM_FAST;
 			err = wldev_ioctl_set(dev, WLC_SET_PM, &pm, sizeof(pm));
 			if (err) {
@@ -1621,7 +1621,7 @@ dhd_rtt_convert_results_to_host(rtt_report_t *rtt_report, uint8 *p_data, uint16 
 
 	NULL_CHECK(rtt_report, "rtt_report is NULL", err);
 	NULL_CHECK(p_data, "p_data is NULL", err);
-	DHD_RTT(("%s enter\n", __FUNCTION__));
+	DHD_RTT(("%s enter\n", __func__));
 	p_data_info = (wl_proxd_rtt_result_t *) p_data;
 	/* unpack and format 'flags' for display */
 	flags = ltoh16_ua(&p_data_info->flags);
@@ -1757,7 +1757,7 @@ dhd_rtt_event_handler(dhd_pub_t *dhd, wl_event_msg_t *event, void *event_data)
 	rtt_results_header_t *entry, *rtt_results_header = NULL;
 #endif /* WL_CFG80211 */
 
-	DHD_RTT(("Enter %s \n", __FUNCTION__));
+	DHD_RTT(("Enter %s \n", __func__));
 	NULL_CHECK(dhd, "dhd is NULL", ret);
 
 #ifdef WL_CFG80211
@@ -1775,7 +1775,7 @@ dhd_rtt_event_handler(dhd_pub_t *dhd, wl_event_msg_t *event, void *event_data)
 	}
 #endif /* WL_CFG80211 */
 	if (ntoh32_ua((void *)&event->datalen) < OFFSETOF(wl_proxd_event_t, tlvs)) {
-		DHD_RTT(("%s: wrong datalen:%d\n", __FUNCTION__,
+		DHD_RTT(("%s: wrong datalen:%d\n", __func__,
 			ntoh32_ua((void *)&event->datalen)));
 		return -EINVAL;
 	}
@@ -1786,7 +1786,7 @@ dhd_rtt_event_handler(dhd_pub_t *dhd, wl_event_msg_t *event, void *event_data)
 	}
 
 	if (!event_data) {
-		DHD_ERROR(("%s: event_data:NULL\n", __FUNCTION__));
+		DHD_ERROR(("%s: event_data:NULL\n", __func__));
 		return -EINVAL;
 	}
 	p_event = (wl_proxd_event_t *) event_data;
@@ -1885,7 +1885,7 @@ dhd_rtt_event_handler(dhd_pub_t *dhd, wl_event_msg_t *event, void *event_data)
 				BCM_XTLV_OPTION_ALIGN32, rtt_unpack_xtlv_cbfn);
 			if (ret != BCME_OK) {
 				DHD_ERROR(("%s : Failed to unpack xtlv for an event\n",
-					__FUNCTION__));
+					__func__));
 				goto exit;
 			}
 #ifdef WL_CFG80211
@@ -1916,7 +1916,7 @@ dhd_rtt_event_handler(dhd_pub_t *dhd, wl_event_msg_t *event, void *event_data)
 				BCM_XTLV_OPTION_ALIGN32, rtt_unpack_xtlv_cbfn);
 			if (ret != BCME_OK) {
 				DHD_ERROR(("%s : Failed to unpack xtlv for an event\n",
-					__FUNCTION__));
+					__func__));
 				goto exit;
 			}
 		}
@@ -2046,7 +2046,7 @@ dhd_rtt_event_handler(dhd_pub_t *dhd, wl_event_msg_t *event, void *event_data)
 			kfree(collect_event_data);
 			if (ret != BCME_OK) {
 				DHD_ERROR(("%s : Failed to unpack xtlv for an event\n",
-					__FUNCTION__));
+					__func__));
 				goto exit;
 			}
 		}
@@ -2082,12 +2082,12 @@ dhd_rtt_work(struct work_struct *work)
 #pragma GCC diagnostic pop
 #endif
 	if (rtt_status == NULL) {
-		DHD_ERROR(("%s : rtt_status is NULL\n", __FUNCTION__));
+		DHD_ERROR(("%s : rtt_status is NULL\n", __func__));
 		return;
 	}
 	dhd = rtt_status->dhd;
 	if (dhd == NULL) {
-		DHD_ERROR(("%s : dhd is NULL\n", __FUNCTION__));
+		DHD_ERROR(("%s : dhd is NULL\n", __func__));
 		return;
 	}
 	(void) dhd_rtt_start(dhd);
@@ -2195,7 +2195,7 @@ dhd_rtt_enable_responder(dhd_pub_t *dhd, wifi_channel_info *channel_info)
 	if (RTT_IS_STOPPED(rtt_status)) {
 		DHD_RTT(("STA responder/Target. \n"));
 	}
-	DHD_RTT(("Enter %s \n", __FUNCTION__));
+	DHD_RTT(("Enter %s \n", __func__));
 	if (!dhd_is_associated(dhd, 0, NULL)) {
 		if (channel_info) {
 			channel.width = channel_info->width;
@@ -2249,7 +2249,7 @@ dhd_rtt_enable_responder(dhd_pub_t *dhd, wifi_channel_info *channel_info)
 exit:
 	if (err) {
 		rtt_status->status = RTT_STOPPED;
-		DHD_ERROR(("rtt is stopped  %s \n", __FUNCTION__));
+		DHD_ERROR(("rtt is stopped  %s \n", __func__));
 		dhd_rtt_ftm_enable(dhd, FALSE);
 		DHD_RTT(("restoring the PM value \n"));
 		if (rtt_status->pm_restore) {
@@ -2275,7 +2275,7 @@ dhd_rtt_cancel_responder(dhd_pub_t *dhd)
 	NULL_CHECK(dhd, "dhd is NULL", err);
 	rtt_status = GET_RTTSTATE(dhd);
 	NULL_CHECK(rtt_status, "rtt_status is NULL", err);
-	DHD_RTT(("Enter %s \n", __FUNCTION__));
+	DHD_RTT(("Enter %s \n", __func__));
 	err = dhd_rtt_ftm_enable(dhd, FALSE);
 	if (err) {
 		DHD_ERROR(("failed to disable FTM (%d)\n", err));
@@ -2311,7 +2311,7 @@ dhd_rtt_init(dhd_pub_t *dhd)
 	dhd->rtt_state = kzalloc(sizeof(rtt_status_info_t), GFP_KERNEL);
 	if (dhd->rtt_state == NULL) {
 		err = BCME_NOMEM;
-		DHD_ERROR(("%s : failed to create rtt_state\n", __FUNCTION__));
+		DHD_ERROR(("%s : failed to create rtt_state\n", __func__));
 		return err;
 	}
 	bzero(dhd->rtt_state, sizeof(rtt_status_info_t));
@@ -2320,7 +2320,7 @@ dhd_rtt_init(dhd_pub_t *dhd)
 			kzalloc(TARGET_INFO_SIZE(RTT_MAX_TARGET_CNT), GFP_KERNEL);
 	if (rtt_status->rtt_config.target_info == NULL) {
 		DHD_ERROR(("%s failed to allocate the target info for %d\n",
-			__FUNCTION__, RTT_MAX_TARGET_CNT));
+			__func__, RTT_MAX_TARGET_CNT));
 		err = BCME_NOMEM;
 		goto exit;
 	}
@@ -2330,7 +2330,7 @@ dhd_rtt_init(dhd_pub_t *dhd)
 
 	ret = dhd_rtt_get_version(dhd, &version);
 	if (ret == BCME_OK && (version == WL_PROXD_API_VERSION)) {
-		DHD_ERROR(("%s : FTM is supported\n", __FUNCTION__));
+		DHD_ERROR(("%s : FTM is supported\n", __func__));
 		/* rtt_status->rtt_capa.proto |= RTT_CAP_ONE_WAY; */
 		rtt_status->rtt_capa.proto |= RTT_CAP_FTM_WAY;
 
@@ -2348,10 +2348,10 @@ dhd_rtt_init(dhd_pub_t *dhd)
 		rtt_status->rtt_capa.bw |= RTT_BW_80;
 	} else {
 		if ((ret != BCME_OK) || (version == 0)) {
-			DHD_ERROR(("%s : FTM is not supported\n", __FUNCTION__));
+			DHD_ERROR(("%s : FTM is not supported\n", __func__));
 		} else {
 			DHD_ERROR(("%s : FTM version mismatch between HOST (%d) and FW (%d)\n",
-				__FUNCTION__, WL_PROXD_API_VERSION, version));
+				__func__, WL_PROXD_API_VERSION, version));
 		}
 	}
 	/* cancel all of RTT request once we got the cancel request */
@@ -2383,7 +2383,7 @@ dhd_rtt_deinit(dhd_pub_t *dhd)
 	rtt_status = GET_RTTSTATE(dhd);
 	NULL_CHECK(rtt_status, "rtt_status is NULL", err);
 	rtt_status->status = RTT_STOPPED;
-	DHD_RTT(("rtt is stopped %s \n", __FUNCTION__));
+	DHD_RTT(("rtt is stopped %s \n", __func__));
 	/* clear evt callback list */
 #if defined(STRICT_GCC_WARNINGS) && defined(__GNUC__)
 #pragma GCC diagnostic push

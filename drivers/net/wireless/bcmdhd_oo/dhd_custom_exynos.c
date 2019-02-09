@@ -121,7 +121,7 @@ dhd_wlan_power(int onoff)
 
 	printk(KERN_INFO"------------------------------------------------");
 	printk(KERN_INFO"------------------------------------------------\n");
-	printk(KERN_INFO"%s Enter: power %s\n", __FUNCTION__, onoff ? "on" : "off");
+	printk(KERN_INFO"%s Enter: power %s\n", __func__, onoff ? "on" : "off");
 
 #ifdef EXYNOS_PCIE_RC_ONOFF
 	if (!onoff) {
@@ -130,13 +130,13 @@ dhd_wlan_power(int onoff)
 
 	if (gpio_direction_output(wlan_pwr_on, onoff)) {
 		printk(KERN_ERR "%s failed to control WLAN_REG_ON to %s\n",
-			__FUNCTION__, onoff ? "HIGH" : "LOW");
+			__func__, onoff ? "HIGH" : "LOW");
 		return -EIO;
 	}
 
 	if (onoff) {
 #if defined(CONFIG_SOC_EXYNOS8895) || defined(CONFIG_SOC_EXYNOS9810)
-		printk(KERN_ERR "%s Disable L1ss EP side\n", __FUNCTION__);
+		printk(KERN_ERR "%s Disable L1ss EP side\n", __func__);
 		exynos_pcie_l1ss_ctrl(0, PCIE_L1SS_CTRL_WIFI);
 #endif /* CONFIG_SOC_EXYNOS8895 || CONFIG_SOC_EXYNOS9810 */
 		exynos_pcie_pm_resume(SAMSUNG_PCIE_CH_NUM);
@@ -146,14 +146,14 @@ dhd_wlan_power(int onoff)
 	if (onoff) {
 		pinctrl = devm_pinctrl_get_select(mmc_dev_for_wlan, "sdio_wifi_on");
 		if (IS_ERR(pinctrl))
-			printk(KERN_INFO "%s WLAN SDIO GPIO control error\n", __FUNCTION__);
+			printk(KERN_INFO "%s WLAN SDIO GPIO control error\n", __func__);
 		msleep(PINCTL_DELAY);
 	}
 #endif /* CONFIG_MACH_A7LTE */
 
 	if (gpio_direction_output(wlan_pwr_on, onoff)) {
 		printk(KERN_ERR "%s failed to control WLAN_REG_ON to %s\n",
-			__FUNCTION__, onoff ? "HIGH" : "LOW");
+			__func__, onoff ? "HIGH" : "LOW");
 		return -EIO;
 	}
 
@@ -161,7 +161,7 @@ dhd_wlan_power(int onoff)
 	if (!onoff) {
 		pinctrl = devm_pinctrl_get_select(mmc_dev_for_wlan, "sdio_wifi_off");
 		if (IS_ERR(pinctrl))
-			printk(KERN_INFO "%s WLAN SDIO GPIO control error\n", __FUNCTION__);
+			printk(KERN_INFO "%s WLAN SDIO GPIO control error\n", __func__);
 	}
 #endif /* CONFIG_MACH_A7LTE */
 #if (defined(CONFIG_MACH_UNIVERSAL3475) || defined(CONFIG_SOC_EXYNOS7870) || \
@@ -187,12 +187,12 @@ static int
 dhd_wlan_set_carddetect(int val)
 {
 	pr_err("%s: notify_func=%p, mmc_host_dev=%p, val=%d\n",
-		__FUNCTION__, notify_func_callback, mmc_host_dev, val);
+		__func__, notify_func_callback, mmc_host_dev, val);
 
 	if (notify_func_callback) {
 		notify_func_callback(mmc_host_dev, val);
 	} else {
-		pr_warning("%s: Nobody to notify\n", __FUNCTION__);
+		pr_warning("%s: Nobody to notify\n", __func__);
 	}
 
 	return 0;
@@ -291,7 +291,7 @@ dhd_wlan_init_gpio(void)
 void
 interrupt_set_cpucore(int set, unsigned int dpc_cpucore, unsigned int primary_cpucore)
 {
-	printk(KERN_INFO "%s: set: %d\n", __FUNCTION__, set);
+	printk(KERN_INFO "%s: set: %d\n", __func__, set);
 	if (set) {
 #if defined(CONFIG_MACH_UNIVERSAL5422)
 		irq_set_affinity(EXYNOS5_IRQ_HSMMC1, cpumask_of(dpc_cpucore));
@@ -349,11 +349,11 @@ dhd_wlan_init(void)
 {
 	int ret;
 
-	printk(KERN_INFO "%s: START.......\n", __FUNCTION__);
+	printk(KERN_INFO "%s: START.......\n", __func__);
 	ret = dhd_wlan_init_gpio();
 	if (ret < 0) {
 		printk(KERN_ERR "%s: failed to initiate GPIO, ret=%d\n",
-			__FUNCTION__, ret);
+			__func__, ret);
 		goto fail;
 	}
 
@@ -366,7 +366,7 @@ dhd_wlan_init(void)
 	ret = dhd_init_wlan_mem();
 	if (ret < 0) {
 		printk(KERN_ERR "%s: failed to alloc reserved memory,"
-			" ret=%d\n", __FUNCTION__, ret);
+			" ret=%d\n", __func__, ret);
 	}
 #endif /* CONFIG_BROADCOM_WIFI_RESERVED_MEM */
 

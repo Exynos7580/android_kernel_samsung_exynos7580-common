@@ -41,7 +41,7 @@
 #ifdef USE_HMP_BOOST
 #define set_hmp(enable)	 { \
 	if(enable != current_hmp_boost) { \
-		pr_debug("[Input Booster2] ******      set_hmp : %d ( %s )\n", enable, __FUNCTION__); \
+		pr_debug("[Input Booster2] ******      set_hmp : %d ( %s )\n", enable, __func__); \
 		if (set_hmp_boost(enable) < 0) {\
 			pr_debug("[Input Booster2] ******            !!! fail to HMP !!!\n"); \
 		} \
@@ -148,7 +148,7 @@ static void input_booster_##_DEVICE_##_timeout_work_func(struct work_struct *wor
 	struct t_input_booster *_this = &_DEVICE_##_booster; \
 	int param_max = sizeof(_this->param)/sizeof(struct t_input_booster_param), temp_index = -1;  \
 	mutex_lock(&_this->lock); \
-	pr_debug("[Input Booster] %s           Timeout : changed  index : %d (%s)\n", HEADGAGE, _this->index , __FUNCTION__); \
+	pr_debug("[Input Booster] %s           Timeout : changed  index : %d (%s)\n", HEADGAGE, _this->index , __func__); \
 	if(_this->index >= 2 && delayed_work_pending(&_this->input_booster_timeout_work[_this->index-2])) { \
 		mutex_unlock(&_this->lock); \
 		return; \
@@ -157,10 +157,10 @@ static void input_booster_##_DEVICE_##_timeout_work_func(struct work_struct *wor
 		temp_index = _this->index; \
 		_this->index = (_this->index) ? _this->index-1 : 0; \
 	} \
-	pr_debug("[Input Booster] %s           Timeout : changed  index : %d (%s)\n", HEADGAGE, _this->index , __FUNCTION__); \
+	pr_debug("[Input Booster] %s           Timeout : changed  index : %d (%s)\n", HEADGAGE, _this->index , __func__); \
 	if(_this->index < param_max) { \
-		pr_debug("[Input Booster] %s           Timeout : changed  index : %d, time : %d (%s)\n", HEADGAGE, _this->index, _this->param[_this->index].time, __FUNCTION__); \
-		pr_debug("[Input Booster] %s           hmp : %d  cpu : %d (%s)\n", TAILGAGE, _this->param[_this->index].hmp_boost, _this->param[_this->index].cpu_freq, __FUNCTION__); \
+		pr_debug("[Input Booster] %s           Timeout : changed  index : %d, time : %d (%s)\n", HEADGAGE, _this->index, _this->param[_this->index].time, __func__); \
+		pr_debug("[Input Booster] %s           hmp : %d  cpu : %d (%s)\n", TAILGAGE, _this->param[_this->index].hmp_boost, _this->param[_this->index].cpu_freq, __func__); \
 		if(_this->param[(_this->index) ? _this->index-1 : 0].time > 0) { \
 			SET_BOOSTER; \
 			if(_this->change_on_release) { \
@@ -171,7 +171,7 @@ static void input_booster_##_DEVICE_##_timeout_work_func(struct work_struct *wor
 		}\
 		_this->index = (temp_index >= 0) ? temp_index : _this->index; \
 	} else { \
-		pr_debug("[Input Booster] Timeout : completed   param_max : %d (%s)\n", param_max, __FUNCTION__); \
+		pr_debug("[Input Booster] Timeout : completed   param_max : %d (%s)\n", param_max, __func__); \
 		pr_debug("[Input Booster]\n"); \
 		REMOVE_BOOSTER; \
 		_this->index = 0; \
@@ -254,7 +254,7 @@ static void input_booster_##_DEVICE_##_reset_booster_work_func(struct work_struc
 			tail_time = tail_param->tail_time; \
 		} \
 		ret = sprintf _ARGU_; \
-		pr_debug("[Input Booster8] %s buf : %s\n", __FUNCTION__, buf); \
+		pr_debug("[Input Booster8] %s buf : %s\n", __func__, buf); \
 		return ret; \
 	} \
 	static ssize_t input_booster_sysfs_class_store_##_ATTR_(struct class *dev, struct class_attribute *attr, const char *buf, size_t count) { \
@@ -264,7 +264,7 @@ static void input_booster_##_DEVICE_##_reset_booster_work_func(struct work_struc
 		struct t_input_booster_device_tree_param *head_param = NULL, *tail_param = NULL; \
 		GET_BOOSTER_PARAM(dt_gender, head_param, tail_param) \
 		len = sscanf _ARGU_; \
-		pr_debug("[Input Booster8] %s buf : %s\n", __FUNCTION__, buf); \
+		pr_debug("[Input Booster8] %s buf : %s\n", __func__, buf); \
 		if (sscanf _ARGU_ != _COUNT_) { \
 			return count; \
 		} \
@@ -306,7 +306,7 @@ static void input_booster_##_DEVICE_##_reset_booster_work_func(struct work_struc
 		if(Arg_count == 1) { \
 			level = dt_gender->level; \
 			ret = sprintf _ARGU_; \
-			pr_debug("[Input Booster8] %s buf : %s\n", __FUNCTION__, buf); \
+			pr_debug("[Input Booster8] %s buf : %s\n", __func__, buf); \
 		} else { \
 			if(head_param != NULL) { \
 				level = head_param->ilevels; \
@@ -336,7 +336,7 @@ static void input_booster_##_DEVICE_##_reset_booster_work_func(struct work_struc
 				phase_time = tail_param->phase_time; \
 				ret += sprintf _ARGU_; \
 			} \
-			pr_debug("[Input Booster8] %s buf : %s\n", __FUNCTION__, buf); \
+			pr_debug("[Input Booster8] %s buf : %s\n", __func__, buf); \
 		} \
 		return  ret; \
 	} \
@@ -346,7 +346,7 @@ static void input_booster_##_DEVICE_##_reset_booster_work_func(struct work_struc
 		int level[1] = {-1}, len; \
 		unsigned int cpu_freq[1] = {-1}, kfc_freq[1] = {-1}, mif_freq[1] = {-1}, int_freq[1] = {-1}, hmp_boost[1] = {-1}, head_time[1] = {-1}, tail_time[1] = {-1}, phase_time[1] = {-1}; \
 		len = sscanf _ARGU_; \
-		pr_debug("[Input Booster8] %s buf : %s\n", __FUNCTION__, buf); \
+		pr_debug("[Input Booster8] %s buf : %s\n", __func__, buf); \
 		if(dt_infor == NULL) { \
 			return  count; \
 		} \
@@ -372,7 +372,7 @@ static void input_booster_##_DEVICE_##_reset_booster_work_func(struct work_struc
 						dt_infor->param_tables[k].head_time = (*head_time == (unsigned int)(-1)) ? dt_infor->param_tables[k].head_time : *head_time; \
 						dt_infor->param_tables[k].tail_time = (*tail_time == (unsigned int)(-1)) ? dt_infor->param_tables[k].tail_time : *tail_time; \
 						dt_infor->param_tables[k].phase_time = (*phase_time == (unsigned int)(-1)) ? dt_infor->param_tables[k].phase_time : *phase_time; \
-						pr_debug("[Input Booster8] %s time : %d %d %d\n", __FUNCTION__, dt_infor->param_tables[*level].head_time, dt_infor->param_tables[k].tail_time, dt_infor->param_tables[*level].phase_time); \
+						pr_debug("[Input Booster8] %s time : %d %d %d\n", __func__, dt_infor->param_tables[*level].head_time, dt_infor->param_tables[k].tail_time, dt_infor->param_tables[*level].phase_time); \
 					} \
 				} \
 			} \

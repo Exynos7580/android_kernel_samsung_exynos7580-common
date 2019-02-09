@@ -290,14 +290,14 @@ linux_pktfree(osl_t *osh, void *p, bool send)
 #if defined(CONFIG_DHD_USE_STATIC_BUF) && defined(DHD_USE_STATIC_CTRLBUF)
 	if (skb && (skb->mac_len == PREALLOC_USED_MAGIC)) {
 		printk("%s: pkt %p is from static pool\n",
-			__FUNCTION__, p);
+			__func__, p);
 		dump_stack();
 		return;
 	}
 
 	if (skb && (skb->mac_len == PREALLOC_FREE_MAGIC)) {
 		printk("%s: pkt %p is from static pool and not in used\n",
-			__FUNCTION__, p);
+			__func__, p);
 		dump_stack();
 		return;
 	}
@@ -344,7 +344,7 @@ osl_pktget_static(osl_t *osh, uint len)
 		return linux_pktget(osh, len);
 
 	if (len > DHD_SKB_MAX_BUFSIZE) {
-		printk("%s: attempt to allocate huge packet (0x%x)\n", __FUNCTION__, len);
+		printk("%s: attempt to allocate huge packet (0x%x)\n", __func__, len);
 		return linux_pktget(osh, len);
 	}
 
@@ -387,7 +387,7 @@ osl_pktget_static(osl_t *osh, uint len)
 	}
 
 	spin_unlock_irqrestore(&bcm_static_skb->osl_pkt_lock, flags);
-	printk("%s: all static pkt in use!\n", __FUNCTION__);
+	printk("%s: all static pkt in use!\n", __func__);
 	return NULL;
 #else
 	down(&bcm_static_skb->osl_pkt_sem);
@@ -458,7 +458,7 @@ osl_pktget_static(osl_t *osh, uint len)
 #endif /* ENHANCED_STATIC_BUF */
 
 	up(&bcm_static_skb->osl_pkt_sem);
-	printk("%s: all static pkt in use!\n", __FUNCTION__);
+	printk("%s: all static pkt in use!\n", __func__);
 	return linux_pktget(osh, len);
 #endif /* DHD_USE_STATIC_CTRLBUF */
 }
@@ -488,14 +488,14 @@ osl_pktfree_static(osl_t *osh, void *p, bool send)
 		if (p == bcm_static_skb->skb_8k[i]) {
 			if (bcm_static_skb->pkt_use[i] == 0) {
 				printk("%s: static pkt idx %d(%p) is double free\n",
-					__FUNCTION__, i, p);
+					__func__, i, p);
 			} else {
 				bcm_static_skb->pkt_use[i] = 0;
 			}
 
 			if (skb->mac_len != PREALLOC_USED_MAGIC) {
 				printk("%s: static pkt idx %d(%p) is not in used\n",
-					__FUNCTION__, i, p);
+					__func__, i, p);
 			}
 
 			skb->mac_len = PREALLOC_FREE_MAGIC;
@@ -505,7 +505,7 @@ osl_pktfree_static(osl_t *osh, void *p, bool send)
 	}
 
 	spin_unlock_irqrestore(&bcm_static_skb->osl_pkt_lock, flags);
-	printk("%s: packet %p does not exist in the pool\n", __FUNCTION__, p);
+	printk("%s: packet %p does not exist in the pool\n", __func__, p);
 #else
 	down(&bcm_static_skb->osl_pkt_sem);
 	for (i = 0; i < STATIC_PKT_1PAGE_NUM; i++) {

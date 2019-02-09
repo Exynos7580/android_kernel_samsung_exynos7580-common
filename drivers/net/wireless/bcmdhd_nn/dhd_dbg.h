@@ -91,7 +91,7 @@ do {	\
 		if (dhd_msg_level & DHD_ERROR_MEM_VAL) {	\
 			printf args;	\
 		}	\
-		DHD_LOG_DUMP_WRITE("[%s] %s: ", dhd_log_dump_get_timestamp(), __FUNCTION__);	\
+		DHD_LOG_DUMP_WRITE("[%s] %s: ", dhd_log_dump_get_timestamp(), __func__);	\
 		DHD_LOG_DUMP_WRITE args;	\
 	}	\
 } while (0)

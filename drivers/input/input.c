@@ -715,7 +715,7 @@ void input_booster_init()
 
 	// Geting the count of devices.
 	ndevice_in_dt = of_get_child_count(np);
-	pr_debug("[Input Booster] %s   ndevice_in_dt : %d\n", __FUNCTION__, ndevice_in_dt);
+	pr_debug("[Input Booster] %s   ndevice_in_dt : %d\n", __func__, ndevice_in_dt);
 
 	device_tree_infor = kcalloc(ABS_CNT, sizeof(struct t_input_booster_device_tree_infor) * ndevice_in_dt, GFP_KERNEL);
 	if(device_tree_infor > 0) {
@@ -728,7 +728,7 @@ void input_booster_init()
 
 			// Geting label.
 			dt_infor->label = of_get_property(cnp, "input_booster,label", NULL);
-			pr_debug("[Input Booster] %s   dt_infor->label : %s\n", __FUNCTION__, dt_infor->label);
+			pr_debug("[Input Booster] %s   dt_infor->label : %s\n", __func__, dt_infor->label);
 
 			if (of_property_read_u32(cnp, "input_booster,type", &dt_infor->type)) {
 				pr_debug("Failed to get type property\n");
@@ -740,7 +740,7 @@ void input_booster_init()
 
 			if (plevels && nlevels) {
 				dt_infor->nlevels = nlevels / sizeof(u32);
-				pr_debug("[Input Booster] %s   dt_infor->nlevels : %d\n", __FUNCTION__, dt_infor->nlevels);
+				pr_debug("[Input Booster] %s   dt_infor->nlevels : %d\n", __func__, dt_infor->nlevels);
 			} else {
 				pr_debug("Failed to calculate number of frequency.\n");
 				break;

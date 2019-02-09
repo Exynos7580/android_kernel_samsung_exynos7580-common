@@ -204,7 +204,7 @@ static int set_btc_esco_params(struct net_device *dev, bool trump_sco)
 				  saved_reg64, saved_reg65, saved_reg71));
 		} else {
 			WL_ERR((":%s: save btc_params failed\n",
-				__FUNCTION__));
+				__func__));
 			saved_status = FALSE;
 			return -1;
 		}
@@ -258,7 +258,7 @@ static int set_btc_esco_params(struct net_device *dev, bool trump_sco)
 		saved_status = FALSE;
 	} else {
 		WL_ERR((":%s att to restore not saved BTCOEX params\n",
-			__FUNCTION__));
+			__func__));
 		return -1;
 	}
 	return 0;

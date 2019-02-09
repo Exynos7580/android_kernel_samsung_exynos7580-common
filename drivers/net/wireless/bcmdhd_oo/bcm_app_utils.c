@@ -944,7 +944,7 @@ wl_cntbuf_to_xtlv_format(void *ctx, void *cntbuf, int buflen, uint32 corerev)
 	macstat = (uint32 *)malloc(WL_CNT_MCST_STRUCT_SZ);
 #endif // endif
 	if (!wlccnt || !macstat) {
-		printf("%s: malloc fail!\n", __FUNCTION__);
+		printf("%s: malloc fail!\n", __func__);
 		res = BCME_NOMEM;
 		goto exit;
 	}

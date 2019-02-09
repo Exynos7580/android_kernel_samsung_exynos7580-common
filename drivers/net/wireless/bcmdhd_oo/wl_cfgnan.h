@@ -96,8 +96,8 @@
 #define NMR2STR(a) (a)[0], (a)[1], (a)[2], (a)[3], (a)[4], (a)[5], (a)[6], (a)[7]
 #define NMRSTR "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x"
 
-#define NAN_DBG_ENTER() {WL_DBG(("Enter: %s\n", __FUNCTION__));}
-#define NAN_DBG_EXIT() {WL_DBG(("Exit: %s\n", __FUNCTION__));}
+#define NAN_DBG_ENTER() {WL_DBG(("Enter: %s\n", __func__));}
+#define NAN_DBG_EXIT() {WL_DBG(("Exit: %s\n", __func__));}
 
 /* Service Control Type length */
 #define NAN_SVC_CONTROL_TYPE_LEN	2
@@ -162,10 +162,10 @@
 #define NAN_START_STOP_TIMEOUT	1000
 
 #ifdef WL_NAN_DEBUG
-#define NAN_MUTEX_LOCK() {WL_DBG(("Mutex Lock: Enter: %s\n", __FUNCTION__)); \
+#define NAN_MUTEX_LOCK() {WL_DBG(("Mutex Lock: Enter: %s\n", __func__)); \
 	mutex_lock(&cfg->nancfg.nan_sync);}
 #define NAN_MUTEX_UNLOCK() {mutex_unlock(&cfg->nancfg.nan_sync); \
-	WL_DBG(("Mutex Unlock: Exit: %s\n", __FUNCTION__));}
+	WL_DBG(("Mutex Unlock: Exit: %s\n", __func__));}
 #else
 #define NAN_MUTEX_LOCK() {mutex_lock(&cfg->nancfg.nan_sync);}
 #define NAN_MUTEX_UNLOCK() {mutex_unlock(&cfg->nancfg.nan_sync);}

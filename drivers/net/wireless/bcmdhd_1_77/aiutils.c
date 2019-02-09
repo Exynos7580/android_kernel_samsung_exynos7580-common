@@ -85,7 +85,7 @@ get_erom_ent(si_t *sih, uint32 **eromptr, uint32 mask, uint32 match)
 		nom++;
 	}
 
-	SI_VMSG(("%s: Returning ent 0x%08x\n", __FUNCTION__, ent));
+	SI_VMSG(("%s: Returning ent 0x%08x\n", __func__, ent));
 	if (inv + nom) {
 		SI_VMSG(("  after %d invalid and %d non-matching entries\n", inv, nom));
 	}
@@ -638,7 +638,7 @@ ai_addrspace(si_t *sih, uint asidx)
 		return cores_info->coresba2[cidx];
 	else {
 		SI_ERROR(("%s: Need to parse the erom again to find addr space %d\n",
-		          __FUNCTION__, asidx));
+		          __func__, asidx));
 		return 0;
 	}
 }
@@ -659,7 +659,7 @@ ai_addrspacesize(si_t *sih, uint asidx)
 		return cores_info->coresba2_size[cidx];
 	else {
 		SI_ERROR(("%s: Need to parse the erom again to find addr space %d\n",
-		          __FUNCTION__, asidx));
+		          __func__, asidx));
 		return 0;
 	}
 }
@@ -671,22 +671,22 @@ ai_flag(si_t *sih)
 	aidmp_t *ai;
 
 	if (BCM5357_DMP()) {
-		SI_ERROR(("%s: Attempting to read USB20H DMP registers on 5357b0\n", __FUNCTION__));
+		SI_ERROR(("%s: Attempting to read USB20H DMP registers on 5357b0\n", __func__));
 		return sii->curidx;
 	}
 	if (BCM4707_DMP()) {
 		SI_ERROR(("%s: Attempting to read CHIPCOMMONB DMP registers on 4707\n",
-			__FUNCTION__));
+			__func__));
 		return sii->curidx;
 	}
 	if (BCM53573_DMP()) {
-		SI_ERROR(("%s: Attempting to read DMP registers on 53573\n", __FUNCTION__));
+		SI_ERROR(("%s: Attempting to read DMP registers on 53573\n", __func__));
 		return sii->curidx;
 	}
 #ifdef REROUTE_OOBINT
 	if (PMU_DMP()) {
 		SI_ERROR(("%s: Attempting to read PMU DMP registers\n",
-			__FUNCTION__));
+			__func__));
 		return PMU_OOB_BIT;
 	}
 #else
@@ -713,18 +713,18 @@ ai_flag_alt(si_t *sih)
 	aidmp_t *ai;
 
 	if (BCM5357_DMP()) {
-		SI_ERROR(("%s: Attempting to read USB20H DMP registers on 5357b0\n", __FUNCTION__));
+		SI_ERROR(("%s: Attempting to read USB20H DMP registers on 5357b0\n", __func__));
 		return sii->curidx;
 	}
 	if (BCM4707_DMP()) {
 		SI_ERROR(("%s: Attempting to read CHIPCOMMONB DMP registers on 4707\n",
-			__FUNCTION__));
+			__func__));
 		return sii->curidx;
 	}
 #ifdef REROUTE_OOBINT
 	if (PMU_DMP()) {
 		SI_ERROR(("%s: Attempting to read PMU DMP registers\n",
-			__FUNCTION__));
+			__func__));
 		return PMU_OOB_BIT;
 	}
 #endif /* REROUTE_OOBINT */
@@ -1076,17 +1076,17 @@ ai_core_cflags_wo(si_t *sih, uint32 mask, uint32 val)
 
 	if (BCM5357_DMP()) {
 		SI_ERROR(("%s: Accessing USB20H DMP register (ioctrl) on 5357\n",
-		          __FUNCTION__));
+		          __func__));
 		return;
 	}
 	if (BCM4707_DMP()) {
 		SI_ERROR(("%s: Accessing CHIPCOMMONB DMP register (ioctrl) on 4707\n",
-			__FUNCTION__));
+			__func__));
 		return;
 	}
 	if (PMU_DMP()) {
 		SI_ERROR(("%s: Accessing PMU DMP register (ioctrl)\n",
-			__FUNCTION__));
+			__func__));
 		return;
 	}
 
@@ -1110,18 +1110,18 @@ ai_core_cflags(si_t *sih, uint32 mask, uint32 val)
 
 	if (BCM5357_DMP()) {
 		SI_ERROR(("%s: Accessing USB20H DMP register (ioctrl) on 5357\n",
-		          __FUNCTION__));
+		          __func__));
 		return 0;
 	}
 	if (BCM4707_DMP()) {
 		SI_ERROR(("%s: Accessing CHIPCOMMONB DMP register (ioctrl) on 4707\n",
-			__FUNCTION__));
+			__func__));
 		return 0;
 	}
 
 	if (PMU_DMP()) {
 		SI_ERROR(("%s: Accessing PMU DMP register (ioctrl)\n",
-			__FUNCTION__));
+			__func__));
 		return 0;
 	}
 	ASSERT(GOODREGS(sii->curwrap));
@@ -1146,17 +1146,17 @@ ai_core_sflags(si_t *sih, uint32 mask, uint32 val)
 
 	if (BCM5357_DMP()) {
 		SI_ERROR(("%s: Accessing USB20H DMP register (iostatus) on 5357\n",
-		          __FUNCTION__));
+		          __func__));
 		return 0;
 	}
 	if (BCM4707_DMP()) {
 		SI_ERROR(("%s: Accessing CHIPCOMMONB DMP register (ioctrl) on 4707\n",
-			__FUNCTION__));
+			__func__));
 		return 0;
 	}
 	if (PMU_DMP()) {
 		SI_ERROR(("%s: Accessing PMU DMP register (ioctrl)\n",
-			__FUNCTION__));
+			__func__));
 		return 0;
 	}
 
@@ -1204,7 +1204,7 @@ ai_dumpregs(si_t *sih, struct bcmstrbuf *b)
 		prev_value = OSL_PCI_READ_CONFIG(osh, cfg_reg, 4);
 
 		if (prev_value == ID32_INVALID) {
-			SI_PRINT(("%s, PCI_BAR0_WIN2 - %x\n", __FUNCTION__, prev_value));
+			SI_PRINT(("%s, PCI_BAR0_WIN2 - %x\n", __func__, prev_value));
 			return;
 		}
 	}
@@ -1306,7 +1306,7 @@ ai_enable_backplane_timeouts(si_t *sih)
 #endif /* BCM_BACKPLANE_TIMEOUT */
 		FALSE) {
 		SI_VMSG((" %s, axi_num_wrappers:%d, Is_PCIE:%d, BUS_TYPE:%d, ID:%x\n",
-			__FUNCTION__, sii->axi_num_wrappers, PCIE(sii),
+			__func__, sii->axi_num_wrappers, PCIE(sii),
 			BUSTYPE(sii->pub.bustype), sii->pub.buscoretype));
 		return;
 	}
@@ -1327,7 +1327,7 @@ ai_enable_backplane_timeouts(si_t *sih)
 
 		prev_value = OSL_PCI_READ_CONFIG(osh, cfg_reg, 4);
 		if (prev_value == ID32_INVALID) {
-			SI_PRINT(("%s, PCI_BAR0_WIN2 - %x\n", __FUNCTION__, prev_value));
+			SI_PRINT(("%s, PCI_BAR0_WIN2 - %x\n", __func__, prev_value));
 			return;
 		}
 	}
@@ -1531,7 +1531,7 @@ ai_clear_backplane_to_per_core(si_t *sih, uint coreid, uint coreunit, void * wra
 #endif /* BCM_BACKPLANE_TIMEOUT */
 		FALSE) {
 		SI_VMSG((" %s, axi_num_wrappers:%d, Is_PCIE:%d, BUS_TYPE:%d, ID:%x\n",
-			__FUNCTION__, sii->axi_num_wrappers, PCIE(sii),
+			__func__, sii->axi_num_wrappers, PCIE(sii),
 			BUSTYPE(sii->pub.bustype), sii->pub.buscoretype));
 		return AXI_WRAP_STS_NONE;
 	}
@@ -1565,7 +1565,7 @@ ai_clear_backplane_to_per_core(si_t *sih, uint coreid, uint coreunit, void * wra
 	if (errlog_status == ID32_INVALID) {
 		/* Do not try to peek further */
 		SI_PRINT(("%s, errlogstatus:%x - Slave Wrapper:%x\n",
-			__FUNCTION__, errlog_status, coreid));
+			__func__, errlog_status, coreid));
 		ret = AXI_WRAP_STS_WRAP_RD_ERR;
 		errlog_lo = (uint32)&ai->errlogstatus;
 		goto end;
@@ -1582,7 +1582,7 @@ ai_clear_backplane_to_per_core(si_t *sih, uint coreid, uint coreunit, void * wra
 
 			if (tmp == ID32_INVALID) {
 				SI_PRINT(("%s: prev errlogstatus:%x, errlogstatus:%x\n",
-					__FUNCTION__, errlog_status, tmp));
+					__func__, errlog_status, tmp));
 				ret = AXI_WRAP_STS_WRAP_RD_ERR;
 				errlog_lo = (uint32)&ai->errlogstatus;
 				goto end;
@@ -1718,7 +1718,7 @@ ai_clear_backplane_to(si_t *sih)
 #endif
 	{
 		SI_VMSG((" %s, axi_num_wrappers:%d, Is_PCIE:%d, BUS_TYPE:%d, ID:%x\n",
-			__FUNCTION__, sii->axi_num_wrappers, PCIE(sii),
+			__func__, sii->axi_num_wrappers, PCIE(sii),
 			BUSTYPE(sii->pub.bustype), sii->pub.buscoretype));
 		return AXI_WRAP_STS_NONE;
 	}
@@ -1742,7 +1742,7 @@ ai_clear_backplane_to(si_t *sih)
 		if (prev_value == ID32_INVALID) {
 			si_axi_error_t * axi_error =
 				&sih->err_info->axi_error[sih->err_info->count];
-			SI_PRINT(("%s, PCI_BAR0_WIN2 - %x\n", __FUNCTION__, prev_value));
+			SI_PRINT(("%s, PCI_BAR0_WIN2 - %x\n", __func__, prev_value));
 
 			axi_error->error = ret = AXI_WRAP_STS_PCI_RD_ERR;
 			axi_error->errlog_lo = cfg_reg;

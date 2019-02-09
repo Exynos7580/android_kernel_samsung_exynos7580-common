@@ -220,10 +220,10 @@ void
 osl_dma_map_dump(void)
 {
 	printk("%s: map_idx=%d unmap_idx=%d current time=%llu\n",
-		__FUNCTION__, map_idx, unmap_idx, OSL_SYSUPTIME_US());
+		__func__, map_idx, unmap_idx, OSL_SYSUPTIME_US());
 	if (dhd_map_log && dhd_unmap_log) {
 		printk("%s: dhd_map_log(pa)=%llx size=%d, dma_unmap_log(pa)=%llx size=%d\n",
-			__FUNCTION__, (uint64)__virt_to_phys((ulong)dhd_map_log),
+			__func__, (uint64)__virt_to_phys((ulong)dhd_map_log),
 			(uint32)(sizeof(dhd_map_log_t) * DHD_MAP_LOG_SIZE),
 			(uint64)__virt_to_phys((ulong)dhd_unmap_log),
 			(uint32)(sizeof(dhd_map_log_t) * DHD_MAP_LOG_SIZE));
@@ -977,7 +977,7 @@ osl_dma_map(osl_t *osh, void *va, uint size, int direction, void *p, hnddma_seg_
 	ret = 0;
 #endif // endif
 	if (ret) {
-		printk("%s: Failed to map memory\n", __FUNCTION__);
+		printk("%s: Failed to map memory\n", __func__);
 		PHYSADDRLOSET(ret_addr, 0);
 		PHYSADDRHISET(ret_addr, 0);
 	} else {
@@ -1366,7 +1366,7 @@ osl_sec_dma_init_elem_mem_block(osl_t *osh, size_t mbsize, int max, sec_mem_elem
 		osh->contig_base_alloc_va = ((uint8 *)osh->contig_base_alloc_va +  mbsize);
 
 	} else {
-		printf("%s sec mem elem kmalloc failed\n", __FUNCTION__);
+		printf("%s sec mem elem kmalloc failed\n", __func__);
 		ret = BCME_ERROR;
 	}
 	return ret;
@@ -1435,7 +1435,7 @@ osl_sec_dma_free_mem_elem(osl_t *osh, sec_mem_elem_t *sec_mem_elem)
 #ifdef NOT_YET
 	}
 	else
-		printf("%s free failed size=%d\n", __FUNCTION__, sec_mem_elem->size);
+		printf("%s free failed size=%d\n", __func__, sec_mem_elem->size);
 #endif /* NOT_YET */
 }
 
@@ -1521,7 +1521,7 @@ osl_sec_dma_map_txmeta(osl_t *osh, void *va, uint size, int direction, void *p,
 
 	} else {
 		printf("%s: error orig va not found va = 0x%p \n",
-			__FUNCTION__, vaorig);
+			__func__, vaorig);
 	}
 	return dma_handle;
 }
@@ -1768,7 +1768,7 @@ osl_sec_dma_alloc_consistent(osl_t *osh, uint size, uint16 align_bits, ulong *pa
 	int i;
 
 	if (size > SEC_CMA_COHERENT_BLK) {
-		printf("%s unsupported size\n", __FUNCTION__);
+		printf("%s unsupported size\n", __func__);
 		return NULL;
 	}
 
@@ -1782,7 +1782,7 @@ osl_sec_dma_alloc_consistent(osl_t *osh, uint size, uint16 align_bits, ulong *pa
 	}
 
 	if (i == SEC_CMA_COHERENT_MAX)
-		printf("%s:No coherent mem: va = 0x%p pa = 0x%lx size = %d\n", __FUNCTION__,
+		printf("%s:No coherent mem: va = 0x%p pa = 0x%lx size = %d\n", __func__,
 			temp_va, (ulong)temp_pa, size);
 
 	*pap = (unsigned long)temp_pa;
@@ -1801,7 +1801,7 @@ osl_sec_dma_free_consistent(osl_t *osh, void *va, uint size, dmaaddr_t pa)
 		}
 	}
 	if (i == SEC_CMA_COHERENT_MAX)
-		printf("%s:Error: va = 0x%p pa = 0x%lx size = %d\n", __FUNCTION__,
+		printf("%s:Error: va = 0x%p pa = 0x%lx size = %d\n", __func__,
 			va, (ulong)pa, size);
 }
 #endif /* BCM_SECURE_DMA */
@@ -1838,7 +1838,7 @@ void
 osl_timer_add(osl_t *osh, osl_timer_t *t, uint32 ms, bool periodic)
 {
 	if (t == NULL) {
-		printf("%s: Timer handle is NULL\n", __FUNCTION__);
+		printf("%s: Timer handle is NULL\n", __func__);
 		return;
 	}
 	ASSERT(!t->set);
@@ -1858,7 +1858,7 @@ void
 osl_timer_update(osl_t *osh, osl_timer_t *t, uint32 ms, bool periodic)
 {
 	if (t == NULL) {
-		printf("%s: Timer handle is NULL\n", __FUNCTION__);
+		printf("%s: Timer handle is NULL\n", __func__);
 		return;
 	}
 	if (periodic) {
@@ -1879,7 +1879,7 @@ bool
 osl_timer_del(osl_t *osh, osl_timer_t *t)
 {
 	if (t == NULL) {
-		printf("%s: Timer handle is NULL\n", __FUNCTION__);
+		printf("%s: Timer handle is NULL\n", __func__);
 		return (FALSE);
 	}
 	if (t->set) {

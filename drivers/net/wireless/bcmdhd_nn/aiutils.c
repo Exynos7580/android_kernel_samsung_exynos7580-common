@@ -79,7 +79,7 @@ get_erom_ent(si_t *sih, uint32 **eromptr, uint32 mask, uint32 match)
 		nom++;
 	}
 
-	SI_VMSG(("%s: Returning ent 0x%08x\n", __FUNCTION__, ent));
+	SI_VMSG(("%s: Returning ent 0x%08x\n", __func__, ent));
 	if (inv + nom) {
 		SI_VMSG(("  after %d invalid and %d non-matching entries\n", inv, nom));
 	}
@@ -523,7 +523,7 @@ ai_addrspace(si_t *sih, uint asidx)
 		return cores_info->coresba2[cidx];
 	else {
 		SI_ERROR(("%s: Need to parse the erom again to find addr space %d\n",
-		          __FUNCTION__, asidx));
+		          __func__, asidx));
 		return 0;
 	}
 }
@@ -544,7 +544,7 @@ ai_addrspacesize(si_t *sih, uint asidx)
 		return cores_info->coresba2_size[cidx];
 	else {
 		SI_ERROR(("%s: Need to parse the erom again to find addr space %d\n",
-		          __FUNCTION__, asidx));
+		          __func__, asidx));
 		return 0;
 	}
 }
@@ -556,16 +556,16 @@ ai_flag(si_t *sih)
 	aidmp_t *ai;
 
 	if (BCM47162_DMP()) {
-		SI_ERROR(("%s: Attempting to read MIPS DMP registers on 47162a0", __FUNCTION__));
+		SI_ERROR(("%s: Attempting to read MIPS DMP registers on 47162a0", __func__));
 		return sii->curidx;
 	}
 	if (BCM5357_DMP()) {
-		SI_ERROR(("%s: Attempting to read USB20H DMP registers on 5357b0\n", __FUNCTION__));
+		SI_ERROR(("%s: Attempting to read USB20H DMP registers on 5357b0\n", __func__));
 		return sii->curidx;
 	}
 	if (BCM4707_DMP()) {
 		SI_ERROR(("%s: Attempting to read CHIPCOMMONB DMP registers on 4707\n",
-			__FUNCTION__));
+			__func__));
 		return sii->curidx;
 	}
 	ai = sii->curwrap;
@@ -580,16 +580,16 @@ ai_flag_alt(si_t *sih)
 	aidmp_t *ai;
 
 	if (BCM47162_DMP()) {
-		SI_ERROR(("%s: Attempting to read MIPS DMP registers on 47162a0", __FUNCTION__));
+		SI_ERROR(("%s: Attempting to read MIPS DMP registers on 47162a0", __func__));
 		return sii->curidx;
 	}
 	if (BCM5357_DMP()) {
-		SI_ERROR(("%s: Attempting to read USB20H DMP registers on 5357b0\n", __FUNCTION__));
+		SI_ERROR(("%s: Attempting to read USB20H DMP registers on 5357b0\n", __func__));
 		return sii->curidx;
 	}
 	if (BCM4707_DMP()) {
 		SI_ERROR(("%s: Attempting to read CHIPCOMMONB DMP registers on 4707\n",
-			__FUNCTION__));
+			__func__));
 		return sii->curidx;
 	}
 	ai = sii->curwrap;
@@ -913,17 +913,17 @@ ai_core_cflags_wo(si_t *sih, uint32 mask, uint32 val)
 
 	if (BCM47162_DMP()) {
 		SI_ERROR(("%s: Accessing MIPS DMP register (ioctrl) on 47162a0",
-		          __FUNCTION__));
+		          __func__));
 		return;
 	}
 	if (BCM5357_DMP()) {
 		SI_ERROR(("%s: Accessing USB20H DMP register (ioctrl) on 5357\n",
-		          __FUNCTION__));
+		          __func__));
 		return;
 	}
 	if (BCM4707_DMP()) {
 		SI_ERROR(("%s: Accessing CHIPCOMMONB DMP register (ioctrl) on 4707\n",
-			__FUNCTION__));
+			__func__));
 		return;
 	}
 
@@ -947,17 +947,17 @@ ai_core_cflags(si_t *sih, uint32 mask, uint32 val)
 
 	if (BCM47162_DMP()) {
 		SI_ERROR(("%s: Accessing MIPS DMP register (ioctrl) on 47162a0",
-		          __FUNCTION__));
+		          __func__));
 		return 0;
 	}
 	if (BCM5357_DMP()) {
 		SI_ERROR(("%s: Accessing USB20H DMP register (ioctrl) on 5357\n",
-		          __FUNCTION__));
+		          __func__));
 		return 0;
 	}
 	if (BCM4707_DMP()) {
 		SI_ERROR(("%s: Accessing CHIPCOMMONB DMP register (ioctrl) on 4707\n",
-			__FUNCTION__));
+			__func__));
 		return 0;
 	}
 
@@ -983,17 +983,17 @@ ai_core_sflags(si_t *sih, uint32 mask, uint32 val)
 
 	if (BCM47162_DMP()) {
 		SI_ERROR(("%s: Accessing MIPS DMP register (iostatus) on 47162a0",
-		          __FUNCTION__));
+		          __func__));
 		return 0;
 	}
 	if (BCM5357_DMP()) {
 		SI_ERROR(("%s: Accessing USB20H DMP register (iostatus) on 5357\n",
-		          __FUNCTION__));
+		          __func__));
 		return 0;
 	}
 	if (BCM4707_DMP()) {
 		SI_ERROR(("%s: Accessing CHIPCOMMONB DMP register (ioctrl) on 4707\n",
-			__FUNCTION__));
+			__func__));
 		return 0;
 	}
 

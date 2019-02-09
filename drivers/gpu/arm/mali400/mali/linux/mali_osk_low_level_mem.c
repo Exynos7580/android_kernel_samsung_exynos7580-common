@@ -569,7 +569,7 @@ _mali_osk_errcode_t _mali_osk_mem_mapregion_map( mali_memory_allocation * descri
 
 		if ( ret != _MALI_OSK_ERR_OK)
 		{
-			MALI_PRINT_ERROR(("%s %d could not remap_pfn_range()\n", __FUNCTION__, __LINE__));
+			MALI_PRINT_ERROR(("%s %d could not remap_pfn_range()\n", __func__, __LINE__));
 			_allocation_list_item_release(alloc_item);
 			return ret;
 		}

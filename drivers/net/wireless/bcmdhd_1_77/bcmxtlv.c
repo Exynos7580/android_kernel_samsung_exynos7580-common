@@ -427,7 +427,7 @@ bcm_get_data_from_xtlv_buf(uint8 *tlv_buf, uint16 buflen, uint16 id,
 		/* check for possible buffer overrun */
 		if (sbuflen < 0) {
 			printf("%s %d: Invalid sbuflen %d\n",
-				__FUNCTION__, __LINE__, sbuflen);
+				__func__, __LINE__, sbuflen);
 			break;
 		}
 

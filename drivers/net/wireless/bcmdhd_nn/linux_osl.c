@@ -422,7 +422,7 @@ osl_ctfpool_add(osl_t *osh)
 	/* Allocate a new skb and add it to the ctfpool */
 	skb = osl_alloc_skb(osh, osh->ctfpool->obj_size);
 	if (skb == NULL) {
-		printf("%s: skb alloc of len %d failed\n", __FUNCTION__,
+		printf("%s: skb alloc of len %d failed\n", __func__,
 		       osh->ctfpool->obj_size);
 		CTFPOOL_UNLOCK(osh->ctfpool, flags);
 		return NULL;
@@ -795,7 +795,7 @@ osl_pktget_static(osl_t *osh, uint len)
 	struct sk_buff *skb;
 
 	if (len > DHD_SKB_MAX_BUFSIZE) {
-		printk("%s: attempt to allocate huge packet (0x%x)\n", __FUNCTION__, len);
+		printk("%s: attempt to allocate huge packet (0x%x)\n", __func__, len);
 		return osl_pktget(osh, len);
 	}
 
@@ -851,7 +851,7 @@ osl_pktget_static(osl_t *osh, uint len)
 #endif
 
 	up(&bcm_static_skb->osl_pkt_sem);
-	printk("%s: all static pkt in use!\n", __FUNCTION__);
+	printk("%s: all static pkt in use!\n", __func__);
 	return osl_pktget(osh, len);
 }
 

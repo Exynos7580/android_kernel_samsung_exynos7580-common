@@ -2118,7 +2118,7 @@ void
 bcm_object_trace_deinit(void)
 {
 	if (dbgobj_objhead || dbgobj_objtail) {
-		printf("%s: not all objects are released\n", __FUNCTION__);
+		printf("%s: not all objects are released\n", __func__);
 		ASSERT(0);
 	}
 	BCM_OBJDBG_LOCK_DESTROY();
@@ -2200,7 +2200,7 @@ bcm_object_trace_opr(void *obj, uint32 opt, const char *caller, int line)
 			if (dbgobj->obj == obj) {
 				printf("%s: obj %p allocated from %s(%d),"
 					" allocate again from %s(%d)\n",
-					__FUNCTION__, dbgobj->obj,
+					__func__, dbgobj->obj,
 					dbgobj->caller, dbgobj->line,
 					caller, line);
 				ASSERT(0);
@@ -2229,7 +2229,7 @@ FREED_ENTRY_FOUND:
 #endif /* BCM_OBJECT_MERGE_SAME_OBJ */
 		if (!dbgobj) {
 			printf("%s: already got %d objects ?????????????????????\n",
-				__FUNCTION__, BCM_OBJDBG_COUNT);
+				__func__, BCM_OBJDBG_COUNT);
 			ASSERT(0);
 			goto EXIT;
 		}
@@ -2259,7 +2259,7 @@ FREED_ENTRY_FOUND:
 			if (dbgobj->obj == obj) {
 				if (dbgobj->flag) {
 					printf("%s: rm flagged obj %p flag 0x%08x from %s(%d)\n",
-						__FUNCTION__, obj, dbgobj->flag, caller, line);
+						__func__, obj, dbgobj->flag, caller, line);
 				}
 				bcm_object_rm_list(&dbgobj_objhead, &dbgobj_objtail, dbgobj);
 				memset(dbgobj->caller, 0x00, BCM_OBJDBG_CALLER_LEN);
@@ -2281,7 +2281,7 @@ FREED_ENTRY_FOUND:
 			if (dbgobj->obj == obj) {
 				printf("%s: obj %p already freed from from %s(%d),"
 					" try free again from %s(%d)\n",
-					__FUNCTION__, obj,
+					__func__, obj,
 					dbgobj->caller, dbgobj->line,
 					caller, line);
 				//ASSERT(0); /* release same obj more than one time? */
@@ -2293,7 +2293,7 @@ FREED_ENTRY_FOUND:
 		}
 
 		printf("%s: ################### release none-existing obj %p from %s(%d)\n",
-			__FUNCTION__, obj, caller, line);
+			__func__, obj, caller, line);
 		//ASSERT(0); /* release same obj more than one time? */
 
 	}
@@ -2362,7 +2362,7 @@ bcm_object_trace_chk(void *obj, uint32 chksn, uint32 sn,
 		if ((dbgobj->obj == obj) &&
 			((!chksn) || (dbgobj->obj_sn == sn))) {
 			printf("%s: (%s:%d) obj %p (sn %d state %d) was freed from %s(%d)\n",
-				__FUNCTION__, caller, line,
+				__func__, caller, line,
 				dbgobj->obj, dbgobj->obj_sn, dbgobj->obj_state,
 				dbgobj->caller, dbgobj->line);
 			goto EXIT;
@@ -2376,11 +2376,11 @@ bcm_object_trace_chk(void *obj, uint32 chksn, uint32 sn,
 	}
 
 	printf("%s: obj %p not found, check from %s(%d), chksn %s, sn %d\n",
-		__FUNCTION__, obj, caller, line, chksn ? "yes" : "no", sn);
+		__func__, obj, caller, line, chksn ? "yes" : "no", sn);
 	dbgobj = dbgobj_objtail;
 	while (dbgobj) {
 		printf("%s: (%s:%d) obj %p sn %d was allocated from %s(%d)\n",
-				__FUNCTION__, caller, line,
+				__func__, caller, line,
 				dbgobj->obj, dbgobj->obj_sn, dbgobj->caller, dbgobj->line);
 		dbgobj = dbgobj->prior;
 		if (dbgobj == dbgobj_objtail)
@@ -2423,7 +2423,7 @@ bcm_object_feature_set(void *obj, uint32 type, uint32 value)
 			break;
 	}
 
-	printf("%s: obj %p not found in active list\n", __FUNCTION__, obj);
+	printf("%s: obj %p not found in active list\n", __func__, obj);
 	ASSERT(0);
 
 EXIT:
@@ -2458,7 +2458,7 @@ bcm_object_feature_get(void *obj, uint32 type, uint32 value)
 			break;
 	}
 
-	printf("%s: obj %p not found in active list\n", __FUNCTION__, obj);
+	printf("%s: obj %p not found in active list\n", __func__, obj);
 	ASSERT(0);
 
 EXIT:

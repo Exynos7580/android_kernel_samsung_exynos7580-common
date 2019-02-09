@@ -348,14 +348,14 @@ mali_error kbase_instr_hwcnt_dump_irq(struct kbase_context *kctx)
 	if (kbdev->hwcnt.kctx != kctx) {
 		/* The instrumentation has been setup for another context */
 		/* MALI_SEC_INTEGRATION */
-		GPU_LOG(DVFS_INFO, DUMMY, 0u, 0u, "hwcnt irq error in %s %d \n", __FUNCTION__, err);
+		GPU_LOG(DVFS_INFO, DUMMY, 0u, 0u, "hwcnt irq error in %s %d \n", __func__, err);
 		goto unlock;
 	}
 
 	if (kbdev->hwcnt.state != KBASE_INSTR_STATE_IDLE) {
 		/* HW counters are disabled or another dump is ongoing, or we're resetting */
 		/* MALI_SEC_INTEGRATION */
-		GPU_LOG(DVFS_INFO, DUMMY, 0u, 0u, "hwcnt disabled or another dump is ongoing in %s %d \n", __FUNCTION__, err);
+		GPU_LOG(DVFS_INFO, DUMMY, 0u, 0u, "hwcnt disabled or another dump is ongoing in %s %d \n", __func__, err);
 		goto unlock;
 	}
 
@@ -429,7 +429,7 @@ mali_error kbase_instr_hwcnt_dump(struct kbase_context *kctx)
 
 #ifdef MALI_SEC_HWCNT
 	if (kctx == NULL) {
-		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "kctx is NULL error in %s %d \n", __FUNCTION__, err);
+		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "kctx is NULL error in %s %d \n", __func__, err);
 		goto out;
 	}
 #endif
@@ -442,7 +442,7 @@ mali_error kbase_instr_hwcnt_dump(struct kbase_context *kctx)
 	if (MALI_ERROR_NONE != err) {
 		/* Can't dump HW counters */
 		/* MALI_SEC_INTEGRATION */
-		GPU_LOG(DVFS_INFO, DUMMY, 0u, 0u, "kbase_instr_hwcnt_dump_irq error in %s %d \n", __FUNCTION__, err);
+		GPU_LOG(DVFS_INFO, DUMMY, 0u, 0u, "kbase_instr_hwcnt_dump_irq error in %s %d \n", __func__, err);
 		goto out;
 	}
 
@@ -454,7 +454,7 @@ mali_error kbase_instr_hwcnt_dump(struct kbase_context *kctx)
 			kbdev->hwcnt.trig_exception = 0;
 			kbdev->hwcnt.state = KBASE_INSTR_STATE_IDLE;
 			err = MALI_ERROR_FUNCTION_FAILED;
-			GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "wait_event_timeout error in %s %d \n", __FUNCTION__, err);
+			GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "wait_event_timeout error in %s %d \n", __func__, err);
 			goto out;
 		}
 	} else
@@ -479,7 +479,7 @@ mali_error kbase_instr_hwcnt_dump(struct kbase_context *kctx)
 		err = MALI_ERROR_FUNCTION_FAILED;
 		kbdev->hwcnt.state = KBASE_INSTR_STATE_IDLE;
 		/* MALI_SEC_INTEGRATION */
-		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "hwcnt state is FAULT error in %s %d \n", __FUNCTION__, err);
+		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "hwcnt state is FAULT error in %s %d \n", __func__, err);
 	} else {
 		/* Dump done */
 		KBASE_DEBUG_ASSERT(kbdev->hwcnt.state == KBASE_INSTR_STATE_IDLE);
@@ -522,7 +522,7 @@ mali_error kbase_instr_hwcnt_clear(struct kbase_context *kctx)
 	/* Check it's the context previously set up and we're not already dumping */
 	if (kbdev->hwcnt.kctx != kctx || kbdev->hwcnt.state != KBASE_INSTR_STATE_IDLE) {
 		/* MALI_SEC_INTEGRATION */
-		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "hwcnt check error in %s %d \n", __FUNCTION__, err);
+		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "hwcnt check error in %s %d \n", __func__, err);
 		goto out;
 	}
 

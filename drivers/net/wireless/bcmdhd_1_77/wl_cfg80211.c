@@ -3960,12 +3960,12 @@ wl_customer6_legacy_chip_check(struct bcm_cfg80211 *cfg,
 	memset(&revinfo, 0, sizeof(revinfo));
 	ret = wldev_ioctl_get(ndev, WLC_GET_REVINFO, &revinfo, sizeof(revinfo));
 	if (ret < 0) {
-		WL_ERR(("%s: GET revinfo FAILED. ret:%d\n", __FUNCTION__, ret));
+		WL_ERR(("%s: GET revinfo FAILED. ret:%d\n", __func__, ret));
 		ASSERT(0);
 		return false;
 	}
 
-	WL_DBG(("%s: GET_REVINFO device 0x%x, vendor 0x%x, chipnum 0x%x\n", __FUNCTION__,
+	WL_DBG(("%s: GET_REVINFO device 0x%x, vendor 0x%x, chipnum 0x%x\n", __func__,
 		dtoh32(revinfo.deviceid), dtoh32(revinfo.vendorid), dtoh32(revinfo.chipnum)));
 	chipnum = revinfo.chipnum;
 	if ((chipnum == BCM4350_CHIP_ID) || (chipnum == BCM4355_CHIP_ID) ||
@@ -4853,7 +4853,7 @@ wl_set_set_wapi_ie(struct net_device *dev, struct cfg80211_connect_params *sme)
 		return BCME_ERROR;
 	}
 
-	WL_DBG((" %s \n", __FUNCTION__));
+	WL_DBG((" %s \n", __func__));
 
 	err = wldev_iovar_setbuf_bsscfg(dev, "wapiie", (void *)sme->ie, sme->ie_len,
 			cfg->ioctl_buf, WLC_IOCTL_MAXLEN, bssidx, &cfg->ioctl_buf_sync);
@@ -5388,7 +5388,7 @@ static bool wl_get_chan_isvht80(struct net_device *net, dhd_pub_t *dhd)
 		chanspec = wl_chspec_driver_to_host(chanspec);
 
 	isvht80 = chanspec & WL_CHANSPEC_BW_80;
-	WL_INFORM(("%s: chanspec(%x:%d)\n", __FUNCTION__, chanspec, isvht80));
+	WL_INFORM(("%s: chanspec(%x:%d)\n", __func__, chanspec, isvht80));
 
 	return isvht80;
 }
@@ -6763,7 +6763,7 @@ wl_cfg80211_get_station(struct wiphy *wiphy, struct net_device *dev,
 
 #ifdef DHD_SUPPORT_IF_CNTS
 		if ((if_stats = kmalloc(sizeof(*if_stats), GFP_KERNEL)) == NULL) {
-			WL_ERR(("%s(%d): kmalloc failed\n", __FUNCTION__, __LINE__));
+			WL_ERR(("%s(%d): kmalloc failed\n", __func__, __LINE__));
 			goto error;
 		}
 		memset(if_stats, 0, sizeof(*if_stats));
@@ -6779,7 +6779,7 @@ wl_cfg80211_get_station(struct wiphy *wiphy, struct net_device *dev,
 				(uint32)dtoh64(if_stats->txfail);
 		} else {
 			WL_ERR(("%s: if_counters not supported ret=%d\n",
-				__FUNCTION__, err));
+				__func__, err));
 #endif /* DHD_SUPPORT_IF_CNTS */
 
 			err = wldev_ioctl_get(dev, WLC_GET_PKTCNTS, &pktcnt,
@@ -6887,7 +6887,7 @@ void wl_cfg80211_update_power_mode(struct net_device *dev)
 
 	err = wldev_ioctl_get(dev, WLC_GET_PM, &pm, sizeof(pm));
 	if (err)
-		WL_ERR(("%s:error (%d)\n", __FUNCTION__, err));
+		WL_ERR(("%s:error (%d)\n", __func__, err));
 	else if (pm != -1 && dev->ieee80211_ptr)
 		dev->ieee80211_ptr->ps = (pm == PM_OFF) ? false : true;
 }
@@ -7357,7 +7357,7 @@ wl_cfg80211_cancel_remain_on_channel(struct wiphy *wiphy,
 			wl_to_p2p_bss_bssidx(cfg, P2PAPI_BSSCFG_DEVICE));
 	} else {
 		WL_ERR(("%s : ignore, request cookie(%llu) is not matched. (cur : %llu)\n",
-			__FUNCTION__, cookie, cfg->last_roc_id));
+			__func__, cookie, cfg->last_roc_id));
 	}
 
 	return err;
@@ -8072,7 +8072,7 @@ wl_cfg80211_mgmt_tx(struct wiphy *wiphy, bcm_struct_cfgdev *cfgdev,
 			if (!cfg->p2p_prb_noti) {
 				cfg->p2p_prb_noti = true;
 				WL_DBG(("%s: TX 802_1X Probe Response first time.\n",
-					__FUNCTION__));
+					__func__));
 			}
 #endif
 			goto exit;
@@ -10036,9 +10036,9 @@ wl_cfg80211_start_ap(
 		dev_role = NL80211_IFTYPE_AP;
 		dhd->op_mode |= DHD_FLAG_HOSTAP_MODE;
 		err = dhd_ndo_enable(dhd, FALSE);
-		WL_DBG(("%s: Disabling NDO on Hostapd mode %d\n", __FUNCTION__, err));
+		WL_DBG(("%s: Disabling NDO on Hostapd mode %d\n", __func__, err));
 		if (err) {
-			WL_ERR(("%s: Disabling NDO Failed %d\n", __FUNCTION__, err));
+			WL_ERR(("%s: Disabling NDO Failed %d\n", __func__, err));
 		}
 #ifdef PKT_FILTER_SUPPORT
 		/* Disable packet filter */
@@ -11547,10 +11547,10 @@ static bool wl_is_linkup(struct bcm_cfg80211 *cfg, const wl_event_msg_t *e, stru
 				err = wldev_iovar_setint(ndev, "ocl_enable", ocl_enable);
 				if (err != 0) {
 					WL_ERR(("[WIFI_SEC] %s: Set ocl_enable %d failed %d\n",
-						__FUNCTION__, ocl_enable, err));
+						__func__, ocl_enable, err));
 				} else {
 					WL_ERR(("[WIFI_SEC] %s: Set ocl_enable %d succeeded %d\n",
-						__FUNCTION__, ocl_enable, err));
+						__func__, ocl_enable, err));
 				}
 			}
 #endif /* CUSTOM_SET_OCLOFF */
@@ -12262,7 +12262,7 @@ int wl_get_bss_info(struct bcm_cfg80211 *cfg, struct net_device *dev, uint8 *mac
 						if (vndrie->len < (VNDR_IE_MIN_LEN + 1)) {
 							WL_ERR(("%s: invalid vndr ie."
 								"length is too small %d\n",
-								__FUNCTION__, vndrie->len));
+								__func__, vndrie->len));
 							break;
 						}
 
@@ -12658,11 +12658,11 @@ wl_notify_connect_status(struct bcm_cfg80211 *cfg, bcm_struct_cfgdev *cfgdev,
 							wl_cfg80211_wbtext_set_default(ndev);
 						} else {
 							WL_ERR(("%s: Failed to set wbtext = %d\n",
-								__FUNCTION__, err));
+								__func__, err));
 						}
 					} else {
 						WL_ERR(("%s: Failed to clear join pref = %d\n",
-							__FUNCTION__, err));
+							__func__, err));
 					}
 					wl_cfg80211_wbtext_clear_bssid_list(cfg);
 				}
@@ -12721,7 +12721,7 @@ wl_notify_connect_status(struct bcm_cfg80211 *cfg, bcm_struct_cfgdev *cfgdev,
 			if (wl_get_drv_status(cfg, CONNECTING, ndev))
 				wl_bss_connect_done(cfg, ndev, e, data, false);
 		} else {
-			WL_DBG(("%s nothing\n", __FUNCTION__));
+			WL_DBG(("%s nothing\n", __func__));
 		}
 
 #ifdef DYNAMIC_MUMIMO_CONTROL
@@ -13023,10 +13023,10 @@ wl_check_pmstatus(struct bcm_cfg80211 *cfg, bcm_struct_cfgdev *cfgdev,
 
 			err = wldev_ioctl_set(ndev, WLC_DISASSOC, &scbval, sizeof(scb_val_t));
 			if (err < 0) {
-				WL_ERR(("%s: Disassoc error %d\n", __FUNCTION__, err));
+				WL_ERR(("%s: Disassoc error %d\n", __func__, err));
 				return err;
 			}
-			WL_ERR(("%s: Force Disassoc due to updated DPM event.\n", __FUNCTION__));
+			WL_ERR(("%s: Force Disassoc due to updated DPM event.\n", __func__));
 
 			last_dpm_upd_time = 0;
 		} else {
@@ -13456,7 +13456,7 @@ wl_bss_roaming_done(struct bcm_cfg80211 *cfg, struct net_device *ndev,
 		wl_set_adps_mode(cfg, ndev, enable_mode);
 	}
 #endif /* WLADPS_SEAK_AP_WAR */
-	WL_ERR(("%s succeeded to " MACDBG " (ch:%d)\n", __FUNCTION__,
+	WL_ERR(("%s succeeded to " MACDBG " (ch:%d)\n", __func__,
 		MAC2STRDBG((const u8*)(&e->addr)), *channel));
 
 	cfg80211_roamed(ndev,
@@ -14699,7 +14699,7 @@ static void wl_init_prof(struct bcm_cfg80211 *cfg, struct net_device *ndev)
 		memset(profile, 0, sizeof(struct wl_profile));
 		spin_unlock_irqrestore(&cfg->cfgdrv_lock, flags);
 	} else {
-		WL_ERR(("%s: No profile\n", __FUNCTION__));
+		WL_ERR(("%s: No profile\n", __func__));
 	}
 	return;
 }
@@ -16049,7 +16049,7 @@ static s32 wl_notifier_change_state(struct bcm_cfg80211 *cfg, struct net_info *_
 	rtt_status_info_t *rtt_status;
 #endif /* RTT_SUPPORT */
 	if (dhd->busstate == DHD_BUS_DOWN) {
-		WL_ERR(("%s : busstate is DHD_BUS_DOWN!\n", __FUNCTION__));
+		WL_ERR(("%s : busstate is DHD_BUS_DOWN!\n", __func__));
 		return 0;
 	}
 	WL_DBG(("Enter state %d set %d _net_info->pm_restore %d iface %s\n",
@@ -17179,7 +17179,7 @@ static s32 __wl_update_wiphybands(struct bcm_cfg80211 *cfg, bool notify)
 					(7 << VHT_CAP_INFO_AMPDU_MAXLEN_EXP_SHIFT);
 				WL_INFORM(("%s band[%d] vht_enab=%d vht_cap=%08x "
 					"vht_rx_mcs_map=%04x vht_tx_mcs_map=%04x\n",
-					__FUNCTION__, index,
+					__func__, index,
 					bands[index]->vht_cap.vht_supported,
 					bands[index]->vht_cap.cap,
 					bands[index]->vht_cap.vht_mcs.rx_mcs_map,
@@ -17621,13 +17621,13 @@ int wl_cfg80211_hang(struct net_device *dev, u16 reason)
 #if defined(DHD_HANG_SEND_UP_TEST)
 	if (dhd->req_hang_type) {
 		WL_ERR(("%s, Clear HANG test request 0x%x\n",
-			__FUNCTION__, dhd->req_hang_type));
+			__func__, dhd->req_hang_type));
 		dhd->req_hang_type = 0;
 	}
 #endif /* DHD_HANG_SEND_UP_TEST */
 	if ((dhd->hang_reason <= HANG_REASON_MASK) || (dhd->hang_reason >= HANG_REASON_MAX)) {
 		WL_ERR(("%s, Invalid hang reason 0x%x\n",
-			__FUNCTION__, dhd->hang_reason));
+			__func__, dhd->hang_reason));
 		dhd->hang_reason = HANG_REASON_UNKNOWN;
 	}
 #ifdef DHD_USE_EXTENDED_HANG_REASON
@@ -17829,7 +17829,7 @@ _Pragma("GCC diagnostic pop")
 	remaining_ie_buf_len = available_buffer_len - (int)ssidie[1];
 	unused_buf_len = WL_EXTRA_BUF_MAX - (4 + bi->length + *ie_size);
 	if (ssidie[1] > available_buffer_len) {
-		WL_ERR(("%s: skip wl_update_hidden_ap_ie : overflow\n", __FUNCTION__));
+		WL_ERR(("%s: skip wl_update_hidden_ap_ie : overflow\n", __func__));
 		return;
 	}
 
@@ -17837,7 +17837,7 @@ _Pragma("GCC diagnostic pop")
 	if (ssidie[1] != ssid_len) {
 		if (ssidie[1]) {
 			WL_INFORM(("%s: Wrong SSID len: %d != %d\n",
-				__FUNCTION__, ssidie[1], bi->SSID_len));
+				__func__, ssidie[1], bi->SSID_len));
 		}
 		if ((roam && (ssid_len > ssidie[1])) && (unused_buf_len > ssid_len)) {
 			WL_INFORM(("Changing the SSID Info.\n"));
@@ -17849,7 +17849,7 @@ _Pragma("GCC diagnostic pop")
 			ssidie[1] = ssid_len;
 		} else if (ssid_len < ssidie[1]) {
 			WL_ERR(("%s: Invalid SSID len: %d < %d\n",
-				__FUNCTION__, ssidie[1], bi->SSID_len));
+				__func__, ssidie[1], bi->SSID_len));
 		}
 		return;
 	}
@@ -18127,23 +18127,23 @@ wl_cfg80211_tdls_mgmt(struct wiphy *wiphy, struct net_device *dev,
 		 * using tdls_wfd_ie iovar
 		 */
 		case WLAN_TDLS_SET_PROBE_WFD_IE:
-			WL_ERR(("%s WLAN_TDLS_SET_PROBE_WFD_IE\n", __FUNCTION__));
+			WL_ERR(("%s WLAN_TDLS_SET_PROBE_WFD_IE\n", __func__));
 			info.mode = TDLS_WFD_PROBE_IE_TX;
 			memcpy(&info.data, buf, len);
 			info.length = len;
 			break;
 		case WLAN_TDLS_SET_SETUP_WFD_IE:
-			WL_ERR(("%s WLAN_TDLS_SET_SETUP_WFD_IE\n", __FUNCTION__));
+			WL_ERR(("%s WLAN_TDLS_SET_SETUP_WFD_IE\n", __func__));
 			info.mode = TDLS_WFD_IE_TX;
 			memcpy(&info.data, buf, len);
 			info.length = len;
 			break;
 		case WLAN_TDLS_SET_WFD_ENABLED:
-			WL_ERR(("%s WLAN_TDLS_SET_MODE_WFD_ENABLED\n", __FUNCTION__));
+			WL_ERR(("%s WLAN_TDLS_SET_MODE_WFD_ENABLED\n", __func__));
 			dhd_tdls_set_mode((dhd_pub_t *)(cfg->pub), true);
 			goto out;
 		case WLAN_TDLS_SET_WFD_DISABLED:
-			WL_ERR(("%s WLAN_TDLS_SET_MODE_WFD_DISABLED\n", __FUNCTION__));
+			WL_ERR(("%s WLAN_TDLS_SET_MODE_WFD_DISABLED\n", __func__));
 			dhd_tdls_set_mode((dhd_pub_t *)(cfg->pub), false);
 			goto out;
 		default:
@@ -18192,7 +18192,7 @@ wl_cfg80211_tdls_oper(struct wiphy *wiphy, struct net_device *dev,
 		 */
 		if (memcmp(peer, (const uint8 *)BSSID_BROADCAST, ETHER_ADDR_LEN) == 0) {
 			info.mode = TDLS_MANUAL_EP_WFD_TPQ;
-			WL_ERR(("%s TDLS TUNNELED PRBOBE REQUEST\n", __FUNCTION__));
+			WL_ERR(("%s TDLS TUNNELED PRBOBE REQUEST\n", __func__));
 		} else {
 			info.mode = TDLS_MANUAL_EP_DISCOVERY;
 		}
@@ -19152,7 +19152,7 @@ wl_cfg80211_wbtext_set_default(struct net_device *ndev)
 	ret = wl_cfg80211_wbtext_config(ndev, data, commandp, WLC_IOCTL_SMLEN);
 	if (ret != BCME_OK) {
 		WL_ERR(("%s: Failed to set roam_prof %s error = %d\n",
-			__FUNCTION__, data, ret));
+			__func__, data, ret));
 		return ret;
 	}
 
@@ -19163,7 +19163,7 @@ wl_cfg80211_wbtext_set_default(struct net_device *ndev)
 	ret = wl_cfg80211_wbtext_config(ndev, data, commandp, WLC_IOCTL_SMLEN);
 	if (ret != BCME_OK) {
 		WL_ERR(("%s: Failed to set roam_prof %s error = %d\n",
-			__FUNCTION__, data, ret));
+			__func__, data, ret));
 		return ret;
 	}
 
@@ -19175,7 +19175,7 @@ wl_cfg80211_wbtext_set_default(struct net_device *ndev)
 	ret = wl_cfg80211_wbtext_weight_config(ndev, data, commandp, WLC_IOCTL_SMLEN);
 	if (ret != BCME_OK) {
 		WL_ERR(("%s: Failed to set weight config %s error = %d\n",
-			__FUNCTION__, data, ret));
+			__func__, data, ret));
 		return ret;
 	}
 
@@ -19186,7 +19186,7 @@ wl_cfg80211_wbtext_set_default(struct net_device *ndev)
 	ret = wl_cfg80211_wbtext_weight_config(ndev, data, commandp, WLC_IOCTL_SMLEN);
 	if (ret != BCME_OK) {
 		WL_ERR(("%s: Failed to set weight config %s error = %d\n",
-			__FUNCTION__, data, ret));
+			__func__, data, ret));
 		return ret;
 	}
 
@@ -19198,7 +19198,7 @@ wl_cfg80211_wbtext_set_default(struct net_device *ndev)
 	ret = wl_cfg80211_wbtext_weight_config(ndev, data, commandp, WLC_IOCTL_SMLEN);
 	if (ret != BCME_OK) {
 		WL_ERR(("%s: Failed to set weight config %s error = %d\n",
-			__FUNCTION__, data, ret));
+			__func__, data, ret));
 		return ret;
 	}
 
@@ -19209,7 +19209,7 @@ wl_cfg80211_wbtext_set_default(struct net_device *ndev)
 	ret = wl_cfg80211_wbtext_weight_config(ndev, data, commandp, WLC_IOCTL_SMLEN);
 	if (ret != BCME_OK) {
 		WL_ERR(("%s: Failed to set weight config %s error = %d\n",
-			__FUNCTION__, data, ret));
+			__func__, data, ret));
 		return ret;
 	}
 
@@ -19221,7 +19221,7 @@ wl_cfg80211_wbtext_set_default(struct net_device *ndev)
 	ret = wl_cfg80211_wbtext_table_config(ndev, data, commandp, WLC_IOCTL_SMLEN);
 	if (ret != BCME_OK) {
 		WL_ERR(("%s: Failed to set RSSI table %s error = %d\n",
-			__FUNCTION__, data, ret));
+			__func__, data, ret));
 		return ret;
 	}
 
@@ -19232,7 +19232,7 @@ wl_cfg80211_wbtext_set_default(struct net_device *ndev)
 	ret = wl_cfg80211_wbtext_table_config(ndev, data, commandp, WLC_IOCTL_SMLEN);
 	if (ret != BCME_OK) {
 		WL_ERR(("%s: Failed to set RSSI table %s error = %d\n",
-			__FUNCTION__, data, ret));
+			__func__, data, ret));
 		return ret;
 	}
 
@@ -19244,7 +19244,7 @@ wl_cfg80211_wbtext_set_default(struct net_device *ndev)
 	ret = wl_cfg80211_wbtext_table_config(ndev, data, commandp, WLC_IOCTL_SMLEN);
 	if (ret != BCME_OK) {
 		WL_ERR(("%s: Failed to set CU table %s error = %d\n",
-			__FUNCTION__, data, ret));
+			__func__, data, ret));
 		return ret;
 	}
 
@@ -19255,7 +19255,7 @@ wl_cfg80211_wbtext_set_default(struct net_device *ndev)
 	ret = wl_cfg80211_wbtext_table_config(ndev, data, commandp, WLC_IOCTL_SMLEN);
 	if (ret != BCME_OK) {
 		WL_ERR(("%s: Failed to set CU table %s error = %d\n",
-			__FUNCTION__, data, ret));
+			__func__, data, ret));
 		return ret;
 	}
 
@@ -19855,7 +19855,7 @@ wl_cfg80211_get_fbt_key(struct net_device *dev, uint8 *key)
 		memcpy(key, cfg->fbt_key, FBT_KEYLEN);
 	} else {
 		memset(key, 0, FBT_KEYLEN);
-		WL_ERR(("%s: Failed to copy KCK and KEK", __FUNCTION__));
+		WL_ERR(("%s: Failed to copy KCK and KEK", __func__));
 	}
 	prhex("KCK, KEK", (uchar *)key, FBT_KEYLEN);
 }
@@ -19903,7 +19903,7 @@ wl_cfg80211_parse_vndr_ies(u8 *parse, u32 len,
 			/* len should be bigger than OUI length + one data length at least */
 			if (vndrie->len < (VNDR_IE_MIN_LEN + 1)) {
 				WL_ERR(("%s: invalid vndr ie. length is too small %d\n",
-					__FUNCTION__, vndrie->len));
+					__func__, vndrie->len));
 				goto end;
 			}
 			/* if wpa or wme ie, do not add ie */
@@ -19974,7 +19974,7 @@ wl_set_adps_mode(struct bcm_cfg80211 *cfg, struct net_device *ndev, uint8 enable
 	len = OFFSETOF(bcm_iov_buf_t, data) + sizeof(*data);
 	iov_buf = kmalloc(len, GFP_KERNEL);
 	if (iov_buf == NULL) {
-		WL_ERR(("%s - failed to allocate %d bytes for iov_buf\n", __FUNCTION__, len));
+		WL_ERR(("%s - failed to allocate %d bytes for iov_buf\n", __func__, len));
 		ret = BCME_NOMEM;
 		goto exit;
 	}
@@ -20461,7 +20461,7 @@ wl_cfg80211_set_mac_acl(struct wiphy *wiphy, struct net_device *cfgdev,
 	/* if acl == NULL, macmode is still disabled.. */
 	if (macmode == MACLIST_MODE_DISABLED) {
 		if ((ret = wl_android_set_ap_mac_list(cfgdev, macmode, NULL)) != 0)
-			WL_ERR(("%s : Setting MAC list failed error=%d\n", __FUNCTION__, ret));
+			WL_ERR(("%s : Setting MAC list failed error=%d\n", __func__, ret));
 
 		return ret;
 	}
@@ -20469,7 +20469,7 @@ wl_cfg80211_set_mac_acl(struct wiphy *wiphy, struct net_device *cfgdev,
 	macnum = acl->n_acl_entries;
 	if (macnum < 0 || macnum > MAX_NUM_MAC_FILT) {
 		WL_ERR(("%s : invalid number of MAC address entries %d\n",
-			__FUNCTION__, macnum));
+			__func__, macnum));
 		return -1;
 	}
 
@@ -20477,7 +20477,7 @@ wl_cfg80211_set_mac_acl(struct wiphy *wiphy, struct net_device *cfgdev,
 	list = (struct maclist*)kmalloc(sizeof(int) +
 		sizeof(struct ether_addr) * macnum, GFP_KERNEL);
 	if (!list) {
-		WL_ERR(("%s : failed to allocate memory\n", __FUNCTION__));
+		WL_ERR(("%s : failed to allocate memory\n", __func__));
 		return -1;
 	}
 
@@ -20488,7 +20488,7 @@ wl_cfg80211_set_mac_acl(struct wiphy *wiphy, struct net_device *cfgdev,
 	}
 	/* set the list */
 	if ((ret = wl_android_set_ap_mac_list(cfgdev, macmode, list)) != 0)
-		WL_ERR(("%s : Setting MAC list failed error=%d\n", __FUNCTION__, ret));
+		WL_ERR(("%s : Setting MAC list failed error=%d\n", __func__, ret));
 
 	kfree(list);
 
@@ -22096,7 +22096,7 @@ static bool wl_cfg80211_wbtext_send_btm_query(struct bcm_cfg80211 *cfg, struct n
 		ret = wl_cfg80211_wbtext_add_bssid_list(cfg,
 			(struct ether_addr *)&profile->bssid);
 	} else {
-		WL_ERR(("%s: failed to set BTM query, error=%d\n", __FUNCTION__, error));
+		WL_ERR(("%s: failed to set BTM query, error=%d\n", __func__, error));
 	}
 	return ret;
 }

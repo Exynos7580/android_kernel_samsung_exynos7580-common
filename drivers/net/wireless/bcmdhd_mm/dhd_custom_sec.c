@@ -618,12 +618,12 @@ int dhd_check_rdwr_macaddr(struct dhd_info *dhd, dhd_pub_t *dhdp,
 				} else { /* change MAC address */
 					if (_dhd_set_mac_address(dhd, 0, mac) == 0) {
 						DHD_INFO(("[WIFI_SEC] %s: MACID is"
-						" overwritten\n", __FUNCTION__));
+						" overwritten\n", __func__));
 						g_imac_flag = MACADDR_MOD;
 					} else {
 						DHD_ERROR(("[WIFI_SEC] %s: "
 						"_dhd_set_mac_address()"
-						" failed\n", __FUNCTION__));
+						" failed\n", __func__));
 						g_imac_flag = MACADDR_NONE;
 					}
 				}
@@ -667,12 +667,12 @@ int dhd_check_rdwr_macaddr(struct dhd_info *dhd, dhd_pub_t *dhdp,
 				} else { /* change MAC address */
 					if (_dhd_set_mac_address(dhd, 0, mac) == 0) {
 						DHD_INFO(("[WIFI_SEC] %s: MACID is"
-						" overwritten\n", __FUNCTION__));
+						" overwritten\n", __func__));
 						g_imac_flag = MACADDR_MOD;
 					} else {
 						DHD_ERROR(("[WIFI_SEC] %s: "
 						"_dhd_set_mac_address()"
-						" failed\n", __FUNCTION__));
+						" failed\n", __func__));
 						g_imac_flag = MACADDR_NONE;
 					}
 				}
@@ -705,11 +705,11 @@ int dhd_check_rdwr_macaddr(struct dhd_info *dhd, dhd_pub_t *dhdp,
 			/* Writing Newly generated MAC ID to the Dongle */
 			if (_dhd_set_mac_address(dhd, 0, mac) == 0) {
 				DHD_INFO(("[WIFI_SEC] %s: MACID is overwritten\n",
-					__FUNCTION__));
+					__func__));
 				g_imac_flag = MACADDR_COB;
 			} else {
 				DHD_ERROR(("[WIFI_SEC] %s: _dhd_set_mac_address()"
-					" failed\n", __FUNCTION__));
+					" failed\n", __func__));
 			}
 		}
 		filp_close(fp_nvm, NULL);
@@ -731,11 +731,11 @@ int dhd_check_rdwr_macaddr(struct dhd_info *dhd, dhd_pub_t *dhdp,
 			(unsigned int *)&(mac->octet[4]),
 			(unsigned int *)&(mac->octet[5]));
 		if (_dhd_set_mac_address(dhd, 0, mac) == 0) {
-			DHD_INFO(("[WIFI_SEC] %s: MACID is overwritten\n", __FUNCTION__));
+			DHD_INFO(("[WIFI_SEC] %s: MACID is overwritten\n", __func__));
 			g_imac_flag = MACADDR_COB;
 		} else {
 			DHD_ERROR(("[WIFI_SEC] %s: _dhd_set_mac_address() failed\n",
-				__FUNCTION__));
+				__func__));
 		}
 	}
 
@@ -972,12 +972,12 @@ int dhd_check_module_cid(dhd_pub_t *dhd)
 		sizeof(cis_buf), 0, 0);
 	if (ret < 0) {
 		DHD_ERROR(("[WIFI_SEC] %s: CIS reading failed, ret=%d\n",
-			__FUNCTION__, ret));
+			__func__, ret));
 		return ret;
 	}
 
 	DHD_ERROR(("[WIFI_SEC] %s: CIS reading success, ret=%d\n",
-		__FUNCTION__, ret));
+		__func__, ret));
 #ifdef DUMP_CIS
 	dhd_dump_cis(cis_buf, 48);
 #endif
@@ -1009,14 +1009,14 @@ int dhd_check_module_cid(dhd_pub_t *dhd)
 	}
 
 	/* find default nvram, if exist */
-	DHD_ERROR(("[WIFI_SEC] %s: cannot find CIS TUPLE set as default\n", __FUNCTION__));
+	DHD_ERROR(("[WIFI_SEC] %s: cannot find CIS TUPLE set as default\n", __func__));
 	max = sizeof(vid_info) / sizeof(vid_info_t);
 	for (idx = 0; idx < max; idx++) {
 		cur_info = &vid_info[idx];
 		if (cur_info->vid_length == 0)
 			goto write_cid;
 	}
-	DHD_ERROR(("[WIFI_SEC] %s: cannot find default CID\n", __FUNCTION__));
+	DHD_ERROR(("[WIFI_SEC] %s: cannot find default CID\n", __func__));
 	return -1;
 
 write_cid:
@@ -1036,7 +1036,7 @@ write_cid:
 		sizeof(cis_buf), 0, 0);
 	if (ret < 0) {
 		DHD_ERROR(("[WIFI_SEC] %s: OTP reading failed, err=%d\n",
-			__FUNCTION__, ret));
+			__func__, ret));
 		return ret;
 	}
 
@@ -1049,10 +1049,10 @@ write_cid:
 	}
 #endif /* BCM4334_CHIP */
 #if defined(BCM4335_CHIP)
-	DHD_TRACE(("[WIFI_SEC] %s: BCM4335 Multiple Revision Check\n", __FUNCTION__));
+	DHD_TRACE(("[WIFI_SEC] %s: BCM4335 Multiple Revision Check\n", __func__));
 	if (concate_revision(dhd->bus, rev_str, sizeof(rev_str),
 		rev_str, sizeof(rev_str)) < 0) {
-		DHD_ERROR(("[WIFI_SEC] %s: fail to concate revision\n", __FUNCTION__));
+		DHD_ERROR(("[WIFI_SEC] %s: fail to concate revision\n", __func__));
 		ret = -1;
 	} else {
 		if (strstr(rev_str, "_a0")) {
@@ -1125,7 +1125,7 @@ int dhd_check_module_mac(dhd_pub_t *dhd, struct ether_addr *mac)
 			mac->octet[0], mac->octet[1], mac->octet[2],
 			mac->octet[3], mac->octet[4], mac->octet[5]);
 		DHD_ERROR(("[WIFI_SEC] %s: Check module mac by legacy FW : " MACDBG "\n",
-			__FUNCTION__, MAC2STRDBG(mac->octet)));
+			__func__, MAC2STRDBG(mac->octet)));
 	} else {
 		bcm_tlv_t *elt = NULL;
 		int remained_len = sizeof(cis_buf);
@@ -1181,7 +1181,7 @@ int dhd_check_module_mac(dhd_pub_t *dhd, struct ether_addr *mac)
 				mac->octet[3], mac->octet[4], mac->octet[5]);
 			DHD_ERROR(("[WIFI_SEC] %s: Cannot find MAC address info from OTP,"
 				" Check module mac by initial value: " MACDBG "\n",
-				__FUNCTION__, MAC2STRDBG(mac->octet)));
+				__func__, MAC2STRDBG(mac->octet)));
 		}
 	}
 
@@ -1320,11 +1320,11 @@ void sec_control_pm(dhd_pub_t *dhd, uint *power_mode)
 			sizeof(uint), TRUE, 0);
 		DHD_ERROR(("[WIFI_SEC] %s: /data/.psm.info open failed,"
 			" so set PM to %d\n",
-			__FUNCTION__, *power_mode));
+			__func__, *power_mode));
 		return;
 	} else {
 		kernel_read(fp, fp->f_pos, &power_val, 1);
-		DHD_ERROR(("[WIFI_SEC] %s: POWER_VAL = %c \r\n", __FUNCTION__, power_val));
+		DHD_ERROR(("[WIFI_SEC] %s: POWER_VAL = %c \r\n", __func__, power_val));
 
 		if (power_val == '0') {
 #ifdef ROAM_ENABLE
@@ -1353,7 +1353,7 @@ void sec_control_pm(dhd_pub_t *dhd, uint *power_mode)
 			if ((ret = dhd_wl_ioctl_cmd(dhd, WLC_SET_VAR, iovbuf,
 				sizeof(iovbuf), TRUE, 0)) < 0) {
 				DHD_ERROR(("[WIFI_SEC] %s: Set lpc failed  %d\n",
-				__FUNCTION__, ret));
+				__func__, ret));
 			}
 #endif /* DHD_ENABLE_LPC */
 		} else {
@@ -1384,32 +1384,32 @@ int dhd_sel_ant_from_file(dhd_pub_t *dhd)
 		chip_id != BCM4356_CHIP_ID &&
 		chip_id != BCM4354_CHIP_ID) {
 		DHD_ERROR(("[WIFI_SEC] %s: This chipset does not support MIMO\n",
-			__FUNCTION__));
+			__func__));
 		return ret;
 	}
 
 	/* Read antenna settings from the file */
 	fp = filp_open(filepath, O_RDONLY, 0);
 	if (IS_ERR(fp)) {
-		DHD_ERROR(("[WIFI_SEC] %s: File [%s] open error\n", __FUNCTION__, filepath));
+		DHD_ERROR(("[WIFI_SEC] %s: File [%s] open error\n", __func__, filepath));
 		return ret;
 	} else {
 		ret = kernel_read(fp, 0, (char *)&ant_val, 4);
 		if (ret < 0) {
-			DHD_ERROR(("[WIFI_SEC] %s: File read error, ret=%d\n", __FUNCTION__, ret));
+			DHD_ERROR(("[WIFI_SEC] %s: File read error, ret=%d\n", __func__, ret));
 			filp_close(fp, NULL);
 			return ret;
 		}
 
 		ant_val = bcm_atoi((char *)&ant_val);
 
-		DHD_ERROR(("[WIFI_SEC]%s: ANT val = %d\n", __FUNCTION__, ant_val));
+		DHD_ERROR(("[WIFI_SEC]%s: ANT val = %d\n", __func__, ant_val));
 		filp_close(fp, NULL);
 
 		/* Check value from the file */
 		if (ant_val < 1 || ant_val > 3) {
 			DHD_ERROR(("[WIFI_SEC] %s: Invalid value %d read from the file %s\n",
-				__FUNCTION__, ant_val, filepath));
+				__func__, ant_val, filepath));
 			return -1;
 		}
 	}
@@ -1421,7 +1421,7 @@ int dhd_sel_ant_from_file(dhd_pub_t *dhd)
 		if (ret) {
 			DHD_ERROR(("[WIFI_SEC] %s: Fail to execute dhd_wl_ioctl_cmd(): "
 				"btc_mode, ret=%d\n",
-				__FUNCTION__, ret));
+				__func__, ret));
 			return ret;
 		}
 	}
@@ -1431,7 +1431,7 @@ int dhd_sel_ant_from_file(dhd_pub_t *dhd)
 	ret = dhd_wl_ioctl_cmd(dhd, WLC_SET_VAR, iovbuf, sizeof(iovbuf), TRUE, 0);
 	if (ret) {
 		DHD_ERROR(("[WIFI_SEC] %s: Fail to execute dhd_wl_ioctl_cmd(): txchain, ret=%d\n",
-			__FUNCTION__, ret));
+			__func__, ret));
 		return ret;
 	}
 
@@ -1439,7 +1439,7 @@ int dhd_sel_ant_from_file(dhd_pub_t *dhd)
 	ret = dhd_wl_ioctl_cmd(dhd, WLC_SET_VAR, iovbuf, sizeof(iovbuf), TRUE, 0);
 	if (ret) {
 		DHD_ERROR(("[WIFI_SEC] %s: Fail to execute dhd_wl_ioctl_cmd(): rxchain, ret=%d\n",
-			__FUNCTION__, ret));
+			__func__, ret));
 		return ret;
 	}
 
@@ -1456,7 +1456,7 @@ int sec_get_param_wfa_cert(dhd_pub_t *dhd, int mode, uint* read_val)
 
 	if (!dhd || (mode < SET_PARAM_BUS_TXGLOM_MODE) ||
 		(mode >= PARAM_LAST_VALUE)) {
-		DHD_ERROR(("[WIFI_SEC] %s: invalid argument\n", __FUNCTION__));
+		DHD_ERROR(("[WIFI_SEC] %s: invalid argument\n", __func__));
 		return BCME_ERROR;
 	}
 
@@ -1484,21 +1484,21 @@ int sec_get_param_wfa_cert(dhd_pub_t *dhd, int mode, uint* read_val)
 #endif /* PROP_TXSTATUS */
 		default:
 			DHD_ERROR(("[WIFI_SEC] %s: File to find file name for index=%d\n",
-				__FUNCTION__, mode));
+				__func__, mode));
 			return BCME_ERROR;
 	}
 
 	fp = filp_open(filepath, O_RDONLY, 0);
 	if (IS_ERR(fp) || (fp == NULL)) {
 		DHD_ERROR(("[WIFI_SEC] %s: File [%s] doesn't exist \n",
-			__FUNCTION__, filepath));
+			__func__, filepath));
 		return BCME_ERROR;
 	} else {
 		if (kernel_read(fp, fp->f_pos, (char *)&val, 4) < 0) {
 		filp_close(fp, NULL);
 			/* File operation is failed so we will return error code */
 			DHD_ERROR(("[WIFI_SEC] %s: read failed, file path=%s\n",
-				__FUNCTION__, filepath));
+				__func__, filepath));
 			return BCME_ERROR;
 		}
 		filp_close(fp, NULL);
@@ -1519,7 +1519,7 @@ int sec_get_param_wfa_cert(dhd_pub_t *dhd, int mode, uint* read_val)
 #endif /* PROP_TXSTATUS */
 		if (val < 0 || val > 1) {
 			DHD_ERROR(("[WIFI_SEC] %s: value[%d] is out of range\n",
-				__FUNCTION__, *read_val));
+				__func__, *read_val));
 			return BCME_ERROR;
 		}
 			break;
@@ -1565,7 +1565,7 @@ uint32 sec_save_wlinfo(char *firm_ver, char *dhd_ver, char *nvram_p)
 	char* nvram_buf;
 	char temp_buf[256];
 
-	DHD_TRACE(("[WIFI_SEC] %s: Entered.\n", __FUNCTION__));
+	DHD_TRACE(("[WIFI_SEC] %s: Entered.\n", __func__));
 
 	DHD_INFO(("[WIFI_SEC] firmware version   : %s\n", firm_ver));
 	DHD_INFO(("[WIFI_SEC] dhd driver version : %s\n", dhd_ver));
@@ -1603,7 +1603,7 @@ uint32 sec_save_wlinfo(char *firm_ver, char *dhd_ver, char *nvram_p)
 		memset(temp_buf, 0, sizeof(temp_buf));
 		nvfp = filp_open(nvram_p, O_RDONLY, 0);
 		if (IS_ERR(nvfp) || (nvfp == NULL)) {
-			DHD_ERROR(("[WIFI_SEC] %s: Nvarm File open failed.\n", __FUNCTION__));
+			DHD_ERROR(("[WIFI_SEC] %s: Nvarm File open failed.\n", __func__));
 			return -1;
 		} else {
 			ret = kernel_read(nvfp, nvfp->f_pos, temp_buf, sizeof(temp_buf));
@@ -1633,7 +1633,7 @@ uint32 sec_save_wlinfo(char *firm_ver, char *dhd_ver, char *nvram_p)
 
 	fp = filp_open(filepath, O_RDONLY, 0);
 	if (IS_ERR(fp) || (fp == NULL)) {
-		DHD_ERROR(("[WIFI_SEC] %s: .wifiver.info File open failed.\n", __FUNCTION__));
+		DHD_ERROR(("[WIFI_SEC] %s: .wifiver.info File open failed.\n", __func__));
 	} else {
 		memset(version_old_info, 0, sizeof(version_old_info));
 		ret = kernel_read(fp, fp->f_pos, version_old_info, sizeof(version_info));
@@ -1648,7 +1648,7 @@ uint32 sec_save_wlinfo(char *firm_ver, char *dhd_ver, char *nvram_p)
 	fp = filp_open(filepath, O_RDWR | O_CREAT, 0664);
 	if (IS_ERR(fp) || (fp == NULL)) {
 		DHD_ERROR(("[WIFI_SEC] %s: .wifiver.info File open failed.\n",
-			__FUNCTION__));
+			__func__));
 	} else {
 		ret = write_filesystem(fp, fp->f_pos, version_info, sizeof(version_info));
 		DHD_INFO(("[WIFI_SEC] sec_save_wlinfo done. ret : %d\n", ret));

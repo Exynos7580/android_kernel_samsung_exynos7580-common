@@ -175,7 +175,7 @@ s32 wldev_mkiovar_bsscfg(
 
 	if (buflen < 0 || iolen > (u32)buflen)
 	{
-		WLDEV_ERROR(("%s: buffer is too short\n", __FUNCTION__));
+		WLDEV_ERROR(("%s: buffer is too short\n", __func__));
 		return BCME_BUFTOOSHORT;
 	}
 
@@ -356,7 +356,7 @@ int wldev_set_country(
 	bzero(&scbval, sizeof(scb_val_t));
 	error = wldev_iovar_getbuf(dev, "country", NULL, 0, &cspec_orig, sizeof(cspec_orig), NULL);
 	if (error < 0) {
-		WLDEV_ERROR(("%s: get country failed = %d\n", __FUNCTION__, error));
+		WLDEV_ERROR(("%s: get country failed = %d\n", __func__, error));
 		return error;
 	}
 
@@ -376,7 +376,7 @@ int wldev_set_country(
 			error = wldev_ioctl(dev, WLC_DISASSOC, &scbval, sizeof(scb_val_t), true);
 			if (error < 0) {
 				WLDEV_ERROR(("%s: set country failed due to Disassoc error %d\n",
-					__FUNCTION__, error));
+					__func__, error));
 				return error;
 			}
 		}
@@ -391,12 +391,12 @@ int wldev_set_country(
 			smbuf, sizeof(smbuf), NULL);
 		if (error < 0) {
 			WLDEV_ERROR(("%s: set country for %s as %s rev %d failed\n",
-				__FUNCTION__, country_code, cspec_desired.ccode, cspec_desired.rev));
+				__func__, country_code, cspec_desired.ccode, cspec_desired.rev));
 			return error;
 		}
 		dhd_bus_country_set(dev, &cspec_desired, notify);
 		WLDEV_INFO(("%s: set country for %s as %s rev %d\n",
-			__FUNCTION__, country_code, cspec_desired.ccode, cspec_desired.rev));
+			__func__, country_code, cspec_desired.ccode, cspec_desired.rev));
 	}
 	return 0;
 }

@@ -1048,7 +1048,7 @@ wl_cfgp2p_parse_vndr_ies(u8 *parse, u32 len,
 			/* len should be bigger than OUI length + one data length at least */
 			if (vndrie->len < (VNDR_IE_MIN_LEN + 1)) {
 				CFGP2P_ERR(("%s: invalid vndr ie. length is too small %d\n",
-					__FUNCTION__, vndrie->len));
+					__func__, vndrie->len));
 				goto end;
 			}
 			/* if wpa or wme ie, do not add ie */
@@ -2410,7 +2410,7 @@ wl_cfgp2p_register_ndev(struct bcm_cfg80211 *cfg)
 
 	/* Allocate etherdev, including space for private structure */
 	if (!(net = alloc_etherdev(sizeof(struct bcm_cfg80211 *)))) {
-		CFGP2P_ERR(("%s: OOM - alloc_etherdev\n", __FUNCTION__));
+		CFGP2P_ERR(("%s: OOM - alloc_etherdev\n", __func__));
 		return -ENODEV;
 	}
 
@@ -2528,7 +2528,7 @@ static int wl_cfgp2p_do_ioctl(struct net_device *net, struct ifreq *ifr, int cmd
 
 	} else {
 		CFGP2P_ERR(("%s: IOCTL req 0x%x on p2p0 I/F. Ignoring. \n",
-		__FUNCTION__, cmd));
+		__func__, cmd));
 		return -1;
 	}
 

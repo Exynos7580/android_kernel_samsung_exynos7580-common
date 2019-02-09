@@ -317,7 +317,7 @@ static int __init power_suspend_init(void)
 				kernel_kobj);
 
 	if (!power_suspend_kobj) {
-		pr_err("%s kobject create failed!\n", __FUNCTION__);
+		pr_err("%s kobject create failed!\n", __func__);
 		return -ENOMEM;
 	}
 
@@ -325,7 +325,7 @@ static int __init power_suspend_init(void)
 			&power_suspend_attr_group);
 
 	if (sysfs_result) {
-		pr_info("%s group create failed!\n", __FUNCTION__);
+		pr_info("%s group create failed!\n", __func__);
 		kobject_put(power_suspend_kobj);
 		return -ENOMEM;
 	}

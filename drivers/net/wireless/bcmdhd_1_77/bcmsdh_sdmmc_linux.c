@@ -121,18 +121,18 @@ static int sdioh_probe(struct sdio_func *func)
 	 /* allocate SDIO Host Controller state info */
 	 osh = osl_attach(&func->dev, SDIO_BUS, TRUE);
 	 if (osh == NULL) {
-		 sd_err(("%s: osl_attach failed\n", __FUNCTION__));
+		 sd_err(("%s: osl_attach failed\n", __func__));
 		 goto fail;
 	 }
 	 osl_static_mem_init(osh, adapter);
 	 sdioh = sdioh_attach(osh, func);
 	 if (sdioh == NULL) {
-		 sd_err(("%s: sdioh_attach failed\n", __FUNCTION__));
+		 sd_err(("%s: sdioh_attach failed\n", __func__));
 		 goto fail;
 	 }
 	 sdioh->bcmsdh = bcmsdh_probe(osh, &func->dev, sdioh, adapter, SDIO_BUS, host_idx, rca);
 	 if (sdioh->bcmsdh == NULL) {
-		 sd_err(("%s: bcmsdh_probe failed\n", __FUNCTION__));
+		 sd_err(("%s: bcmsdh_probe failed\n", __func__));
 		 goto fail;
 	 }
 
@@ -154,7 +154,7 @@ static void sdioh_remove(struct sdio_func *func)
 
 	sdioh = sdio_get_drvdata(func);
 	if (sdioh == NULL) {
-		sd_err(("%s: error, no sdioh handler found\n", __FUNCTION__));
+		sd_err(("%s: error, no sdioh handler found\n", __func__));
 		return;
 	}
 
@@ -172,7 +172,7 @@ static int bcmsdh_sdmmc_probe(struct sdio_func *func,
 	if (func == NULL)
 		return -EINVAL;
 
-	sd_err(("bcmsdh_sdmmc: %s Enter\n", __FUNCTION__));
+	sd_err(("bcmsdh_sdmmc: %s Enter\n", __func__));
 	sd_info(("sdio_bcmsdh: func->class=%x\n", func->class));
 	sd_info(("sdio_vendor: 0x%04x\n", func->vendor));
 	sd_info(("sdio_device: 0x%04x\n", func->device));
@@ -188,11 +188,11 @@ static int bcmsdh_sdmmc_probe(struct sdio_func *func,
 static void bcmsdh_sdmmc_remove(struct sdio_func *func)
 {
 	if (func == NULL) {
-		sd_err(("%s is called with NULL SDIO function pointer\n", __FUNCTION__));
+		sd_err(("%s is called with NULL SDIO function pointer\n", __func__));
 		return;
 	}
 
-	sd_trace(("bcmsdh_sdmmc: %s Enter\n", __FUNCTION__));
+	sd_trace(("bcmsdh_sdmmc: %s Enter\n", __func__));
 	sd_info(("sdio_bcmsdh: func->class=%x\n", func->class));
 	sd_info(("sdio_vendor: 0x%04x\n", func->vendor));
 	sd_info(("sdio_device: 0x%04x\n", func->device));
@@ -228,7 +228,7 @@ static int bcmsdh_sdmmc_suspend(struct device *pdev)
 	struct sdio_func *func = dev_to_sdio_func(pdev);
 	mmc_pm_flag_t sdio_flags;
 
-	sd_err(("%s Enter\n", __FUNCTION__));
+	sd_err(("%s Enter\n", __func__));
 	if (func->num != 2)
 		return 0;
 
@@ -242,7 +242,7 @@ static int bcmsdh_sdmmc_suspend(struct device *pdev)
 
 	sdio_flags = sdio_get_host_pm_caps(func);
 	if (!(sdio_flags & MMC_PM_KEEP_POWER)) {
-		sd_err(("%s: can't keep power while host is suspended\n", __FUNCTION__));
+		sd_err(("%s: can't keep power while host is suspended\n", __func__));
 		dhd_mmc_suspend = FALSE;
 		return  -EINVAL;
 	}
@@ -250,7 +250,7 @@ static int bcmsdh_sdmmc_suspend(struct device *pdev)
 	/* keep power while host suspended */
 	err = sdio_set_host_pm_flags(func, MMC_PM_KEEP_POWER);
 	if (err) {
-		sd_err(("%s: error while trying to keep power\n", __FUNCTION__));
+		sd_err(("%s: error while trying to keep power\n", __func__));
 		dhd_mmc_suspend = FALSE;
 		return err;
 	}
@@ -264,7 +264,7 @@ static int bcmsdh_sdmmc_resume(struct device *pdev)
 	sdioh_info_t *sdioh;
 	struct sdio_func *func = dev_to_sdio_func(pdev);
 
-	sd_err(("%s Enter\n", __FUNCTION__));
+	sd_err(("%s Enter\n", __func__));
 	if (func->num != 2)
 		return 0;
 
@@ -346,7 +346,7 @@ sdioh_interrupt_set(sdioh_info_t *sd, bool enable)
 	if (!sd)
 		return BCME_BADARG;
 
-	sd_trace(("%s: %s\n", __FUNCTION__, enable ? "Enabling" : "Disabling"));
+	sd_trace(("%s: %s\n", __func__, enable ? "Enabling" : "Disabling"));
 	return SDIOH_API_RC_SUCCESS;
 }
 

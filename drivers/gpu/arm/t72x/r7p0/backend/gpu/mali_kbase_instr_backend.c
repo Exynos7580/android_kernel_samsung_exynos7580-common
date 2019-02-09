@@ -464,7 +464,7 @@ int kbase_instr_hwcnt_wait_for_dump(struct kbase_context *kctx)
 		if (ret == 0) {
 			kbdev->hwcnt.backend.state = KBASE_INSTR_STATE_IDLE;
 			err = -EINVAL;
-			GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "wait_event_timeout error in %s %d \n", __FUNCTION__, err);
+			GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "wait_event_timeout error in %s %d \n", __func__, err);
 			return err;
 		}
 	} else

@@ -403,7 +403,7 @@ void fimc_is_ois_enable(struct fimc_is_core *core)
 		return;
 	}
 
-	info("%s : E\n", __FUNCTION__);
+	info("%s : E\n", __func__);
 	if (core_pdata->use_ois_hsi2c) {
 	    fimc_is_ois_i2c_config(core->client1, true);
 	}
@@ -421,7 +421,7 @@ void fimc_is_ois_enable(struct fimc_is_core *core)
 	if (core_pdata->use_ois_hsi2c) {
 	    fimc_is_ois_i2c_config(core->client1, false);
 	}
-	info("%s : X\n", __FUNCTION__);
+	info("%s : X\n", __func__);
 }
 
 int fimc_is_ois_sine_mode(struct fimc_is_core *core, int mode)
@@ -435,7 +435,7 @@ int fimc_is_ois_sine_mode(struct fimc_is_core *core, int mode)
 		return -EINVAL;
 	}
 
-	info("%s : E\n", __FUNCTION__);
+	info("%s : E\n", __func__);
 	if (core_pdata->use_ois_hsi2c) {
 		fimc_is_ois_i2c_config(core->client1, true);
 	}
@@ -474,7 +474,7 @@ int fimc_is_ois_sine_mode(struct fimc_is_core *core, int mode)
 	if (core_pdata->use_ois_hsi2c) {
 		fimc_is_ois_i2c_config(core->client1, false);
 	}
-	info("%s : X\n", __FUNCTION__);
+	info("%s : X\n", __func__);
 
 	return ret;
 }
@@ -529,7 +529,7 @@ void fimc_is_ois_offset_test(struct fimc_is_core *core, long *raw_data_x, long *
 		return;
 	}
 
-	info("%s : E\n", __FUNCTION__);
+	info("%s : E\n", __func__);
 	if (core_pdata->use_ois_hsi2c) {
 	    fimc_is_ois_i2c_config(core->client1, true);
 	}
@@ -586,7 +586,7 @@ void fimc_is_ois_offset_test(struct fimc_is_core *core, long *raw_data_x, long *
 	}
 
 	fimc_is_ois_version(core);
-	info("%s : X\n", __FUNCTION__);
+	info("%s : X\n", __func__);
 	return;
 }
 
@@ -604,7 +604,7 @@ void fimc_is_ois_get_offset_data(struct fimc_is_core *core, long *raw_data_x, lo
 		return;
 	}
 
-	info("%s : E\n", __FUNCTION__);
+	info("%s : E\n", __func__);
 	if (core_pdata->use_ois_hsi2c) {
 	    fimc_is_ois_i2c_config(core->client1, true);
 	}
@@ -643,7 +643,7 @@ void fimc_is_ois_get_offset_data(struct fimc_is_core *core, long *raw_data_x, lo
 	}
 
 	fimc_is_ois_version(core);
-	info("%s : X\n", __FUNCTION__);
+	info("%s : X\n", __func__);
 	return;
 }
 
@@ -660,7 +660,7 @@ int fimc_is_ois_self_test(struct fimc_is_core *core)
 		return -EINVAL;
 	}
 
-	info("%s : E\n", __FUNCTION__);
+	info("%s : E\n", __func__);
 	if (core_pdata->use_ois_hsi2c) {
 	    fimc_is_ois_i2c_config(core->client1, true);
 	}
@@ -692,7 +692,7 @@ int fimc_is_ois_self_test(struct fimc_is_core *core)
 	    fimc_is_ois_i2c_config(core->client1, false);
 	}
 
-	info("%s(%d) : X\n", __FUNCTION__, val);
+	info("%s(%d) : X\n", __func__, val);
 	return (int)val;
 }
 
@@ -716,7 +716,7 @@ bool fimc_is_ois_diff_test(struct fimc_is_core *core, int *x_diff, int *y_diff)
 	msleep(30);
 #endif
 
-	info("(%s) : E\n", __FUNCTION__);
+	info("(%s) : E\n", __func__);
 	if (core_pdata->use_ois_hsi2c) {
 		fimc_is_ois_i2c_config(core->client1, true);
 	}
@@ -735,7 +735,7 @@ bool fimc_is_ois_diff_test(struct fimc_is_core *core, int *x_diff, int *y_diff)
 		err("i2c write fail\n");
 	}
 	msleep(400);
-	info("(%s) : OIS Position = Center\n", __FUNCTION__);
+	info("(%s) : OIS Position = Center\n", __func__);
 
 	ret = fimc_is_ois_i2c_write(core->client1, 0x0000, 0x00);
 	if (ret) {
@@ -887,7 +887,7 @@ bool fimc_is_ois_diff_test(struct fimc_is_core *core, int *x_diff, int *y_diff)
 	*x_diff = abs(x_max - x_min);
 	*y_diff = abs(y_max - y_min);
 
-	info("(%s) : X (default_diff:%d)(%d,%d)\n", __FUNCTION__,
+	info("(%s) : X (default_diff:%d)(%d,%d)\n", __func__,
 			default_diff, *x_diff, *y_diff);
 
 	ret = fimc_is_ois_i2c_read_multi(core->client1, 0x021A, read_x, 2);

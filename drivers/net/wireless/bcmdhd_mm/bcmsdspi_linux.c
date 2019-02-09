@@ -82,7 +82,7 @@ sdspi_isr(int irq, void *dev_id
 	sd->local_intrcount++;
 
 	if (!sd->card_init_done) {
-		sd_err(("%s: Hey Bogus intr...not even initted: irq %d\n", __FUNCTION__, irq));
+		sd_err(("%s: Hey Bogus intr...not even initted: irq %d\n", __func__, irq));
 		return IRQ_RETVAL(FALSE);
 	} else {
 		ours = spi_check_client_intr(sd, NULL);
@@ -153,7 +153,7 @@ static struct spi_driver bcmsdh_spi_driver = {
 int bcmsdh_register_client_driver(void)
 {
 	int error = 0;
-	sd_trace(("bcmsdh_gspi: %s Enter\n", __FUNCTION__));
+	sd_trace(("bcmsdh_gspi: %s Enter\n", __func__));
 
 	error = spi_register_driver(&bcmsdh_spi_driver);
 
@@ -165,7 +165,7 @@ int bcmsdh_register_client_driver(void)
 */
 void bcmsdh_unregister_client_driver(void)
 {
-	sd_trace(("%s Enter\n", __FUNCTION__));
+	sd_trace(("%s Enter\n", __func__));
 	spi_unregister_driver(&bcmsdh_spi_driver);
 }
 #endif /* BCMSPI_ANDROID */
@@ -175,9 +175,9 @@ int
 spi_register_irq(sdioh_info_t *sd, uint irq)
 {
 #ifndef BCMSPI_ANDROID
-	sd_trace(("Entering %s: irq == %d\n", __FUNCTION__, irq));
+	sd_trace(("Entering %s: irq == %d\n", __func__, irq));
 	if (request_irq(irq, sdspi_isr, IRQF_SHARED, "bcmsdspi", sd) < 0) {
-		sd_err(("%s: request_irq() failed\n", __FUNCTION__));
+		sd_err(("%s: request_irq() failed\n", __func__));
 		return ERROR;
 	}
 #endif /* !BCMSPI_ANDROID */
@@ -243,19 +243,19 @@ sdioh_interrupt_set(sdioh_info_t *sd, bool enable)
 	ulong flags;
 	struct sdos_info *sdos;
 
-	sd_trace(("%s: %s\n", __FUNCTION__, enable ? "Enabling" : "Disabling"));
+	sd_trace(("%s: %s\n", __func__, enable ? "Enabling" : "Disabling"));
 
 	sdos = (struct sdos_info *)sd->sdos_info;
 	ASSERT(sdos);
 
 	if (!(sd->host_init_done && sd->card_init_done)) {
-		sd_err(("%s: Card & Host are not initted - bailing\n", __FUNCTION__));
+		sd_err(("%s: Card & Host are not initted - bailing\n", __func__));
 		return SDIOH_API_RC_FAIL;
 	}
 
 #ifndef BCMSPI_ANDROID
 	if (enable && !(sd->intr_handler && sd->intr_handler_arg)) {
-		sd_err(("%s: no handler registered, will not enable\n", __FUNCTION__));
+		sd_err(("%s: no handler registered, will not enable\n", __func__));
 		return SDIOH_API_RC_FAIL;
 	}
 #endif /* !BCMSPI_ANDROID */
@@ -286,11 +286,11 @@ spi_lock(sdioh_info_t *sd)
 	sdos = (struct sdos_info *)sd->sdos_info;
 	ASSERT(sdos);
 
-	sd_trace(("%s: %d\n", __FUNCTION__, sd->lockcount));
+	sd_trace(("%s: %d\n", __func__, sd->lockcount));
 
 	spin_lock_irqsave(&sdos->lock, flags);
 	if (sd->lockcount) {
-		sd_err(("%s: Already locked!\n", __FUNCTION__));
+		sd_err(("%s: Already locked!\n", __func__));
 		ASSERT(sd->lockcount == 0);
 	}
 #ifdef BCMSPI_ANDROID
@@ -310,7 +310,7 @@ spi_unlock(sdioh_info_t *sd)
 	ulong flags;
 	struct sdos_info *sdos;
 
-	sd_trace(("%s: %d, %d\n", __FUNCTION__, sd->lockcount, sd->client_intr_enabled));
+	sd_trace(("%s: %d, %d\n", __func__, sd->lockcount, sd->client_intr_enabled));
 	ASSERT(sd->lockcount > 0);
 
 	sdos = (struct sdos_info *)sd->sdos_info;
@@ -334,7 +334,7 @@ void spi_waitbits(sdioh_info_t *sd, bool yield)
 	ASSERT(!yield);
 #endif
 	sd_trace(("%s: yield %d canblock %d\n",
-	          __FUNCTION__, yield, BLOCKABLE()));
+	          __func__, yield, BLOCKABLE()));
 
 	/* Clear the "interrupt happened" flag and last intrstatus */
 	sd->got_hcint = FALSE;

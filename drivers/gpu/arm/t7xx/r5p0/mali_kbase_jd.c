@@ -1298,7 +1298,7 @@ static void jd_done_worker(struct work_struct *data)
 				kbdev->hwcnt.hwcnt_prev_time = now;
 				err = hwcnt_dump(kbdev->hwcnt.kctx);
 				if (err != MALI_ERROR_NONE) {
-					dev_err(kbdev->dev, "hwcnt dump error in %s %d \n", __FUNCTION__, err);
+					dev_err(kbdev->dev, "hwcnt dump error in %s %d \n", __func__, err);
 				}
 			}
 			mutex_unlock(&kbdev->hwcnt.mlock);

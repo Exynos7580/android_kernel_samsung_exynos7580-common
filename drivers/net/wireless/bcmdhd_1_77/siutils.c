@@ -294,14 +294,14 @@ si_get_pmu_reg_addr(si_t *sih, uint32 offset)
 	uint32 pmuaddr = INVALID_ADDR;
 	uint origidx = 0;
 
-	SI_MSG(("%s: pmu access, offset: %x\n", __FUNCTION__, offset));
+	SI_MSG(("%s: pmu access, offset: %x\n", __func__, offset));
 	if (!(sii->pub.cccaps & CC_CAP_PMU)) {
 		goto done;
 	}
 	if (AOB_ENAB(&sii->pub)) {
 		uint pmucoreidx;
 		pmuregs_t *pmu;
-		SI_MSG(("%s: AOBENAB: %x\n", __FUNCTION__, offset));
+		SI_MSG(("%s: AOBENAB: %x\n", __func__, offset));
 		origidx = sii->curidx;
 		pmucoreidx = si_findcoreidx(&sii->pub, PMU_CORE_ID, 0);
 		pmu = si_setcoreidx(&sii->pub, pmucoreidx);
@@ -311,7 +311,7 @@ si_get_pmu_reg_addr(si_t *sih, uint32 offset)
 		pmuaddr = SI_ENUM_BASE + offset;
 
 done:
-	printf("%s: addrRET: %x\n", __FUNCTION__, pmuaddr);
+	printf("%s: addrRET: %x\n", __func__, pmuaddr);
 	return pmuaddr;
 }
 
@@ -592,7 +592,7 @@ si_doattach(si_info_t *sii, uint devid, osl_t *osh, volatile void *regs,
 	sih->err_info = MALLOCZ(osh, sizeof(si_axi_error_info_t));
 	if (sih->err_info == NULL) {
 		SI_ERROR(("%s: %d bytes MALLOC FAILED",
-			__FUNCTION__, sizeof(si_axi_error_info_t)));
+			__func__, sizeof(si_axi_error_info_t)));
 		return NULL;
 	}
 #endif /* BCM_BACKPLANE_TIMEOUT */
@@ -602,7 +602,7 @@ si_doattach(si_info_t *sii, uint devid, osl_t *osh, volatile void *regs,
 	if ((bustype == PCI_BUS) &&
 	    (OSL_PCI_READ_CONFIG(sii->osh, PCI_SPROM_CONTROL, sizeof(uint32)) == 0xffffffff)) {
 		SI_ERROR(("%s: incoming bus is PCI but it's a lie, switching to SI "
-		          "devid:0x%x\n", __FUNCTION__, devid));
+		          "devid:0x%x\n", __func__, devid));
 		bustype = SI_BUS;
 	}
 
@@ -642,7 +642,7 @@ si_doattach(si_info_t *sii, uint devid, osl_t *osh, volatile void *regs,
 	*   some way of recognizing them needs to be added here.
 	*/
 	if (!cc) {
-		SI_ERROR(("%s: chipcommon register space is null \n", __FUNCTION__));
+		SI_ERROR(("%s: chipcommon register space is null \n", __func__));
 		return NULL;
 	}
 	w = R_REG(osh, &cc->chipid);
@@ -673,7 +673,7 @@ si_doattach(si_info_t *sii, uint devid, osl_t *osh, volatile void *regs,
 			(sizeof(axi_wrapper_t) * SI_MAX_AXI_WRAPPERS));
 
 		if (sii->axi_wrapper == NULL) {
-			SI_ERROR(("%s: %zu  bytes MALLOC Failed", __FUNCTION__,
+			SI_ERROR(("%s: %zu  bytes MALLOC Failed", __func__,
 				(sizeof(axi_wrapper_t) * SI_MAX_AXI_WRAPPERS)));
 			return NULL;
 		}
@@ -702,7 +702,7 @@ si_doattach(si_info_t *sii, uint devid, osl_t *osh, volatile void *regs,
 	si_check_boot_type(sih, osh);
 
 	if (ulp_module_init(osh, sih) != BCME_OK) {
-		ULP_ERR(("%s: err in ulp_module_init\n", __FUNCTION__));
+		ULP_ERR(("%s: err in ulp_module_init\n", __func__));
 		goto exit;
 	}
 #endif /* BCMULP */
@@ -721,7 +721,7 @@ si_doattach(si_info_t *sii, uint devid, osl_t *osh, volatile void *regs,
 			/* otp_clk_div is even number, 120/14 < 9mhz */
 			clkdiv = (clkdiv & ~CLKD_OTP) | (14 << CLKD_OTP_SHIFT);
 			W_REG(osh, &cc->clkdiv, clkdiv);
-			SI_ERROR(("%s: set clkdiv to %x\n", __FUNCTION__, clkdiv));
+			SI_ERROR(("%s: set clkdiv to %x\n", __func__, clkdiv));
 		}
 		OSL_DELAY(10);
 	}
@@ -2860,7 +2860,7 @@ si_chipcontrl_btshd0_4331(si_t *sih, bool on)
 	origidx = si_coreidx(sih);
 
 	if ((cc = (chipcregs_t *)si_setcore(sih, CC_CORE_ID, 0)) == NULL) {
-		SI_ERROR(("%s: Failed to find CORE ID!\n", __FUNCTION__));
+		SI_ERROR(("%s: Failed to find CORE ID!\n", __func__));
 		return;
 	}
 
@@ -2890,7 +2890,7 @@ si_chipcontrl_restore(si_t *sih, uint32 val)
 	uint origidx = si_coreidx(sih);
 
 	if ((cc = (chipcregs_t *)si_setcore(sih, CC_CORE_ID, 0)) == NULL) {
-		SI_ERROR(("%s: Failed to find CORE ID!\n", __FUNCTION__));
+		SI_ERROR(("%s: Failed to find CORE ID!\n", __func__));
 		return;
 	}
 	W_REG(sii->osh, &cc->chipcontrol, val);
@@ -2906,7 +2906,7 @@ si_chipcontrl_read(si_t *sih)
 	uint32 val;
 
 	if ((cc = (chipcregs_t *)si_setcore(sih, CC_CORE_ID, 0)) == NULL) {
-		SI_ERROR(("%s: Failed to find CORE ID!\n", __FUNCTION__));
+		SI_ERROR(("%s: Failed to find CORE ID!\n", __func__));
 		return -1;
 	}
 	val = R_REG(sii->osh, &cc->chipcontrol);
@@ -2923,7 +2923,7 @@ si_chipcontrl_epa4331(si_t *sih, bool on)
 	uint32 val;
 
 	if ((cc = (chipcregs_t *)si_setcore(sih, CC_CORE_ID, 0)) == NULL) {
-		SI_ERROR(("%s: Failed to find CORE ID!\n", __FUNCTION__));
+		SI_ERROR(("%s: Failed to find CORE ID!\n", __func__));
 		return;
 	}
 	val = R_REG(sii->osh, &cc->chipcontrol);
@@ -2960,7 +2960,7 @@ si_chipcontrl_srom4360(si_t *sih, bool on)
 	uint32 val;
 
 	if ((cc = (chipcregs_t *)si_setcore(sih, CC_CORE_ID, 0)) == NULL) {
-		SI_ERROR(("%s: Failed to find CORE ID!\n", __FUNCTION__));
+		SI_ERROR(("%s: Failed to find CORE ID!\n", __func__));
 		return;
 	}
 	val = R_REG(sii->osh, &cc->chipcontrol);
@@ -2988,7 +2988,7 @@ si_clk_srom4365(si_t *sih)
 	uint32 val;
 
 	if ((cc = (chipcregs_t *)si_setcore(sih, CC_CORE_ID, 0)) == NULL) {
-		SI_ERROR(("%s: Failed to find CORE ID!\n", __FUNCTION__));
+		SI_ERROR(("%s: Failed to find CORE ID!\n", __func__));
 		return;
 	}
 	val = R_REG(sii->osh, &cc->clkdiv2);
@@ -3017,7 +3017,7 @@ si_chipcontrl_epa4331_wowl(si_t *sih, bool enter_wowl)
 	origidx = si_coreidx(sih);
 
 	if ((cc = (chipcregs_t *)si_setcore(sih, CC_CORE_ID, 0)) == NULL) {
-		SI_ERROR(("%s: Failed to find CORE ID!\n", __FUNCTION__));
+		SI_ERROR(("%s: Failed to find CORE ID!\n", __func__));
 		return;
 	}
 
@@ -3051,7 +3051,7 @@ si_epa_4313war(si_t *sih)
 	uint origidx = si_coreidx(sih);
 
 	if ((cc = (chipcregs_t *)si_setcore(sih, CC_CORE_ID, 0)) == NULL) {
-		SI_ERROR(("%s: Failed to find CORE ID!\n", __FUNCTION__));
+		SI_ERROR(("%s: Failed to find CORE ID!\n", __func__));
 		return;
 	}
 
@@ -3087,7 +3087,7 @@ si_btcombo_p250_4313_war(si_t *sih)
 	uint origidx = si_coreidx(sih);
 
 	if ((cc = (chipcregs_t *)si_setcore(sih, CC_CORE_ID, 0)) == NULL) {
-		SI_ERROR(("%s: Failed to find CORE ID!\n", __FUNCTION__));
+		SI_ERROR(("%s: Failed to find CORE ID!\n", __func__));
 		return;
 	}
 	W_REG(sii->osh, &cc->gpiocontrol,
@@ -3106,7 +3106,7 @@ si_btc_enable_chipcontrol(si_t *sih)
 	uint origidx = si_coreidx(sih);
 
 	if ((cc = (chipcregs_t *)si_setcore(sih, CC_CORE_ID, 0)) == NULL) {
-		SI_ERROR(("%s: Failed to find CORE ID!\n", __FUNCTION__));
+		SI_ERROR(("%s: Failed to find CORE ID!\n", __func__));
 		return;
 	}
 
@@ -3124,7 +3124,7 @@ si_btcombo_43228_war(si_t *sih)
 	uint origidx = si_coreidx(sih);
 
 	if ((cc = (chipcregs_t *)si_setcore(sih, CC_CORE_ID, 0)) == NULL) {
-		SI_ERROR(("%s: Failed to find CORE ID!\n", __FUNCTION__));
+		SI_ERROR(("%s: Failed to find CORE ID!\n", __func__));
 		return;
 	}
 
@@ -3399,7 +3399,7 @@ si_survive_perst_war(si_t *sih, bool reset, uint32 sperst_mask, uint32 sperst_va
 		bar0win_after = OSL_PCI_READ_CONFIG(sii->osh, PCI_BAR0_WIN, sizeof(uint32));
 		if (bar0win_after != bar0win) {
 			SI_ERROR(("%s: bar0win before %08x, bar0win after %08x\n",
-				__FUNCTION__, bar0win, bar0win_after));
+				__func__, bar0win, bar0win_after));
 			OSL_PCI_WRITE_CONFIG(sii->osh, PCI_BAR0_WIN, sizeof(uint32), bar0win);
 		}
 	}

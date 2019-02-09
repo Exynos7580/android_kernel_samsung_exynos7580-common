@@ -179,7 +179,7 @@ void fimc_is_ois_offset_test_impl(struct fimc_is_core *core, long *raw_data_x, l
 		return;
 	}
 
-	info("%s : E\n", __FUNCTION__);
+	info("%s : E\n", __func__);
 
 	if(fimc_is_ois_cal_revision(ois_minfo.cal_ver) < 4)
 		scale_factor = OIS_GYRO_SCALE_FACTOR_V003;
@@ -272,7 +272,7 @@ void fimc_is_ois_offset_test_impl(struct fimc_is_core *core, long *raw_data_x, l
 		fimc_is_ois_i2c_config(core->client1, false);
 	}
 
-	info("%s : X\n", __FUNCTION__);
+	info("%s : X\n", __func__);
 	return;
 }
 
@@ -289,7 +289,7 @@ void fimc_is_ois_get_offset_data_impl(struct fimc_is_core *core, long *raw_data_
 		return;
 	}
 
-	info("%s : E\n", __FUNCTION__);
+	info("%s : E\n", __func__);
 
 	if (core_pdata->use_ois_hsi2c) {
 		fimc_is_ois_i2c_config(core->client1, true);
@@ -312,7 +312,7 @@ void fimc_is_ois_get_offset_data_impl(struct fimc_is_core *core, long *raw_data_
 		fimc_is_ois_i2c_config(core->client1, false);
 	}
 
-	info("%s : X\n", __FUNCTION__);
+	info("%s : X\n", __func__);
 	return;
 }
 
@@ -329,7 +329,7 @@ int fimc_is_ois_self_test_impl(struct fimc_is_core *core)
 		return -EINVAL;
 	}
 
-	info("%s : E\n", __FUNCTION__);
+	info("%s : E\n", __func__);
 
 	if (core_pdata->use_ois_hsi2c) {
 		fimc_is_ois_i2c_config(core->client1, true);
@@ -377,7 +377,7 @@ int fimc_is_ois_self_test_impl(struct fimc_is_core *core)
 		fimc_is_ois_i2c_config(core->client1, false);
 	}
 
-	info("%s(%d) : X\n", __FUNCTION__, val);
+	info("%s(%d) : X\n", __func__, val);
 	if (val == 3) {
 		return 0;
 	} else {
@@ -408,7 +408,7 @@ bool fimc_is_ois_diff_test_impl(struct fimc_is_core *core, int *x_diff, int *y_d
 	msleep(100);
 #endif
 
-	info("(%s) : E\n", __FUNCTION__);
+	info("(%s) : E\n", __func__);
 
 	fimc_is_sec_get_cal_buf(&buf);
 
@@ -541,7 +541,7 @@ bool fimc_is_ois_diff_test_impl(struct fimc_is_core *core, int *x_diff, int *y_d
 	*x_diff = abs(x_max - x_min);
 	*y_diff = abs(y_max - y_min);
 
-	info("(%s) : X (default_diff:%d)(%d,%d)\n", __FUNCTION__,
+	info("(%s) : X (default_diff:%d)(%d,%d)\n", __func__,
 			default_diff, *x_diff, *y_diff);
 
 	if (core_pdata->use_ois_hsi2c) {

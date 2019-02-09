@@ -300,7 +300,7 @@ int fimc_is_ois_gpio_off(struct fimc_is_core *core)
 
 void fimc_is_ois_enable(struct fimc_is_core *core)
 {
-	info("%s : X\n", __FUNCTION__);
+	info("%s : X\n", __func__);
 }
 
 int fimc_is_ois_sine_mode(struct fimc_is_core *core, int mode)

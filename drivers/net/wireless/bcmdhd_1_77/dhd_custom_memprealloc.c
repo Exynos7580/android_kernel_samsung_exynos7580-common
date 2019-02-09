@@ -425,7 +425,7 @@ dhd_init_wlan_mem(void)
 		goto err_mem_alloc;
 	}
 
-	pr_err("%s: WIFI MEM Allocated\n", __FUNCTION__);
+	pr_err("%s: WIFI MEM Allocated\n", __func__);
 	return 0;
 
 err_mem_alloc:

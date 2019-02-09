@@ -57,7 +57,7 @@ int vmm_resolve(void *binary, _Elf_Sym *sym, _Elf_Sxword *value) {
 	char *strtab;
 	size_t strtabsz;
 
-	printk(KERN_ALERT "%s\n", __FUNCTION__);
+	printk(KERN_ALERT "%s\n", __func__);
 
 	if(ld_get_dynamic_strtab(binary, &strtab, &strtabsz)) { return -1; }
 
@@ -70,7 +70,7 @@ int vmm_resolve(void *binary, _Elf_Sym *sym, _Elf_Sxword *value) {
 
 int vmm_translate(void *binary, void *in, void **out) {
 
-	printk(KERN_ALERT "%s\n", __FUNCTION__);
+	printk(KERN_ALERT "%s\n", __func__);
 
 	*out = (void *)virt_to_phys(in);
 
@@ -81,7 +81,7 @@ int vmm_disable(void) {
 
 	_vmm_goto_EL2(VMM_64BIT_SMC_CALL_MAGIC, (void *)virt_to_phys(&_vmm_disable), VMM_STACK_OFFSET, VMM_MODE_AARCH64, NULL, 0);
 
-	printk(KERN_ALERT "%s\n", __FUNCTION__);
+	printk(KERN_ALERT "%s\n", __func__);
 
 	return 0;
 }
@@ -93,7 +93,7 @@ int vmm_entry(void) {
 	int status;
 	_main_ entry_point;
 
-	printk(KERN_ALERT "%s\n", __FUNCTION__);
+	printk(KERN_ALERT "%s\n", __func__);
 
 	if(ld_get_entry(vmm, (void **)&entry_point)) { return -1; }
 
@@ -118,7 +118,7 @@ int vmm_init(void) {
 	char *name;
 	void *base;
 
-	printk(KERN_ALERT "%s\n", __FUNCTION__);
+	printk(KERN_ALERT "%s\n", __func__);
 
 	if(smp_processor_id() != 0) { return 0; }
 

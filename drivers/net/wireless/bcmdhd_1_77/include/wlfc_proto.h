@@ -303,8 +303,8 @@
 /* wlfc-breadcrumb */
 #define WLFC_BREADCRUMB(x) do {if ((x) == NULL) \
 	{printf("WLFC: %s():%d:caller:%p\n", \
-	__FUNCTION__, __LINE__, CALL_SITE);}} while (0)
-#define WLFC_WHEREIS(s) printf("WLFC: at %s():%d, %s\n", __FUNCTION__, __LINE__, (s))
+	__func__, __LINE__, CALL_SITE);}} while (0)
+#define WLFC_WHEREIS(s) printf("WLFC: at %s():%d, %s\n", __func__, __LINE__, (s))
 #else
 #define WLFC_DBGMESG(x)
 #define WLFC_BREADCRUMB(x)

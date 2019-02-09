@@ -18,13 +18,13 @@
 
 #define SMFLED_INFO(format, args...) \
     printk(KERN_INFO "%s:%s() line-%d: " format, \
-            ALIAS_NAME, __FUNCTION__, __LINE__, ## args)
+            ALIAS_NAME, __func__, __LINE__, ## args)
 #define SMFLED_WARN(format, args...) \
     printk(KERN_WARNING "%s:%s() line-%d: " format, \
-            ALIAS_NAME, __FUNCTION__, __LINE__, ## args)
+            ALIAS_NAME, __func__, __LINE__, ## args)
 #define SMFLED_ERR(format, args...) \
     printk(KERN_ERR "%s:%s() line-%d: " format, \
-            ALIAS_NAME, __FUNCTION__, __LINE__, ## args)
+            ALIAS_NAME, __func__, __LINE__, ## args)
 
 #define SM_FLED_DEVICE  "sm-flash-led"
 #define ALIAS_NAME SM_FLED_DEVICE

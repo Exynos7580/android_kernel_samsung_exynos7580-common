@@ -54,7 +54,7 @@ extern char *dhd_log_dump_get_timestamp(void);
 do {	\
 	if (dhd_msg_level & DHD_ERROR_VAL) {	\
 		printf args;	\
-		dhd_log_dump_print_drv("[%s] %s: ", dhd_log_dump_get_timestamp(), __FUNCTION__); \
+		dhd_log_dump_print_drv("[%s] %s: ", dhd_log_dump_get_timestamp(), __func__); \
 		dhd_log_dump_print_drv args; \
 	}	\
 } while (0)
@@ -62,7 +62,7 @@ do {	\
 do {	\
 	if (dhd_msg_level & DHD_INFO_VAL) {	\
 		printf args;	\
-		dhd_log_dump_print_drv("[%s] %s: ", dhd_log_dump_get_timestamp(), __FUNCTION__); \
+		dhd_log_dump_print_drv("[%s] %s: ", dhd_log_dump_get_timestamp(), __func__); \
 		dhd_log_dump_print_drv args; \
 	}	\
 } while (0)
@@ -104,7 +104,7 @@ do {	\
 #define DHD_EVENT(args) \
 do {	\
 	if (dhd_msg_level & DHD_EVENT_VAL) {	\
-		dhd_log_dump_print("[%s] %s: ", dhd_log_dump_get_timestamp(), __FUNCTION__);	\
+		dhd_log_dump_print("[%s] %s: ", dhd_log_dump_get_timestamp(), __func__);	\
 		dhd_log_dump_print args;	\
 	}	\
 } while (0)
@@ -132,7 +132,7 @@ do {	\
 #define DHD_MSGTRACE_LOG(args)	\
 do {	\
 	if (dhd_msg_level & DHD_MSGTRACE_VAL) {	\
-		dhd_log_dump_print("[%s] %s: ", dhd_log_dump_get_timestamp(), __FUNCTION__);	\
+		dhd_log_dump_print("[%s] %s: ", dhd_log_dump_get_timestamp(), __func__);	\
 		dhd_log_dump_print args;	\
 	}   \
 } while (0)
@@ -154,7 +154,7 @@ do {	\
 #define DHD_ERROR_MEM(args)					\
 do {                                        \
 	if (dhd_msg_level & DHD_ERROR_VAL) {    \
-		dhd_log_dump_print_drv("[%s] %s: ", dhd_log_dump_get_timestamp(), __FUNCTION__); \
+		dhd_log_dump_print_drv("[%s] %s: ", dhd_log_dump_get_timestamp(), __func__); \
 		dhd_log_dump_print_drv args;	\
 	}	\
 } while (0)
@@ -166,7 +166,7 @@ do {                                        \
 			if (dhd_msg_level & DHD_ERROR_MEM_VAL) {	\
 				printf args;	\
 			}	\
-		DHD_LOG_DUMP_WRITE("[%s] %s: ", dhd_log_dump_get_timestamp(), __FUNCTION__);	\
+		DHD_LOG_DUMP_WRITE("[%s] %s: ", dhd_log_dump_get_timestamp(), __func__);	\
 		DHD_LOG_DUMP_WRITE args;	\
 	}	\
 } while (0)
@@ -174,7 +174,7 @@ do {                                        \
 do {                                        \
 	if (dhd_msg_level & DHD_ERROR_VAL) {    \
 		printf args;	\
-		DHD_LOG_DUMP_WRITE_EX("[%s] %s: ", dhd_log_dump_get_timestamp(), __FUNCTION__);	\
+		DHD_LOG_DUMP_WRITE_EX("[%s] %s: ", dhd_log_dump_get_timestamp(), __func__);	\
 		DHD_LOG_DUMP_WRITE_EX args;	\
 	}	\
 } while (0)
@@ -224,7 +224,7 @@ extern char *dhd_log_dump_get_timestamp(void);
 do {	\
 	if (dhd_msg_level & DHD_ERROR_VAL) {	\
 		printf args;	\
-		dhd_log_dump_print_drv("[%s] %s: ", dhd_log_dump_get_timestamp(), __FUNCTION__); \
+		dhd_log_dump_print_drv("[%s] %s: ", dhd_log_dump_get_timestamp(), __func__); \
 		dhd_log_dump_print_drv args; \
 	}	\
 } while (0)
@@ -232,7 +232,7 @@ do {	\
 do {	\
 	if (dhd_msg_level & DHD_INFO_VAL) {	\
 		printf args;	\
-		dhd_log_dump_print_drv("[%s] %s: ", dhd_log_dump_get_timestamp(), __FUNCTION__); \
+		dhd_log_dump_print_drv("[%s] %s: ", dhd_log_dump_get_timestamp(), __func__); \
 		dhd_log_dump_print_drv args; \
 	}	\
 } while (0)
@@ -257,7 +257,7 @@ do {	\
 #define DHD_EVENT(args) \
 do {	\
 	if (dhd_msg_level & DHD_EVENT_VAL) {	\
-		dhd_log_dump_print("[%s] %s: ", dhd_log_dump_get_timestamp(), __FUNCTION__);	\
+		dhd_log_dump_print("[%s] %s: ", dhd_log_dump_get_timestamp(), __func__);	\
 		dhd_log_dump_print args;	\
 	}	\
 } while (0)
@@ -276,7 +276,7 @@ do {	\
 #define DHD_MSGTRACE_LOG(args)	\
 do {	\
 	if (dhd_msg_level & DHD_MSGTRACE_VAL) {	\
-		dhd_log_dump_print("[%s] %s: ", dhd_log_dump_get_timestamp(), __FUNCTION__);	\
+		dhd_log_dump_print("[%s] %s: ", dhd_log_dump_get_timestamp(), __func__);	\
 		dhd_log_dump_print args;	\
 	}   \
 } while (0)
@@ -292,7 +292,7 @@ do {	\
 #define DHD_ERROR_MEM(args)                  \
 do {                                        \
 	if (dhd_msg_level & DHD_ERROR_VAL) {    \
-		dhd_log_dump_print("[%s] %s: ", dhd_log_dump_get_timestamp(), __FUNCTION__);	\
+		dhd_log_dump_print("[%s] %s: ", dhd_log_dump_get_timestamp(), __func__);	\
 		dhd_log_dump_print args;	\
 	}	\
 } while (0)

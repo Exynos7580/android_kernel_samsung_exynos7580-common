@@ -42,7 +42,7 @@ dump_bytes(const char *section_name, const char *first_symbol, const char *last_
 
 	if (!start_addr || !end_addr || start_addr >= end_addr) {
 		printk(KERN_ERR "FIPS(%s): Error Invalid Addresses in Section : %s, Start_Addr : %p , End_Addr : %p",
-                       __FUNCTION__, section_name, start_addr, end_addr);
+                       __func__, section_name, start_addr, end_addr);
 		return -1;
 	}
 
@@ -64,7 +64,7 @@ static int query_symbol_addresses(const char *first_symbol, const char *last_sym
 #endif
 
 	if (!start || !end || start >= end) {
-		printk(KERN_ERR "FIPS(%s): Error Invalid Addresses.", __FUNCTION__);
+		printk(KERN_ERR "FIPS(%s): Error Invalid Addresses.", __func__);
 		return -1;
 	}
 
@@ -84,13 +84,13 @@ static int init_hash(struct hash_desc *desc)
 
 	tfm = crypto_alloc_hash("hmac(sha256)", 0, 0);
 	if (IS_ERR(tfm)) {
-		printk(KERN_ERR "FIPS(%s): integrity failed to allocate tfm %ld", __FUNCTION__, PTR_ERR(tfm));
+		printk(KERN_ERR "FIPS(%s): integrity failed to allocate tfm %ld", __func__, PTR_ERR(tfm));
 		return -1;
 	}
 
 	ret = crypto_hash_setkey (tfm, key, strlen(key));
 	if (ret) {
-		printk(KERN_ERR "FIPS(%s): fail at crypto_hash_setkey", __FUNCTION__);
+		printk(KERN_ERR "FIPS(%s): fail at crypto_hash_setkey", __func__);
 		return -1;
 	}
 
@@ -99,7 +99,7 @@ static int init_hash(struct hash_desc *desc)
 
 	ret = crypto_hash_init(desc);
 	if (ret) {
-		printk(KERN_ERR "FIPS(%s): fail at crypto_hash_init", __FUNCTION__);
+		printk(KERN_ERR "FIPS(%s): fail at crypto_hash_init", __func__);
 		return -1;
 	}
 
@@ -111,18 +111,18 @@ static int finalize_hash(struct hash_desc *desc, unsigned char *out, unsigned in
 	int ret = -1;
 
 	if (!desc || !desc->tfm || !out || !out_size) {
-		printk(KERN_ERR "FIPS(%s): Invalid args", __FUNCTION__);
+		printk(KERN_ERR "FIPS(%s): Invalid args", __func__);
 		return ret;
 	}
 
 	if (crypto_hash_digestsize(desc->tfm) > out_size) {
-		printk(KERN_ERR "FIPS(%s): Not enough space for digest", __FUNCTION__);
+		printk(KERN_ERR "FIPS(%s): Not enough space for digest", __func__);
 		return ret;
 	}
 
 	ret = crypto_hash_final(desc, out);
 	if (ret) {
-		printk(KERN_ERR "FIPS(%s): crypto_hash_final failed", __FUNCTION__);
+		printk(KERN_ERR "FIPS(%s): crypto_hash_final failed", __func__);
 		return -1;
 	}
 
@@ -143,7 +143,7 @@ static int update_hash(struct hash_desc *desc, unsigned char *start_addr, unsign
 
 	buf = kmalloc(PAGE_SIZE, GFP_KERNEL);
 	if (!buf) {
-		printk(KERN_ERR "FIPS(%s): kmalloc failed", __FUNCTION__);
+		printk(KERN_ERR "FIPS(%s): kmalloc failed", __func__);
 		return ret;
 	}
 
@@ -169,7 +169,7 @@ static int update_hash(struct hash_desc *desc, unsigned char *start_addr, unsign
 
 		ret = crypto_hash_update(desc, &sg, bytes);
 		if (ret) {
-			printk(KERN_ERR "FIPS(%s): crypto_hash_update failed", __FUNCTION__);
+			printk(KERN_ERR "FIPS(%s): crypto_hash_update failed", __func__);
 			kfree(buf);
 			buf = 0;
 			return -1;
@@ -203,7 +203,7 @@ int do_fips_fmp_integrity_check(void)
 
 	err = init_hash(&desc);
 	if (err) {
-		printk(KERN_ERR "FIPS(%s): init_hash failed", __FUNCTION__);
+		printk(KERN_ERR "FIPS(%s): init_hash failed", __func__);
 		return -1;
 	}
 
@@ -212,7 +212,7 @@ int do_fips_fmp_integrity_check(void)
 	for (i = 0; i < rows; i++) {
 		err = query_symbol_addresses(symtab[i][1], symtab[i][2], &start_addr, &end_addr);
 		if (err) {
-			printk (KERN_ERR "FIPS(%s): Error to get start / end addresses", __FUNCTION__);
+			printk (KERN_ERR "FIPS(%s): Error to get start / end addresses", __func__);
 			crypto_free_hash(desc.tfm);
 			return -1;
 		}
@@ -224,7 +224,7 @@ int do_fips_fmp_integrity_check(void)
 
 		err = update_hash(&desc, (unsigned char *)start_addr, size);
 		if (err) {
-			printk(KERN_ERR "FIPS(%s): Error to update hash", __FUNCTION__);
+			printk(KERN_ERR "FIPS(%s): Error to update hash", __func__);
 			crypto_free_hash(desc.tfm);
 			return -1;
 		}
@@ -232,7 +232,7 @@ int do_fips_fmp_integrity_check(void)
 
 	err = finalize_hash(&desc, runtime_hmac, sizeof(runtime_hmac));
 	if (err) {
-		printk(KERN_ERR "FIPS(%s): Error in finalize", __FUNCTION__);
+		printk(KERN_ERR "FIPS(%s): Error in finalize", __func__);
 		crypto_free_hash(desc.tfm);
 		return -1;
 	}
@@ -240,7 +240,7 @@ int do_fips_fmp_integrity_check(void)
 	crypto_free_hash(desc.tfm);
 	builtime_hmac = get_builtime_fmp_hmac();
 	if (!builtime_hmac) {
-		printk(KERN_ERR "FIPS(%s): Unable to retrieve builtime_hmac", __FUNCTION__);
+		printk(KERN_ERR "FIPS(%s): Unable to retrieve builtime_hmac", __func__);
 		return -1;
 	}
 
@@ -253,7 +253,7 @@ int do_fips_fmp_integrity_check(void)
 		printk(KERN_INFO "FIPS: Integrity Check Passed");
 		return 0;
 	} else {
-		printk(KERN_ERR "FIPS(%s): Integrity Check Failed", __FUNCTION__);
+		printk(KERN_ERR "FIPS(%s): Integrity Check Failed", __func__);
 		return -1;
 	}
 

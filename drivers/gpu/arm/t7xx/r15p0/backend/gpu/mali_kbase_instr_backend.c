@@ -126,7 +126,7 @@ int kbase_instr_hwcnt_enable_internal(struct kbase_device *kbdev,
 		if (ret == 0) {
 			kbdev->hwcnt.backend.state = KBASE_INSTR_STATE_DISABLED;
 			err = -EINVAL;
-			GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "wait_event_timeout error in %s %d \n", __FUNCTION__, err);
+			GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "wait_event_timeout error in %s %d \n", __func__, err);
 			return err;
 		}
 	}
@@ -376,7 +376,7 @@ void kbasep_cache_clean_worker(struct work_struct *data)
 		kbdev->hwcnt.backend.triggered = 1;
 		spin_unlock_irqrestore(&kbdev->hwcnt.lock, flags);
 		mutex_unlock(&kbdev->hwcnt.dvs_lock);
-		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "dvs is enabled before running cache clean worker error in %s\n", __FUNCTION__);
+		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "dvs is enabled before running cache clean worker error in %s\n", __func__);
 		return;
 	}
 #endif
@@ -481,7 +481,7 @@ int kbase_instr_hwcnt_wait_for_dump(struct kbase_context *kctx)
 		if (ret == 0) {
 			kbdev->hwcnt.backend.state = KBASE_INSTR_STATE_IDLE;
 			err = -EINVAL;
-			GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "wait_event_timeout error in %s %d \n", __FUNCTION__, err);
+			GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "wait_event_timeout error in %s %d \n", __func__, err);
 			return err;
 		}
 	} else

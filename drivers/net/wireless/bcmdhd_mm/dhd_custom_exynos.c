@@ -214,7 +214,7 @@ static int dhd_init_wlan_mem(void)
 		goto err_mem_alloc;
 	}
 
-	pr_err("%s: WIFI MEM Allocated\n", __FUNCTION__);
+	pr_err("%s: WIFI MEM Allocated\n", __func__);
 	return 0;
 
 err_mem_alloc:
@@ -263,20 +263,20 @@ static int dhd_wlan_power(int onoff)
 
 	printk(KERN_INFO"------------------------------------------------");
 	printk(KERN_INFO"------------------------------------------------\n");
-	printk(KERN_INFO"%s Enter: power %s\n", __FUNCTION__, onoff ? "on" : "off");
+	printk(KERN_INFO"%s Enter: power %s\n", __func__, onoff ? "on" : "off");
 
 #ifdef CONFIG_MACH_A7LTE
 	if (onoff) {
 		pinctrl = devm_pinctrl_get_select(mmc_dev_for_wlan, "sdio_wifi_on");
 		if (IS_ERR(pinctrl))
-			printk(KERN_INFO "%s WLAN SDIO GPIO control error\n", __FUNCTION__);
+			printk(KERN_INFO "%s WLAN SDIO GPIO control error\n", __func__);
 		msleep(PINCTL_DELAY);
 	}
 #endif /* CONFIG_MACH_A7LTE */
 
 	if (gpio_direction_output(wlan_pwr_on, onoff)) {
 		printk(KERN_ERR "%s failed to control WLAN_REG_ON to %s\n",
-			__FUNCTION__, onoff ? "HIGH" : "LOW");
+			__func__, onoff ? "HIGH" : "LOW");
 		return -EIO;
 	}
 
@@ -284,7 +284,7 @@ static int dhd_wlan_power(int onoff)
 	if (!onoff) {
 		pinctrl = devm_pinctrl_get_select(mmc_dev_for_wlan, "sdio_wifi_off");
 		if (IS_ERR(pinctrl))
-			printk(KERN_INFO "%s WLAN SDIO GPIO control error\n", __FUNCTION__);
+			printk(KERN_INFO "%s WLAN SDIO GPIO control error\n", __func__);
 	}
 #endif /* CONFIG_MACH_A7LTE */
 #if defined(CONFIG_MACH_UNIVERSAL3475) || defined(CONFIG_MACH_UNIVERSAL7580)
@@ -305,12 +305,12 @@ extern void *mmc_host_dev;
 static int dhd_wlan_set_carddetect(int val)
 {
 	pr_err("%s: notify_func=%p, mmc_host_dev=%p, val=%d\n",
-		__FUNCTION__, notify_func_callback, mmc_host_dev, val);
+		__func__, notify_func_callback, mmc_host_dev, val);
 
 	if (notify_func_callback)
 		notify_func_callback(mmc_host_dev, val);
 	else
-		pr_warning("%s: Nobody to notify\n", __FUNCTION__);
+		pr_warning("%s: Nobody to notify\n", __func__);
 
 	return 0;
 }
@@ -403,7 +403,7 @@ void set_cpucore_for_interrupt(cpumask_var_t default_cpu_mask,
 
 void interrupt_set_cpucore(int set, unsigned int dpc_cpucore, unsigned int primary_cpucore)
 {
-	printk(KERN_INFO "%s: set: %d\n", __FUNCTION__, set);
+	printk(KERN_INFO "%s: set: %d\n", __func__, set);
 	if (set)
 	{
 #if defined(CONFIG_MACH_UNIVERSAL5422)
@@ -449,11 +449,11 @@ int __init dhd_wlan_init(void)
 {
 	int ret;
 
-	printk(KERN_INFO "%s: start\n", __FUNCTION__);
+	printk(KERN_INFO "%s: start\n", __func__);
 	ret = dhd_wlan_init_gpio();
 	if (ret < 0) {
 		printk(KERN_ERR "%s: failed to initiate GPIO, ret=%d\n",
-			__FUNCTION__, ret);
+			__func__, ret);
 		return ret;
 	}
 

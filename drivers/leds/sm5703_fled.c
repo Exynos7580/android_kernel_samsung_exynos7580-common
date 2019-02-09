@@ -33,13 +33,13 @@
 
 #define SM5703_FLED_INFO(format, args...) \
 	printk(KERN_INFO "%s:%s() line-%d: " format, \
-			ALIAS_NAME, __FUNCTION__, __LINE__, ## args)
+			ALIAS_NAME, __func__, __LINE__, ## args)
 #define SM5703_FLED_WARN(format, args...) \
 	printk(KERN_WARNING "%s:%s() line-%d: " format, \
-			ALIAS_NAME, __FUNCTION__, __LINE__, ## args)
+			ALIAS_NAME, __func__, __LINE__, ## args)
 #define SM5703_FLED_ERR(format, args...) \
 	printk(KERN_ERR "%s:%s() line-%d: " format, \
-			ALIAS_NAME, __FUNCTION__, __LINE__, ## args)
+			ALIAS_NAME, __func__, __LINE__, ## args)
 
 #define FLED_PINCTRL_STATE_DEFAULT "fled_default"
 #define FLED_PINCTRL_STATE_SLEEP "fled_sleep"
@@ -350,8 +350,8 @@ int32_t sm5703_charger_notification(struct sm_fled_info *fled_info,
 	info->ta_exist = ((vbus_valid & SM5703_STATUS5_VBUSOK) >> 5);
 	info->chgon_call = on;
 
-	SM5703_FLED_INFO("%s, info->boost = %d, mode = %d, vbus_valid = %d\n",__FUNCTION__,info->boost, mode, vbus_valid);
-	SM5703_FLED_INFO("%s, info->ta_exist = %d, info->chgon_call = %d, info->flash_status = %d\n",__FUNCTION__,info->ta_exist,info->chgon_call,info->flash_status);
+	SM5703_FLED_INFO("%s, info->boost = %d, mode = %d, vbus_valid = %d\n",__func__,info->boost, mode, vbus_valid);
+	SM5703_FLED_INFO("%s, info->ta_exist = %d, info->chgon_call = %d, info->flash_status = %d\n",__func__,info->ta_exist,info->chgon_call,info->flash_status);
 
 	if (info->ta_exist) {
 		if (mode == FLASHLIGHT_MODE_TORCH ) {
@@ -379,7 +379,7 @@ int32_t sm5703_charger_notification(struct sm_fled_info *fled_info,
 
 	cntl_val = sm5703_reg_read(info->i2c_client, SM5703_CNTL);
 	cntl_val &= SM5703_OPERATION_MODE_MASK;
-	SM5703_FLED_INFO("%s, OperationMode = %d\n",__FUNCTION__,cntl_val);
+	SM5703_FLED_INFO("%s, OperationMode = %d\n",__func__,cntl_val);
 
 	sm5703_fled_unlock(fled_info);
 
@@ -399,8 +399,8 @@ int32_t sm5703_boost_notification(struct sm_fled_info *fled_info, int32_t on)
 	info->ta_exist = on;
 	//sm5703_fled_set_ta_status(info->i2c_client, on);
 #endif
-	SM5703_FLED_INFO("%s, on = %d, info->boost = %d, mode = %d\n",__FUNCTION__, on,info->boost, mode);
-	SM5703_FLED_INFO("%s, info->ta_exist = %d, info->chgon_call = %d, info->flash_status = %d\n",__FUNCTION__, info->ta_exist, info->chgon_call, info->flash_status);
+	SM5703_FLED_INFO("%s, on = %d, info->boost = %d, mode = %d\n",__func__, on,info->boost, mode);
+	SM5703_FLED_INFO("%s, info->ta_exist = %d, info->chgon_call = %d, info->flash_status = %d\n",__func__, info->ta_exist, info->chgon_call, info->flash_status);
 
 	if (on == 1) {
 		if (mode == FLASHLIGHT_MODE_TORCH )
@@ -438,7 +438,7 @@ int32_t sm5703_boost_notification(struct sm_fled_info *fled_info, int32_t on)
 
 	cntl_val = sm5703_reg_read(info->i2c_client, SM5703_CNTL);
 	cntl_val &= SM5703_OPERATION_MODE_MASK;
-	SM5703_FLED_INFO("%s, OperationMode = %d\n",__FUNCTION__,cntl_val);
+	SM5703_FLED_INFO("%s, OperationMode = %d\n",__func__,cntl_val);
 
 	sm5703_fled_unlock(fled_info);
 	return 0;
@@ -457,9 +457,9 @@ int32_t sm5703_fled_notification(struct sm_fled_info *fled_info)
 	BUG_ON(info == NULL);
 	sm5703_fled_lock(fled_info);
 #ifdef SM5703_FLED_DEBUG
-	SM5703_FLED_INFO("%s, info->boost = %d, mode = %d, vbus_valid = %d\n",__FUNCTION__,info->boost, mode, vbus_valid);
-	SM5703_FLED_INFO("%s, info->ta_exist = %d, info->chgon_call = %d, info->flash_status = %d\n",__FUNCTION__,info->ta_exist, info->chgon_call, info->flash_status);
-	SM5703_FLED_INFO("%s, set start\n",__FUNCTION__);
+	SM5703_FLED_INFO("%s, info->boost = %d, mode = %d, vbus_valid = %d\n",__func__,info->boost, mode, vbus_valid);
+	SM5703_FLED_INFO("%s, info->ta_exist = %d, info->chgon_call = %d, info->flash_status = %d\n",__func__,info->ta_exist, info->chgon_call, info->flash_status);
+	SM5703_FLED_INFO("%s, set start\n",__func__);
 #endif
 	if (info->ta_exist == 1) {
 		if (mode == FLASHLIGHT_MODE_TORCH ) {
@@ -488,11 +488,11 @@ int32_t sm5703_fled_notification(struct sm_fled_info *fled_info)
 			}
 		}
 	}
-	SM5703_FLED_INFO("%s, set done\n",__FUNCTION__);
+	SM5703_FLED_INFO("%s, set done\n",__func__);
 #ifdef SM5703_FLED_DEBUG
 	cntl_val = sm5703_reg_read(info->i2c_client, SM5703_CNTL);
 	cntl_val &= SM5703_OPERATION_MODE_MASK;
-	SM5703_FLED_INFO("%s, OperationMode = %d\n",__FUNCTION__,cntl_val);
+	SM5703_FLED_INFO("%s, OperationMode = %d\n",__func__,cntl_val);
 #endif
 	sm5703_fled_unlock(fled_info);
 	return 0;
@@ -505,8 +505,8 @@ static int sm5703_fled_set_mode(struct sm_fled_info *fled_info,
 {
 	sm5703_fled_info_t *info = (sm5703_fled_info_t *)fled_info;
 #ifdef SM5703_FLED_DEBUG
-	SM5703_FLED_INFO("Start : %s, mode = %d, info->flash_status = %d\n",__FUNCTION__,mode,info->flash_status);
-	SM5703_FLED_INFO("%s, info->ta_exist = %d\n",__FUNCTION__,info->ta_exist);
+	SM5703_FLED_INFO("Start : %s, mode = %d, info->flash_status = %d\n",__func__,mode,info->flash_status);
+	SM5703_FLED_INFO("%s, info->ta_exist = %d\n",__func__,info->ta_exist);
 #endif
 
 	switch (mode) {
@@ -558,8 +558,8 @@ static int sm5703_fled_flash(struct sm_fled_info *fled_info, int turn_way)
 
 	SM5703_FLED_INFO("Start : E\n");
 
-	SM5703_FLED_INFO("%s, info->boost = %d\n",__FUNCTION__,info->boost);
-	SM5703_FLED_INFO("%s, info->ta_exist = %d, info->flash_status = %d\n",__FUNCTION__, info->ta_exist,info->flash_status);
+	SM5703_FLED_INFO("%s, info->boost = %d\n",__func__,info->boost);
+	SM5703_FLED_INFO("%s, info->ta_exist = %d, info->flash_status = %d\n",__func__, info->ta_exist,info->flash_status);
 	/*
 		 if (info->flash_status == 0) {
 	// Lock LED until setting to OFF MODE
@@ -567,7 +567,7 @@ static int sm5703_fled_flash(struct sm_fled_info *fled_info, int turn_way)
 	info->flash_status = 1;
 	}
 	 */
-	SM5703_FLED_INFO("%s, turn_way = %d, info->base.flashlight_dev->props.mode = %d\n",__FUNCTION__,turn_way,info->base.flashlight_dev->props.mode);
+	SM5703_FLED_INFO("%s, turn_way = %d, info->base.flashlight_dev->props.mode = %d\n",__func__,turn_way,info->base.flashlight_dev->props.mode);
 
 	if (turn_way == TURN_WAY_I2C)
 	{

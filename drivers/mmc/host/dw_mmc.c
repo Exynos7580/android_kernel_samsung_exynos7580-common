@@ -4297,7 +4297,7 @@ struct mmc_host *wlan_mmc = NULL;
 static int ext_cd_init_callback(
 	void (*notify_func)(void *dev_id, int state), void *dev_id, struct mmc_host *mmc) 
 {
-	printk("Enter %s\n",__FUNCTION__);
+	printk("Enter %s\n",__func__);
 	mutex_lock(&notify_mutex_lock);
 	WARN_ON(notify_func_callback);
 	notify_func_callback = notify_func;
@@ -4311,7 +4311,7 @@ static int ext_cd_init_callback(
 static int ext_cd_cleanup_callback(
 	void (*notify_func)(void *dev_id, int state), void *dev_id)
 {
-	printk("Enter %s\n",__FUNCTION__);
+	printk("Enter %s\n",__func__);
 	mutex_lock(&notify_mutex_lock);
 	WARN_ON(notify_func_callback);
 	notify_func_callback = NULL;

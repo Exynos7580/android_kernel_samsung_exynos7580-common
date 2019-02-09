@@ -750,7 +750,7 @@ osl_ctfpool_add(osl_t *osh)
 	/* Allocate a new skb and add it to the ctfpool */
 	skb = osl_alloc_skb(osh, osh->ctfpool->obj_size);
 	if (skb == NULL) {
-		printf("%s: skb alloc of len %d failed\n", __FUNCTION__,
+		printf("%s: skb alloc of len %d failed\n", __func__,
 		       osh->ctfpool->obj_size);
 		CTFPOOL_UNLOCK(osh->ctfpool, flags);
 		return NULL;
@@ -1110,14 +1110,14 @@ osl_pktfree(osl_t *osh, void *p, bool send)
 #if defined(CONFIG_DHD_USE_STATIC_BUF) && defined(DHD_USE_STATIC_CTRLBUF)
 	if (skb && (skb->mac_len == PREALLOC_USED_MAGIC)) {
 		printk("%s: pkt %p is from static pool\n",
-			__FUNCTION__, p);
+			__func__, p);
 		dump_stack();
 		return;
 	}
 
 	if (skb && (skb->mac_len == PREALLOC_FREE_MAGIC)) {
 		printk("%s: pkt %p is from static pool and not in used\n",
-			__FUNCTION__, p);
+			__func__, p);
 		dump_stack();
 		return;
 	}
@@ -1168,7 +1168,7 @@ osl_pktget_static(osl_t *osh, uint len)
 		return osl_pktget(osh, len);
 
 	if (len > DHD_SKB_MAX_BUFSIZE) {
-		printk("%s: attempt to allocate huge packet (0x%x)\n", __FUNCTION__, len);
+		printk("%s: attempt to allocate huge packet (0x%x)\n", __func__, len);
 		return osl_pktget(osh, len);
 	}
 
@@ -1212,7 +1212,7 @@ osl_pktget_static(osl_t *osh, uint len)
 	}
 
 	spin_unlock_irqrestore(&bcm_static_skb->osl_pkt_lock, flags);
-	printk("%s: all static pkt in use!\n", __FUNCTION__);
+	printk("%s: all static pkt in use!\n", __func__);
 	return NULL;
 #else
 	down(&bcm_static_skb->osl_pkt_sem);
@@ -1283,7 +1283,7 @@ osl_pktget_static(osl_t *osh, uint len)
 #endif /* ENHANCED_STATIC_BUF */
 
 	up(&bcm_static_skb->osl_pkt_sem);
-	printk("%s: all static pkt in use!\n", __FUNCTION__);
+	printk("%s: all static pkt in use!\n", __func__);
 	return osl_pktget(osh, len);
 #endif /* DHD_USE_STATIC_CTRLBUF */
 }
@@ -1313,14 +1313,14 @@ osl_pktfree_static(osl_t *osh, void *p, bool send)
 		if (p == bcm_static_skb->skb_8k[i]) {
 			if (bcm_static_skb->pkt_use[i] == 0) {
 				printk("%s: static pkt idx %d(%p) is double free\n",
-					__FUNCTION__, i, p);
+					__func__, i, p);
 			} else {
 				bcm_static_skb->pkt_use[i] = 0;
 			}
 
 			if (skb->mac_len != PREALLOC_USED_MAGIC) {
 				printk("%s: static pkt idx %d(%p) is not in used\n",
-					__FUNCTION__, i, p);
+					__func__, i, p);
 			}
 
 			skb->mac_len = PREALLOC_FREE_MAGIC;
@@ -1330,7 +1330,7 @@ osl_pktfree_static(osl_t *osh, void *p, bool send)
 	}
 
 	spin_unlock_irqrestore(&bcm_static_skb->osl_pkt_lock, flags);
-	printk("%s: packet %p does not exist in the pool\n", __FUNCTION__, p);
+	printk("%s: packet %p does not exist in the pool\n", __func__, p);
 #else
 	down(&bcm_static_skb->osl_pkt_sem);
 	for (i = 0; i < STATIC_PKT_1PAGE_NUM; i++) {
@@ -1744,7 +1744,7 @@ osl_dma_map(osl_t *osh, void *va, uint size, int direction, void *p, hnddma_seg_
 	ret = 0;
 #endif
 	if (ret) {
-		printk("%s: Failed to map memory\n", __FUNCTION__);
+		printk("%s: Failed to map memory\n", __func__);
 		PHYSADDRLOSET(ret_addr, 0);
 		PHYSADDRHISET(ret_addr, 0);
 	} else {
@@ -2133,7 +2133,7 @@ osl_sec_dma_init_elem_mem_block(osl_t *osh, size_t mbsize, int max, sec_mem_elem
 		osh->contig_base_alloc_va = ((uint8 *)osh->contig_base_alloc_va +  mbsize);
 
 	} else {
-		printf("%s sec mem elem kmalloc failed\n", __FUNCTION__);
+		printf("%s sec mem elem kmalloc failed\n", __func__);
 		ret = BCME_ERROR;
 	}
 	return ret;
@@ -2203,7 +2203,7 @@ osl_sec_dma_free_mem_elem(osl_t *osh, sec_mem_elem_t *sec_mem_elem)
 #ifdef NOT_YET
 	}
 	else
-		printf("%s free failed size=%d\n", __FUNCTION__, sec_mem_elem->size);
+		printf("%s free failed size=%d\n", __func__, sec_mem_elem->size);
 #endif /* NOT_YET */
 }
 
@@ -2289,7 +2289,7 @@ osl_sec_dma_map_txmeta(osl_t *osh, void *va, uint size, int direction, void *p,
 
 	} else {
 		printf("%s: error orig va not found va = 0x%p \n",
-			__FUNCTION__, vaorig);
+			__func__, vaorig);
 	}
 	return dma_handle;
 }
@@ -2537,7 +2537,7 @@ osl_sec_dma_alloc_consistent(osl_t *osh, uint size, uint16 align_bits, ulong *pa
 	int i;
 
 	if (size > SEC_CMA_COHERENT_BLK) {
-		printf("%s unsupported size\n", __FUNCTION__);
+		printf("%s unsupported size\n", __func__);
 		return NULL;
 	}
 
@@ -2551,7 +2551,7 @@ osl_sec_dma_alloc_consistent(osl_t *osh, uint size, uint16 align_bits, ulong *pa
 	}
 
 	if (i == SEC_CMA_COHERENT_MAX)
-		printf("%s:No coherent mem: va = 0x%p pa = 0x%lx size = %d\n", __FUNCTION__,
+		printf("%s:No coherent mem: va = 0x%p pa = 0x%lx size = %d\n", __func__,
 			temp_va, (ulong)temp_pa, size);
 
 	*pap = (unsigned long)temp_pa;
@@ -2570,7 +2570,7 @@ osl_sec_dma_free_consistent(osl_t *osh, void *va, uint size, dmaaddr_t pa)
 		}
 	}
 	if (i == SEC_CMA_COHERENT_MAX)
-		printf("%s:Error: va = 0x%p pa = 0x%lx size = %d\n", __FUNCTION__,
+		printf("%s:Error: va = 0x%p pa = 0x%lx size = %d\n", __func__,
 			va, (ulong)pa, size);
 }
 
@@ -2643,7 +2643,7 @@ osl_timer_add(osl_t *osh, osl_timer_t *t, uint32 ms, bool periodic)
 {
 
 	if (t == NULL) {
-		printf("%s: Timer handle is NULL\n", __FUNCTION__);
+		printf("%s: Timer handle is NULL\n", __func__);
 		return;
 	}
 	ASSERT(!t->set);
@@ -2664,7 +2664,7 @@ osl_timer_update(osl_t *osh, osl_timer_t *t, uint32 ms, bool periodic)
 {
 
 	if (t == NULL) {
-		printf("%s: Timer handle is NULL\n", __FUNCTION__);
+		printf("%s: Timer handle is NULL\n", __func__);
 		return;
 	}
 	if (periodic) {
@@ -2685,7 +2685,7 @@ bool
 osl_timer_del(osl_t *osh, osl_timer_t *t)
 {
 	if (t == NULL) {
-		printf("%s: Timer handle is NULL\n", __FUNCTION__);
+		printf("%s: Timer handle is NULL\n", __func__);
 		return (FALSE);
 	}
 	if (t->set) {

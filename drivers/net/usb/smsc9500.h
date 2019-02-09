@@ -624,7 +624,7 @@ extern u32 debug_mode;
 #   define SMSC_WARNING(msg, args...)               \
     if(debug_mode&DBG_WARNING) {                    \
         printk("SMSC_9500_WARNING: ");\
-        printk(__FUNCTION__);\
+        printk(__func__);\
         printk(": " msg "\n",## args);\
     }
 #else
@@ -657,7 +657,7 @@ extern void SMSC_ASSERT(BOOLEAN condition);
     if(!(condition)) {                                                              \
         printk("SMSC_9500_ASSERTION_FAILURE: \n");\
         printk("    Condition = " #condition "\n");\
-        printk("    Function  = ");printk(__FUNCTION__);printk("\n");\
+        printk("    Function  = ");printk(__func__);printk("\n");\
         printk("    File      = " __FILE__ "\n");\
         printk("    Line      = %d\n",__LINE__);    \
         while(1);\

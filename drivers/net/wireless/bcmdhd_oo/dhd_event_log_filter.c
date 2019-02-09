@@ -421,7 +421,7 @@ evt_xtlv_print_cb(void *ctx, const uint8 *data, uint16 type, uint16 len)
 	uint8 bssid[ETHER_ADDR_LEN];
 	wl_event_based_statistics_v1_t *elem;
 
-	DHD_FILTER_TRACE(("%s type:%d %x len:%d %x\n", __FUNCTION__, type, type, len, len));
+	DHD_FILTER_TRACE(("%s type:%d %x len:%d %x\n", __func__, type, type, len, len));
 
 	if (type == WL_IFSTATS_XTLV_IF_EVENT_STATS) {
 		elem = (wl_event_based_statistics_v1_t *)(uintptr_t)data;
@@ -432,7 +432,7 @@ evt_xtlv_print_cb(void *ctx, const uint8 *data, uint16 type, uint16 len)
 		}
 	} else {
 		DHD_FILTER_ERR(("%s TYPE(%d) IS NOT SUPPORTED TO PRINT\n",
-			__FUNCTION__, type));
+			__func__, type));
 		return BCME_ERROR;
 	}
 
@@ -452,11 +452,11 @@ evt_xtlv_copy_cb(void *ctx, const uint8 *data, uint16 type, uint16 len)
 	int tbl_idx;
 	uint32 elem_size;
 
-	DHD_FILTER_TRACE(("%s type:%d %x len:%d %x\n", __FUNCTION__, type, type, len, len));
+	DHD_FILTER_TRACE(("%s type:%d %x len:%d %x\n", __func__, type, type, len, len));
 
 	for (tbl_idx = 0; ; tbl_idx++) {
 		if (cur_ctx->tbl[tbl_idx].xtlv_id == EWPF_XTLV_INVALID) {
-			DHD_FILTER_ERR(("%s NOT SUPPORTED TYPE(%d)\n", __FUNCTION__, type));
+			DHD_FILTER_ERR(("%s NOT SUPPORTED TYPE(%d)\n", __func__, type));
 			return BCME_OK;
 		}
 		if (cur_ctx->tbl[tbl_idx].xtlv_id == type) {
@@ -580,12 +580,12 @@ filter_main_cb(void *ctx, const uint8 *data, uint16 type, uint16 len)
 	int idx;
 	int err;
 
-	DHD_FILTER_TRACE(("%s type:%x len:%d\n", __FUNCTION__, type, len));
+	DHD_FILTER_TRACE(("%s type:%x len:%d\n", __func__, type, len));
 
 	sub_ctx.dhdp = cur_ctx->dhdp;
 	for (idx = 0; ; idx++) {
 		if (cur_ctx->tbl[idx].xtlv_id == EWPF_XTLV_INVALID) {
-			DHD_FILTER_TRACE(("%s NOT SUPPORTED TYPE(%d)\n", __FUNCTION__, type));
+			DHD_FILTER_TRACE(("%s NOT SUPPORTED TYPE(%d)\n", __func__, type));
 			return BCME_OK;
 		}
 		if (cur_ctx->tbl[idx].xtlv_id == type) {

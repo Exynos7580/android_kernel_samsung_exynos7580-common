@@ -349,7 +349,7 @@ static int sm5703mfd_parse_dt(struct device *dev,
 	ret = pdata->irq_gpio = of_get_named_gpio_flags(np, "sm5703,irq-gpio",
 			0, &irq_gpio_flags);
 	if (ret < 0) {
-		dev_err(dev, "%s : can't get irq-gpio\r\n", __FUNCTION__);
+		dev_err(dev, "%s : can't get irq-gpio\r\n", __func__);
 		return ret;
 	}
 
@@ -357,12 +357,12 @@ static int sm5703mfd_parse_dt(struct device *dev,
 	ret = of_property_read_u32(np, "sm5703,irq-base", (u32*)&pdata->irq_base);
 	if (ret < 0 || pdata->irq_base == -1) {
 		dev_info(dev, "%s : no assignment of irq_base, use irq_alloc_descs()\r\n",
-				__FUNCTION__);
+				__func__);
 
 		ret = pdata->mrstb_gpio = of_get_named_gpio_flags(np,
 				"sm5703,mrstb-gpio", 0, NULL);
 		if (ret < 0) {
-			dev_err(dev, "%s : can't get mrstb-gpio\r\n", __FUNCTION__);
+			dev_err(dev, "%s : can't get mrstb-gpio\r\n", __func__);
 			pdata->mrstb_gpio = 0;
 		}
 

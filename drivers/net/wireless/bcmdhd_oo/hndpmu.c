@@ -254,7 +254,7 @@ si_pmu_ulp_register(si_t *sih)
 static uint
 si_pmu_ulp_get_retention_size_cb(void *handle, ulp_ext_info_t *einfo)
 {
-	ULP_DBG(("%s: sz: %d\n", __FUNCTION__, sizeof(si_pmu_ulp_cr_dat_t)));
+	ULP_DBG(("%s: sz: %d\n", __func__, sizeof(si_pmu_ulp_cr_dat_t)));
 	return sizeof(si_pmu_ulp_cr_dat_t);
 }
 
@@ -263,7 +263,7 @@ si_pmu_ulp_enter_cb(void *handle, ulp_ext_info_t *einfo, uint8 *cache_data)
 {
 	si_pmu_ulp_cr_dat_t crinfo = {0};
 	crinfo.ilpcycles_per_sec = ilpcycles_per_sec;
-	ULP_DBG(("%s: ilpcycles_per_sec: %x\n", __FUNCTION__, ilpcycles_per_sec));
+	ULP_DBG(("%s: ilpcycles_per_sec: %x\n", __func__, ilpcycles_per_sec));
 	memcpy(cache_data, (void*)&crinfo, sizeof(crinfo));
 	return BCME_OK;
 }
@@ -275,7 +275,7 @@ si_pmu_ulp_exit_cb(void *handle, uint8 *cache_data,
 	si_pmu_ulp_cr_dat_t *crinfo = (si_pmu_ulp_cr_dat_t *)cache_data;
 
 	ilpcycles_per_sec = crinfo->ilpcycles_per_sec;
-	ULP_DBG(("%s: ilpcycles_per_sec: %x, cache_data: %p\n", __FUNCTION__,
+	ULP_DBG(("%s: ilpcycles_per_sec: %x, cache_data: %p\n", __func__,
 		ilpcycles_per_sec, cache_data));
 	return BCME_OK;
 }
@@ -418,7 +418,7 @@ int
 si_pmu_fast_lpo_disable(si_t *sih)
 {
 	if (!si_pmu_cap_fast_lpo(sih)) {
-		PMU_ERROR(("%s: No Fast LPO capability\n", __FUNCTION__));
+		PMU_ERROR(("%s: No Fast LPO capability\n", __func__));
 		return BCME_ERROR;
 	}
 
@@ -584,7 +584,7 @@ si_pmustatstimer_dump(si_t *sih)
 	pmuintstatus = R_REG(osh, &pmu->pmuintstatus);
 	pmuintmask0 = R_REG(osh, &pmu->pmuintmask0);
 
-	PMU_ERROR(("%s : TIME %d\n", __FUNCTION__, current_time_ms));
+	PMU_ERROR(("%s : TIME %d\n", __func__, current_time_ms));
 
 	PMU_ERROR(("\tMAX Timer Num %d, MAX Source Num %d\n",
 		max_stats_timer_num, max_stats_timer_src_num));

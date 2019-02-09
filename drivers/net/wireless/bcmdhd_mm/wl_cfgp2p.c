@@ -1052,7 +1052,7 @@ wl_cfgp2p_parse_vndr_ies(u8 *parse, u32 len,
 			/* len should be bigger than OUI length + one data length at least */
 			if (vndrie->len < (VNDR_IE_MIN_LEN + 1)) {
 				CFGP2P_ERR(("%s: invalid vndr ie. length is too small %d\n",
-					__FUNCTION__, vndrie->len));
+					__func__, vndrie->len));
 				goto end;
 			}
 			/* if wpa or wme ie, do not add ie */
@@ -2414,7 +2414,7 @@ wl_cfgp2p_register_ndev(struct bcm_cfg80211 *cfg)
 
 	/* Allocate etherdev, including space for private structure */
 	if (!(net = alloc_etherdev(sizeof(struct bcm_cfg80211 *)))) {
-		CFGP2P_ERR(("%s: OOM - alloc_etherdev\n", __FUNCTION__));
+		CFGP2P_ERR(("%s: OOM - alloc_etherdev\n", __func__));
 		return -ENODEV;
 	}
 
@@ -2532,7 +2532,7 @@ static int wl_cfgp2p_do_ioctl(struct net_device *net, struct ifreq *ifr, int cmd
 
 	} else {
 		CFGP2P_ERR(("%s: IOCTL req 0x%x on p2p0 I/F. Ignoring. \n",
-		__FUNCTION__, cmd));
+		__func__, cmd));
 		return -1;
 	}
 
@@ -2666,7 +2666,7 @@ wl_cfgp2p_add_p2p_disc_if(struct bcm_cfg80211 *cfg)
 
 #if defined(CUSTOMER_HW4) && defined(PLATFORM_SLP)
 	g_if_flag |= 0x4;	/* DHD_FLAG_P2P_MODE */
-	WL_TRACE(("%s: p2p0 IF up : g_if_flag(%d)\n", __FUNCTION__, g_if_flag));
+	WL_TRACE(("%s: p2p0 IF up : g_if_flag(%d)\n", __func__, g_if_flag));
 #endif /* CUSTOMER_HW4 && PLATFORM_SLP */
 
 	return wdev;
@@ -2765,12 +2765,12 @@ wl_cfgp2p_del_p2p_disc_if(struct wireless_dev *wdev, struct bcm_cfg80211 *cfg)
 
 #if defined(CUSTOMER_HW4) && defined(PLATFORM_SLP)
 	g_if_flag &= 0x1;	/* DHD_FLAG_STA_MODE */
-	WL_TRACE(("%s: p2p0 IF down : g_if_flag(%d)\n", __FUNCTION__, g_if_flag));
+	WL_TRACE(("%s: p2p0 IF down : g_if_flag(%d)\n", __func__, g_if_flag));
 
 	wl_cfgp2p_probe_init_priv(cfg);
 	if (!g_if_flag) {
 		dhd_stop_p2p();
-		WL_TRACE(("%s: wlan0 IF down\n", __FUNCTION__));
+		WL_TRACE(("%s: wlan0 IF down\n", __func__));
 	}
 #endif /* CUSTOMER_HW4 && PLATFORM_SLP */
 

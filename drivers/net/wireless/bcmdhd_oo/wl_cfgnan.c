@@ -123,7 +123,7 @@ int
 wl_cfgnan_remove_inst_id(struct bcm_cfg80211 *cfg, uint8 inst_id)
 {
 	s32 ret = BCME_OK;
-	WL_DBG(("%s: Removing svc instance id %d\n", __FUNCTION__, inst_id));
+	WL_DBG(("%s: Removing svc instance id %d\n", __func__, inst_id));
 	clrbit(cfg->nancfg.svc_inst_id_mask, inst_id-1);
 	return ret;
 }
@@ -172,7 +172,7 @@ s32 wl_cfgnan_parse_sdea_data(osl_t *osh, const uint8 *p_attr,
 		if (tlv_data->sde_svc_info.dlen > 0) {
 			tlv_data->sde_svc_info.data = MALLOCZ(osh, tlv_data->sde_svc_info.dlen);
 			if (!tlv_data->sde_svc_info.data) {
-				WL_ERR(("%s: memory allocation failed\n", __FUNCTION__));
+				WL_ERR(("%s: memory allocation failed\n", __func__));
 				tlv_data->sde_svc_info.dlen = 0;
 				ret = BCME_NOMEM;
 				goto fail;
@@ -191,7 +191,7 @@ s32 wl_cfgnan_parse_sdea_data(osl_t *osh, const uint8 *p_attr,
 			/* must be able to handle null msg which is not error */
 			tlv_data->sde_svc_info.dlen = 0;
 			WL_DBG(("%s: sdea svc info length is zero, null info data\n",
-				__FUNCTION__));
+				__func__));
 		}
 	}
 	return ret;
@@ -297,7 +297,7 @@ wl_cfgnan_parse_sda_data(osl_t *osh, const uint8 *p_attr,
 		tlv_data->tx_match_filter.data =
 			MALLOCZ(osh, tlv_data->tx_match_filter.dlen);
 		if (!tlv_data->tx_match_filter.data) {
-			WL_ERR(("%s: memory allocation failed\n", __FUNCTION__));
+			WL_ERR(("%s: memory allocation failed\n", __func__));
 			tlv_data->tx_match_filter.dlen = 0;
 			ret = -ENOMEM;
 			goto fail;
@@ -328,14 +328,14 @@ wl_cfgnan_parse_sda_data(osl_t *osh, const uint8 *p_attr,
 				tlv_data->rx_match_filter.dlen > MAX_MATCH_FILTER_LEN) {
 			tlv_data->rx_match_filter.dlen = 0;
 			WL_ERR(("%s: sr matching filter length is invalid\n",
-					__FUNCTION__));
+					__func__));
 			ret = BCME_BADLEN;
 			goto fail;
 		}
 		tlv_data->rx_match_filter.data =
 			MALLOCZ(osh, tlv_data->rx_match_filter.dlen);
 		if (!tlv_data->rx_match_filter.data) {
-			WL_ERR(("%s: memory allocation failed\n", __FUNCTION__));
+			WL_ERR(("%s: memory allocation failed\n", __func__));
 			tlv_data->rx_match_filter.dlen = 0;
 			ret = BCME_NOMEM;
 			goto fail;
@@ -375,7 +375,7 @@ wl_cfgnan_parse_sda_data(osl_t *osh, const uint8 *p_attr,
 			tlv_data->svc_info.data =
 				MALLOCZ(osh, tlv_data->svc_info.dlen);
 			if (!tlv_data->svc_info.data) {
-				WL_ERR(("%s: memory allocation failed\n", __FUNCTION__));
+				WL_ERR(("%s: memory allocation failed\n", __func__));
 				tlv_data->svc_info.dlen = 0;
 				ret = BCME_NOMEM;
 				goto fail;
@@ -395,7 +395,7 @@ wl_cfgnan_parse_sda_data(osl_t *osh, const uint8 *p_attr,
 			/* must be able to handle null msg which is not error */
 			tlv_data->svc_info.dlen = 0;
 			WL_DBG(("%s: svc info length is zero, null info data\n",
-					__FUNCTION__));
+					__func__));
 		}
 	}
 
@@ -657,7 +657,7 @@ wl_cfgnan_set_vars_cbfn(void *ctx, const uint8 *data, uint16 type, uint16 len)
 		tlv_data->svc_info.data =
 			MALLOCZ(ctx_tlv_data->cfg->osh, len);
 		if (!tlv_data->svc_info.data) {
-			WL_ERR(("%s: memory allocation failed\n", __FUNCTION__));
+			WL_ERR(("%s: memory allocation failed\n", __func__));
 			tlv_data->svc_info.dlen = 0;
 			ret = BCME_NOMEM;
 			goto fail;
@@ -687,7 +687,7 @@ wl_cfg_nan_check_cmd_len(uint16 nan_iov_len, uint16 data_size,
 				ALIGN_SIZE(data_size, 4);
 		if (*subcmd_len > nan_iov_len) {
 			WL_DBG(("%s: Buf short, requested:%d, available:%d\n",
-					__FUNCTION__, *subcmd_len, nan_iov_len));
+					__func__, *subcmd_len, nan_iov_len));
 			ret = BCME_NOMEM;
 		}
 	} else {
@@ -1060,7 +1060,7 @@ wl_cfgnan_config_control_flag(struct net_device *ndev, struct bcm_cfg80211 *cfg,
 
 	NAN_DBG_ENTER();
 	WL_INFORM_MEM(("%s: Modifying nan ctrl flag %x val %d",
-		__FUNCTION__, flag, set));
+		__func__, flag, set));
 	nan_buf = MALLOCZ(dhdp->osh, nan_buf_size);
 	if (!nan_buf) {
 		WL_ERR(("%s: memory allocation failed\n", __func__));
@@ -2562,7 +2562,7 @@ process_resp_buf(void *iov_resp,
 		dpreq_ret = (wl_nan_dp_req_ret_t *)(iov_resp);
 		*instance_id = dpreq_ret->ndp_id;
 		WL_DBG(("%s: Initiator NDI: " MACDBG "\n",
-			__FUNCTION__, MAC2STRDBG(dpreq_ret->indi.octet)));
+			__func__, MAC2STRDBG(dpreq_ret->indi.octet)));
 	} else if (sub_cmd_id == WL_NAN_CMD_RANGE_REQUEST) {
 		wl_nan_range_id *range_id = NULL;
 		range_id = (wl_nan_range_id *)(iov_resp);
@@ -2667,12 +2667,12 @@ wl_cfgnan_cache_svc_info(struct bcm_cfg80211 *cfg,
 		}
 	}
 	if (i == NAN_MAX_SVC_INST) {
-		WL_ERR(("%s:cannot accomodate ranging session\n", __FUNCTION__));
+		WL_ERR(("%s:cannot accomodate ranging session\n", __func__));
 		ret = BCME_NORESOURCE;
 		goto fail;
 	}
 	if (cmd_data->sde_control_flag & NAN_SDE_CF_RANGING_REQUIRED) {
-		WL_DBG(("%s:updating ranging info", __FUNCTION__));
+		WL_DBG(("%s:updating ranging info", __func__));
 		svc_info->status = 1;
 		svc_info->ranging_interval = cmd_data->ranging_intvl_msec;
 		svc_info->ranging_ind = cmd_data->ranging_indication;
@@ -2709,7 +2709,7 @@ wl_cfgnan_terminate_ranging_sessions(struct net_device *ndev,
 				&status);
 			if (unlikely(ret) || unlikely(status)) {
 				WL_ERR(("%s:nan range cancel failed ret = %d status = %d\n",
-					__FUNCTION__, ret, status));
+					__func__, ret, status));
 			}
 			memset(ranging_inst, 0, sizeof(nan_ranging_inst_t));
 			WL_DBG(("Range cancelled \n"));
@@ -3094,7 +3094,7 @@ wl_cfgnan_sd_params_handler(struct net_device *ndev,
 				cmd_data->svc_info.dlen,
 				cmd_data->svc_info.data, BCM_XTLV_OPTION_ALIGN32);
 		if (unlikely(ret)) {
-			WL_ERR(("%s: fail to pack WL_NAN_XTLV_SD_SVC_INFO\n", __FUNCTION__));
+			WL_ERR(("%s: fail to pack WL_NAN_XTLV_SD_SVC_INFO\n", __func__));
 			goto fail;
 		}
 	}
@@ -3107,7 +3107,7 @@ wl_cfgnan_sd_params_handler(struct net_device *ndev,
 				cmd_data->sde_svc_info.dlen,
 				cmd_data->sde_svc_info.data, BCM_XTLV_OPTION_ALIGN32);
 		if (unlikely(ret)) {
-			WL_ERR(("%s: fail to pack sdea svc info\n", __FUNCTION__));
+			WL_ERR(("%s: fail to pack sdea svc info\n", __func__));
 			goto fail;
 		}
 	}
@@ -3119,7 +3119,7 @@ wl_cfgnan_sd_params_handler(struct net_device *ndev,
 				WL_NAN_XTLV_CFG_MATCH_TX, cmd_data->tx_match.dlen,
 				cmd_data->tx_match.data, BCM_XTLV_OPTION_ALIGN32);
 		if (unlikely(ret)) {
-			WL_ERR(("%s: failed on xtlv_pack for tx match filter\n", __FUNCTION__));
+			WL_ERR(("%s: failed on xtlv_pack for tx match filter\n", __func__));
 			goto fail;
 		}
 	}
@@ -3130,7 +3130,7 @@ wl_cfgnan_sd_params_handler(struct net_device *ndev,
 				sizeof(cmd_data->life_count), &cmd_data->life_count,
 				BCM_XTLV_OPTION_ALIGN32);
 		if (unlikely(ret)) {
-			WL_ERR(("%s: failed to WL_NAN_XTLV_CFG_SVC_LIFE_COUNT\n", __FUNCTION__));
+			WL_ERR(("%s: failed to WL_NAN_XTLV_CFG_SVC_LIFE_COUNT\n", __func__));
 			goto fail;
 		}
 	}
@@ -3153,7 +3153,7 @@ wl_cfgnan_sd_params_handler(struct net_device *ndev,
 
 				srf_mac = MALLOCZ(dhdp->osh, srf_size);
 				if (srf_mac == NULL) {
-					WL_ERR(("%s: memory allocation failed\n", __FUNCTION__));
+					WL_ERR(("%s: memory allocation failed\n", __func__));
 					ret = -ENOMEM;
 					goto fail;
 				}
@@ -3165,14 +3165,14 @@ wl_cfgnan_sd_params_handler(struct net_device *ndev,
 						BCM_XTLV_OPTION_ALIGN32);
 				if (unlikely(ret)) {
 					WL_ERR(("%s: failed to WL_NAN_XTLV_CFG_SR_FILTER\n",
-							__FUNCTION__));
+							__func__));
 					goto fail;
 				}
 			} else if (cmd_data->srf_type == SRF_TYPE_BLOOM_FILTER) {
 				/* Create bloom filter */
 				srf = MALLOCZ(dhdp->osh, srf_ctrl_size);
 				if (srf == NULL) {
-					WL_ERR(("%s: memory allocation failed\n", __FUNCTION__));
+					WL_ERR(("%s: memory allocation failed\n", __func__));
 					ret = -ENOMEM;
 					goto fail;
 				}
@@ -3197,7 +3197,7 @@ wl_cfgnan_sd_params_handler(struct net_device *ndev,
 
 				ret = wl_nan_bloom_create(&bp, &bloom_idx, bloom_len);
 				if (unlikely(ret)) {
-					WL_ERR(("%s: Bloom create failed\n", __FUNCTION__));
+					WL_ERR(("%s: Bloom create failed\n", __func__));
 					goto fail;
 				}
 
@@ -3207,7 +3207,7 @@ wl_cfgnan_sd_params_handler(struct net_device *ndev,
 					ret = bcm_bloom_add_member(bp, srftmp, ETHER_ADDR_LEN);
 					if (unlikely(ret)) {
 						WL_ERR(("%s: Cannot add to bloom filter\n",
-								__FUNCTION__));
+								__func__));
 						goto fail;
 					}
 					srftmp += ETHER_ADDR_LEN;
@@ -3218,7 +3218,7 @@ wl_cfgnan_sd_params_handler(struct net_device *ndev,
 						(srf + NAN_SRF_CTRL_FIELD_LEN),
 						&bloom_size);
 				if (unlikely(ret)) {
-					WL_ERR(("%s: Cannot get filter data\n", __FUNCTION__));
+					WL_ERR(("%s: Cannot get filter data\n", __func__));
 					goto fail;
 				}
 				ret = bcm_pack_xtlv_entry(&pxtlv, nan_buf_size,
@@ -3257,7 +3257,7 @@ wl_cfgnan_sd_params_handler(struct net_device *ndev,
 				WL_NAN_XTLV_CFG_SEC_CSID, sizeof(nan_sec_csid_e),
 				(uint8*)&cmd_data->csid, BCM_XTLV_OPTION_ALIGN32);
 		if (unlikely(ret)) {
-			WL_ERR(("%s: fail to pack on csid\n", __FUNCTION__));
+			WL_ERR(("%s: fail to pack on csid\n", __func__));
 			goto fail;
 		}
 	}
@@ -3272,7 +3272,7 @@ wl_cfgnan_sd_params_handler(struct net_device *ndev,
 					cmd_data->key.data, BCM_XTLV_OPTION_ALIGN32);
 				if (unlikely(ret)) {
 					WL_ERR(("%s: fail to pack WL_NAN_XTLV_CFG_SEC_PMK\n",
-						__FUNCTION__));
+						__func__));
 					goto fail;
 				}
 			}
@@ -3288,7 +3288,7 @@ wl_cfgnan_sd_params_handler(struct net_device *ndev,
 		ret = bcm_pack_xtlv_entry(&pxtlv, nan_buf_size, WL_NAN_XTLV_CFG_SEC_SCID,
 			cmd_data->scid.dlen, cmd_data->scid.data, BCM_XTLV_OPTION_ALIGN32);
 		if (unlikely(ret)) {
-			WL_ERR(("%s: fail to pack WL_NAN_XTLV_CFG_SEC_SCID\n", __FUNCTION__));
+			WL_ERR(("%s: fail to pack WL_NAN_XTLV_CFG_SEC_SCID\n", __func__));
 			goto fail;
 		}
 	}
@@ -3299,7 +3299,7 @@ wl_cfgnan_sd_params_handler(struct net_device *ndev,
 				sizeof(uint16), (uint8*)&cmd_data->sde_control_flag,
 				BCM_XTLV_OPTION_ALIGN32);
 		if (ret != BCME_OK) {
-			WL_ERR(("%s: fail to pack WL_NAN_XTLV_SD_SDE_CONTROL\n", __FUNCTION__));
+			WL_ERR(("%s: fail to pack WL_NAN_XTLV_SD_SDE_CONTROL\n", __func__));
 			goto fail;
 		}
 	}
@@ -3422,7 +3422,7 @@ wl_cfgnan_svc_handler(struct net_device *ndev,
 #ifdef WL_NAN_DISC_CACHE
 		ret = wl_cfgnan_cache_svc_info(cfg, cmd_data, cmd_id);
 		if (ret < 0) {
-			WL_ERR(("%s: fail to cache svc info, ret=%d\n", __FUNCTION__, ret));
+			WL_ERR(("%s: fail to cache svc info, ret=%d\n", __func__, ret));
 			goto fail;
 		}
 #endif /* WL_NAN_DISC_CACHE */
@@ -3461,7 +3461,7 @@ wl_cfgnan_publish_handler(struct net_device *ndev,
 
 	ret = wl_cfgnan_svc_handler(ndev, cfg, WL_NAN_CMD_SD_PUBLISH, cmd_data);
 	if (ret < 0) {
-		WL_ERR(("%s: fail to handle pub, ret=%d\n", __FUNCTION__, ret));
+		WL_ERR(("%s: fail to handle pub, ret=%d\n", __func__, ret));
 		goto fail;
 	}
 	WL_INFORM_MEM(("[NAN] Service published for instance id:%d\n", cmd_data->pub_id));
@@ -3493,7 +3493,7 @@ wl_cfgnan_subscribe_handler(struct net_device *ndev,
 
 	ret = wl_cfgnan_svc_handler(ndev, cfg, WL_NAN_CMD_SD_SUBSCRIBE, cmd_data);
 	if (ret < 0) {
-		WL_ERR(("%s: fail to handle svc, ret=%d\n", __FUNCTION__, ret));
+		WL_ERR(("%s: fail to handle svc, ret=%d\n", __func__, ret));
 		goto fail;
 	}
 	WL_INFORM_MEM(("[NAN] Service subscribed for instance id:%d\n", cmd_data->sub_id));
@@ -3796,7 +3796,7 @@ wl_cfgnan_transmit_handler(struct net_device *ndev,
 				cmd_data->svc_info.data, BCM_XTLV_OPTION_ALIGN32);
 		if (unlikely(ret)) {
 			WL_ERR(("%s: fail to pack on bcm_pack_xtlv_entry, ret=%d\n",
-				__FUNCTION__, ret));
+				__func__, ret));
 			goto fail;
 		}
 
@@ -3815,7 +3815,7 @@ wl_cfgnan_transmit_handler(struct net_device *ndev,
 				WL_NAN_XTLV_SD_SDE_SVC_INFO, cmd_data->sde_svc_info.dlen,
 				cmd_data->sde_svc_info.data, BCM_XTLV_OPTION_ALIGN32);
 		if (unlikely(ret)) {
-			WL_ERR(("%s: fail to pack sdea svc info\n", __FUNCTION__));
+			WL_ERR(("%s: fail to pack sdea svc info\n", __func__));
 			goto fail;
 		}
 	}
@@ -3935,7 +3935,7 @@ wl_cfgnan_init(struct bcm_cfg80211 *cfg)
 		goto fail;
 	}
 	WL_DBG(("%s: NMI " MACDBG "\n",
-			__FUNCTION__, MAC2STRDBG(if_addr.octet)));
+			__func__, MAC2STRDBG(if_addr.octet)));
 	WL_DBG(("nan if_addr\n"));
 	ret = wl_cfgnan_if_addr_handler(&nan_buf->cmds[0],
 			&nan_buf_size, &if_addr);
@@ -4197,7 +4197,7 @@ wl_cfgnan_data_path_request_handler(struct net_device *ndev,
 	if (!ETHER_ISNULLADDR(wdev->netdev->dev_addr)) {
 		memcpy(&datareq->ndi, wdev->netdev->dev_addr, ETHER_ADDR_LEN);
 		WL_DBG(("%s: Retrieved ndi mac " MACDBG "\n",
-			__FUNCTION__, MAC2STRDBG(datareq->ndi.octet)));
+			__func__, MAC2STRDBG(datareq->ndi.octet)));
 	} else {
 		WL_ERR(("Invalid NDI addr retrieved\n"));
 		ret = BCME_BADARG;
@@ -4238,7 +4238,7 @@ wl_cfgnan_data_path_request_handler(struct net_device *ndev,
 				WL_NAN_XTLV_CFG_SEC_CSID, sizeof(nan_sec_csid_e),
 				(uint8*)&cmd_data->csid, BCM_XTLV_OPTION_ALIGN32);
 		if (unlikely(ret)) {
-			WL_ERR(("%s: fail to pack on csid\n", __FUNCTION__));
+			WL_ERR(("%s: fail to pack on csid\n", __func__));
 			goto fail;
 		}
 	}
@@ -4253,7 +4253,7 @@ wl_cfgnan_data_path_request_handler(struct net_device *ndev,
 					cmd_data->key.data, BCM_XTLV_OPTION_ALIGN32);
 				if (unlikely(ret)) {
 					WL_ERR(("%s: fail to pack on WL_NAN_XTLV_CFG_SEC_PMK\n",
-						__FUNCTION__));
+						__func__));
 					goto fail;
 				}
 			}
@@ -4271,7 +4271,7 @@ wl_cfgnan_data_path_request_handler(struct net_device *ndev,
 					cmd_data->svc_hash.data, BCM_XTLV_OPTION_ALIGN32);
 			if (ret != BCME_OK) {
 				WL_ERR(("%s: fail to pack WL_NAN_XTLV_CFG_SVC_HASH\n",
-						__FUNCTION__));
+						__func__));
 				goto fail;
 			}
 		} else {
@@ -4292,7 +4292,7 @@ wl_cfgnan_data_path_request_handler(struct net_device *ndev,
 					cache->svc_hash, BCM_XTLV_OPTION_ALIGN32);
 			if (ret != BCME_OK) {
 				WL_ERR(("%s: fail to pack WL_NAN_XTLV_CFG_SVC_HASH\n",
-						__FUNCTION__));
+						__func__));
 				goto fail;
 			}
 #else
@@ -4441,7 +4441,7 @@ wl_cfgnan_data_path_response_handler(struct net_device *ndev,
 	if (!ETHER_ISNULLADDR(wdev->netdev->dev_addr)) {
 		memcpy(&dataresp->ndi, wdev->netdev->dev_addr, ETHER_ADDR_LEN);
 		WL_DBG(("%s: Retrieved ndi mac " MACDBG "\n",
-			__FUNCTION__, MAC2STRDBG(dataresp->ndi.octet)));
+			__func__, MAC2STRDBG(dataresp->ndi.octet)));
 	} else {
 		WL_ERR(("Invalid NDI addr retrieved\n"));
 		ret = BCME_BADARG;
@@ -4481,7 +4481,7 @@ wl_cfgnan_data_path_response_handler(struct net_device *ndev,
 				WL_NAN_XTLV_CFG_SEC_CSID, sizeof(nan_sec_csid_e),
 				(uint8*)&cmd_data->csid, BCM_XTLV_OPTION_ALIGN32);
 		if (unlikely(ret)) {
-			WL_ERR(("%s: fail to pack csid\n", __FUNCTION__));
+			WL_ERR(("%s: fail to pack csid\n", __func__));
 			goto fail;
 		}
 	}
@@ -4496,7 +4496,7 @@ wl_cfgnan_data_path_response_handler(struct net_device *ndev,
 					cmd_data->key.data, BCM_XTLV_OPTION_ALIGN32);
 				if (unlikely(ret)) {
 					WL_ERR(("%s: fail to pack WL_NAN_XTLV_CFG_SEC_PMK\n",
-						__FUNCTION__));
+						__func__));
 					goto fail;
 				}
 			}
@@ -4515,7 +4515,7 @@ wl_cfgnan_data_path_response_handler(struct net_device *ndev,
 					BCM_XTLV_OPTION_ALIGN32);
 			if (ret != BCME_OK) {
 				WL_ERR(("%s: fail to pack WL_NAN_XTLV_CFG_SVC_HASH\n",
-						__FUNCTION__));
+						__func__));
 				goto fail;
 			}
 		}
@@ -4699,7 +4699,7 @@ static s32 wl_nan_cache_to_event_data(nan_disc_result_cache *cache,
 		nan_event_data->svc_info.data =
 			MALLOCZ(osh, nan_event_data->svc_info.dlen);
 		if (!nan_event_data->svc_info.data) {
-			WL_ERR(("%s: memory allocation failed\n", __FUNCTION__));
+			WL_ERR(("%s: memory allocation failed\n", __func__));
 			nan_event_data->svc_info.dlen = 0;
 			ret = -ENOMEM;
 			goto fail;
@@ -4712,7 +4712,7 @@ static s32 wl_nan_cache_to_event_data(nan_disc_result_cache *cache,
 		nan_event_data->tx_match_filter.data =
 			MALLOCZ(osh, nan_event_data->tx_match_filter.dlen);
 		if (!nan_event_data->tx_match_filter.data) {
-			WL_ERR(("%s: memory allocation failed\n", __FUNCTION__));
+			WL_ERR(("%s: memory allocation failed\n", __func__));
 			nan_event_data->tx_match_filter.dlen = 0;
 			ret = -ENOMEM;
 			goto fail;
@@ -4788,7 +4788,7 @@ wl_nan_dp_cmn_event_data(struct bcm_cfg80211 *cfg, void *event_data,
 					}
 				}
 				if (i == NAN_MAX_SVC_INST) {
-					WL_ERR(("%s:cannot accommadate ndp id\n", __FUNCTION__));
+					WL_ERR(("%s:cannot accommadate ndp id\n", __func__));
 					ret = BCME_NORESOURCE;
 					goto fail;
 				}
@@ -4841,7 +4841,7 @@ wl_nan_dp_cmn_event_data(struct bcm_cfg80211 *cfg, void *event_data,
 		}
 	} else {
 		/* Follow though, not handling other IDs as of now */
-		WL_DBG(("%s:ID = 0x%02x not supported\n", __FUNCTION__, xtlv->id));
+		WL_DBG(("%s:ID = 0x%02x not supported\n", __func__, xtlv->id));
 	}
 fail:
 	NAN_DBG_EXIT();
@@ -5037,7 +5037,7 @@ wl_cfgnan_notify_nan_status(struct bcm_cfg80211 *cfg,
 		wl_nan_event_txs_t *txs = (wl_nan_event_txs_t *)xtlv->data;
 		wl_nan_event_sd_txs_t *txs_sd = NULL;
 		if (txs->status == WL_NAN_TXS_SUCCESS) {
-			WL_DBG(("%s: TXS success for type %d", __FUNCTION__, txs->type));
+			WL_DBG(("%s: TXS success for type %d", __func__, txs->type));
 			nan_event_data->status = NAN_STATUS_SUCCESS;
 			memcpy(nan_event_data->nan_reason, "NAN_STATUS_SUCCESS",
 				strlen("NAN_STATUS_SUCCESS"));
@@ -5045,7 +5045,7 @@ wl_cfgnan_notify_nan_status(struct bcm_cfg80211 *cfg,
 			/* TODO : populate status based on reason codes
 			For now adding it as no ACK, so that app/framework can retry
 			*/
-			WL_DBG(("%s: TXS failed for type %d status %d", __FUNCTION__,
+			WL_DBG(("%s: TXS failed for type %d status %d", __func__,
 				txs->type, txs->status));
 			nan_event_data->status = NAN_STATUS_NO_OTA_ACK;
 			memcpy(nan_event_data->nan_reason, "NAN_STATUS_NO_OTA_ACK",
@@ -5289,7 +5289,7 @@ wl_cfgnan_cache_disc_result(struct bcm_cfg80211 *cfg, void * data)
 		disc_res[add_index].svc_info.data =
 			MALLOCZ(cfg->osh, disc_res[add_index].svc_info.dlen);
 		if (!disc_res[add_index].svc_info.data) {
-			WL_ERR(("%s: memory allocation failed\n", __FUNCTION__));
+			WL_ERR(("%s: memory allocation failed\n", __func__));
 			disc_res[add_index].svc_info.dlen = 0;
 			ret = -ENOMEM;
 			goto done;
@@ -5302,7 +5302,7 @@ wl_cfgnan_cache_disc_result(struct bcm_cfg80211 *cfg, void * data)
 		disc_res[add_index].tx_match_filter.data =
 			MALLOCZ(cfg->osh, disc_res[add_index].tx_match_filter.dlen);
 		if (!disc_res[add_index].tx_match_filter.data) {
-			WL_ERR(("%s: memory allocation failed\n", __FUNCTION__));
+			WL_ERR(("%s: memory allocation failed\n", __func__));
 			disc_res[add_index].tx_match_filter.dlen = 0;
 			ret = -ENOMEM;
 			goto done;

@@ -545,19 +545,19 @@ enum {
 
 #define DHD_NULL_CHK_AND_RET(cond) \
 	if (!cond) { \
-		DHD_ERROR(("%s " #cond " is NULL\n", __FUNCTION__)); \
+		DHD_ERROR(("%s " #cond " is NULL\n", __func__)); \
 		return; \
 	}
 
 #define DHD_NULL_CHK_AND_RET_VAL(cond, value) \
 	if (!cond) { \
-		DHD_ERROR(("%s " #cond " is NULL\n", __FUNCTION__)); \
+		DHD_ERROR(("%s " #cond " is NULL\n", __func__)); \
 		return value; \
 	}
 
 #define DHD_NULL_CHK_AND_GOTO(cond, label) \
 	if (!cond) { \
-		DHD_ERROR(("%s " #cond " is NULL\n", __FUNCTION__)); \
+		DHD_ERROR(("%s " #cond " is NULL\n", __func__)); \
 		goto label; \
 	}
 
@@ -1201,7 +1201,7 @@ WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(dhd_workitem_context_t, dhd_get_dhd_workitem_
 	#define DHD_PM_RESUME_RETURN_ERROR(a)   do { \
 			if (dhd_mmc_suspend) { \
 				printf("%s[%d]: mmc is still in suspend state!!!\n", \
-					__FUNCTION__, __LINE__); \
+					__func__, __LINE__); \
 				return a; \
 			} \
 		} while (0)
@@ -1297,25 +1297,25 @@ inline static void MUTEX_UNLOCK_SOFTAP_SET(dhd_pub_t * dhdp)
 #define DHD_OS_WAKE_LOCK(pub) \
 	do { \
 		printf("call wake_lock: %s %d\n", \
-			__FUNCTION__, __LINE__); \
+			__func__, __LINE__); \
 		dhd_os_wake_lock(pub); \
 	} while (0)
 #define DHD_OS_WAKE_UNLOCK(pub) \
 	do { \
 		printf("call wake_unlock: %s %d\n", \
-			__FUNCTION__, __LINE__); \
+			__func__, __LINE__); \
 		dhd_os_wake_unlock(pub); \
 	} while (0)
 #define DHD_EVENT_WAKE_LOCK(pub) \
 	do { \
 		printf("call event wake_lock: %s %d\n", \
-			__FUNCTION__, __LINE__); \
+			__func__, __LINE__); \
 		dhd_event_wake_lock(pub); \
 	} while (0)
 #define DHD_EVENT_WAKE_UNLOCK(pub) \
 	do { \
 		printf("call event wake_unlock: %s %d\n", \
-			__FUNCTION__, __LINE__); \
+			__func__, __LINE__); \
 		dhd_event_wake_unlock(pub); \
 	} while (0)
 #define DHD_PM_WAKE_LOCK_TIMEOUT(pub, val) \
@@ -1341,49 +1341,49 @@ inline static void MUTEX_UNLOCK_SOFTAP_SET(dhd_pub_t * dhdp)
 #define DHD_OS_WAKE_LOCK_TIMEOUT(pub) \
 	do { \
 		printf("call wake_lock_timeout: %s %d\n", \
-			__FUNCTION__, __LINE__); \
+			__func__, __LINE__); \
 		dhd_os_wake_lock_timeout(pub); \
 	} while (0)
 #define DHD_OS_WAKE_LOCK_RX_TIMEOUT_ENABLE(pub, val) \
 	do { \
 		printf("call wake_lock_rx_timeout_enable[%d]: %s %d\n", \
-			val, __FUNCTION__, __LINE__); \
+			val, __func__, __LINE__); \
 		dhd_os_wake_lock_rx_timeout_enable(pub, val); \
 	} while (0)
 #define DHD_OS_WAKE_LOCK_CTRL_TIMEOUT_ENABLE(pub, val) \
 	do { \
 		printf("call wake_lock_ctrl_timeout_enable[%d]: %s %d\n", \
-			val, __FUNCTION__, __LINE__); \
+			val, __func__, __LINE__); \
 		dhd_os_wake_lock_ctrl_timeout_enable(pub, val); \
 	} while (0)
 #define DHD_OS_WAKE_LOCK_CTRL_TIMEOUT_CANCEL(pub) \
 	do { \
 		printf("call wake_lock_ctrl_timeout_cancel: %s %d\n", \
-			__FUNCTION__, __LINE__); \
+			__func__, __LINE__); \
 		dhd_os_wake_lock_ctrl_timeout_cancel(pub); \
 	} while (0)
 #define DHD_OS_WAKE_LOCK_WAIVE(pub) \
 	do { \
 		printf("call wake_lock_waive: %s %d\n", \
-			__FUNCTION__, __LINE__); \
+			__func__, __LINE__); \
 		dhd_os_wake_lock_waive(pub); \
 	} while (0)
 #define DHD_OS_WAKE_LOCK_RESTORE(pub) \
 	do { \
 		printf("call wake_lock_restore: %s %d\n", \
-			__FUNCTION__, __LINE__); \
+			__func__, __LINE__); \
 		dhd_os_wake_lock_restore(pub); \
 	} while (0)
 #define DHD_OS_WAKE_LOCK_INIT(dhd) \
 	do { \
 		printf("call wake_lock_init: %s %d\n", \
-			__FUNCTION__, __LINE__); \
+			__func__, __LINE__); \
 		dhd_os_wake_lock_init(dhd); \
 	} while (0)
 #define DHD_OS_WAKE_LOCK_DESTROY(dhd) \
 	do { \
 		printf("call wake_lock_destroy: %s %d\n", \
-			__FUNCTION__, __LINE__); \
+			__func__, __LINE__); \
 		dhd_os_wake_lock_destroy(dhd); \
 	} while (0)
 #else
@@ -1416,13 +1416,13 @@ inline static void MUTEX_UNLOCK_SOFTAP_SET(dhd_pub_t * dhdp)
 #define DHD_OS_SCAN_WAKE_LOCK_TIMEOUT(pub, val) \
 	do { \
 		printf("call wake_lock_scan: %s %d\n", \
-			__FUNCTION__, __LINE__); \
+			__func__, __LINE__); \
 		dhd_os_scan_wake_lock_timeout(pub, val); \
 	} while (0)
 #define DHD_OS_SCAN_WAKE_UNLOCK(pub) \
 	do { \
 		printf("call wake_unlock_scan: %s %d\n", \
-			__FUNCTION__, __LINE__); \
+			__func__, __LINE__); \
 		dhd_os_scan_wake_unlock(pub); \
 	} while (0)
 #else
@@ -1653,7 +1653,7 @@ extern void dhd_os_ioctl_resp_unlock(dhd_pub_t * pub);
 extern void dhd_wakeup_ioctl_event(dhd_pub_t *pub, dhd_ioctl_recieved_status_t reason);
 #else
 static INLINE void dhd_wakeup_ioctl_event(dhd_pub_t *pub, dhd_ioctl_recieved_status_t reason)
-{ printf("%s is NOT implemented for SDIO", __FUNCTION__); return; }
+{ printf("%s is NOT implemented for SDIO", __func__); return; }
 #endif // endif
 #ifdef SHOW_LOGTRACE
 extern int dhd_os_read_file(void *file, char *buf, uint32 size);

@@ -48,7 +48,7 @@ ssize_t mst_ctrl_write(struct file *file, const char __user *buffer, size_t size
 	char *string;
 	int nfc_status;
 
-	printk(KERN_ERR " %s\n", __FUNCTION__);
+	printk(KERN_ERR " %s\n", __func__);
 
 	/* size includes space for NULL, so size will be "number of buffer char. + 1" */
 	string = kmalloc(size * sizeof(char), GFP_KERNEL);
@@ -71,17 +71,17 @@ ssize_t mst_ctrl_write(struct file *file, const char __user *buffer, size_t size
 
 	switch(mode) {
 		case 1:
-			printk(KERN_ERR " %s -> Notify secure world that NFS starts.\n", __FUNCTION__);
+			printk(KERN_ERR " %s -> Notify secure world that NFS starts.\n", __func__);
 			nfc_status = exynos_smc(SMC_CMD_FC_NFC_ACTION, 1, 0, 0);
-			printk(KERN_ERR " %s -> value of nfc_status is %d.\n", __FUNCTION__, nfc_status);
+			printk(KERN_ERR " %s -> value of nfc_status is %d.\n", __func__, nfc_status);
 			break;
 		case 0:
-			printk(KERN_ERR " %s -> Notify secure world that NFS ends.\n", __FUNCTION__);
+			printk(KERN_ERR " %s -> Notify secure world that NFS ends.\n", __func__);
 			nfc_status = exynos_smc(SMC_CMD_FC_NFC_ACTION, 2, 0, 0);
-			printk(KERN_ERR " %s -> value of nfc_status is %d.\n", __FUNCTION__, nfc_status);
+			printk(KERN_ERR " %s -> value of nfc_status is %d.\n", __func__, nfc_status);
 			break;
 		default:
-			printk(KERN_ERR " %s -> Invalid mst operations\n", __FUNCTION__);
+			printk(KERN_ERR " %s -> Invalid mst operations\n", __func__);
 			break;
 	}
 
@@ -106,15 +106,15 @@ long mst_ctrl_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	 */
 	switch (cmd) {
 		case 1:
-			printk(KERN_ERR " %s -> Notify secure world that NFS starts.\n", __FUNCTION__);
+			printk(KERN_ERR " %s -> Notify secure world that NFS starts.\n", __func__);
 			exynos_smc(SMC_CMD_FC_NFC_ACTION, 0x1, 0, 0);
 			break;
 		case 0:
-			printk(KERN_ERR " %s -> Notify secure world that NFS ends.\n", __FUNCTION__);
+			printk(KERN_ERR " %s -> Notify secure world that NFS ends.\n", __func__);
 			exynos_smc(SMC_CMD_FC_NFC_ACTION, 0x2, 0, 0);
 			break;
 		default:
-			printk(KERN_ERR " %s -> Invalid mst ctrl operations\n", __FUNCTION__);
+			printk(KERN_ERR " %s -> Invalid mst ctrl operations\n", __func__);
 			return -1;
 			break;
 	}

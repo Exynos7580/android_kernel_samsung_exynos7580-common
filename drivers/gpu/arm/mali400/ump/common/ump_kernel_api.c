@@ -418,7 +418,7 @@ void _ump_ukk_cache_operations_control(_ump_uk_cache_operations_control_s* args)
 	}
 	else
 	{
-		DBG_MSG(1, ("Illegal call to %s at line %d\n", __FUNCTION__, __LINE__));
+		DBG_MSG(1, ("Illegal call to %s at line %d\n", __func__, __LINE__));
 	}
 	_mali_osk_lock_signal(session_data->lock, _MALI_OSK_LOCKMODE_RW);
 

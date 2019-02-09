@@ -40,7 +40,7 @@
 
 int ld_Elf_Ehdr_to_Elf_Shdr(_Elf_Ehdr *ehdr, _Elf_Shdr **shdr, size_t *size) {
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(ehdr == NULL) { return -1; }
 	if(shdr == NULL) { return -1; }
@@ -55,7 +55,7 @@ int ld_Elf_Ehdr_to_Elf_Shdr(_Elf_Ehdr *ehdr, _Elf_Shdr **shdr, size_t *size) {
 
 int ld_Elf_Ehdr_to_Elf_Phdr(_Elf_Ehdr *ehdr, _Elf_Phdr **phdr, size_t *size) {
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(ehdr == NULL) { return -1; }
 	if(phdr == NULL) { return -1; }
@@ -70,7 +70,7 @@ int ld_Elf_Ehdr_to_Elf_Phdr(_Elf_Ehdr *ehdr, _Elf_Phdr **phdr, size_t *size) {
 
 int ld_binary_to_Elf_Ehdr(void *binary, _Elf_Ehdr **ehdr) {
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(ehdr == NULL) { return -1; }
 
@@ -84,7 +84,7 @@ int ld_get_entry(void *binary, void **entry) {
 	_Elf_Ehdr *ehdr;
 	void *base = NULL;
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(binary == NULL) { return -1; }
 	if(entry == NULL) { return -1; }
@@ -104,7 +104,7 @@ int ld_get_name(void *binary, char **name) {
 	size_t sz;
 	unsigned int i;
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(binary == NULL) { return -1; }
 	if(name == NULL) { return -1; }
@@ -139,7 +139,7 @@ int ld_get_version(void *binary, char **version) {
 	void *base = NULL;
 	unsigned int i;
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(ld_get_dynamic_strtab(binary, &strtab, &strtabsz)) { return -1; }
 
@@ -163,7 +163,7 @@ int ld_get_version(void *binary, char **version) {
 
 int ld_get_string(char *strtab, int index, char **string) {
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(strtab == NULL) { return -1; }
 	if(string == NULL) { return -1; }
@@ -175,7 +175,7 @@ int ld_get_string(char *strtab, int index, char **string) {
 
 int ld_get_symbol(_Elf_Sym *symtab, int index, _Elf_Sym **symbol) {
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(symtab == NULL) { return -1; }
 	if(symbol == NULL) { return -1; }
@@ -193,7 +193,7 @@ int ld_get_base(void *binary, void **address) {
 	size_t size;
 	unsigned int i;
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(address == NULL) { return -1; }
 
@@ -225,7 +225,7 @@ int ld_get_size(void *binary, size_t *size) {
 	int set;
 	unsigned int i;
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(size == NULL) { return -1; }
 
@@ -257,7 +257,7 @@ int ld_get_sect(void *binary, char *name, void **section, size_t *size) {
 	char *tmp;
 	unsigned int i;
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(binary == NULL) { return -1; }
 	if(name == NULL) { return -1; }
@@ -292,7 +292,7 @@ int ld_get_dynamic_symtab(void *binary, _Elf_Sym **symtab, size_t *size) {
 	size_t ent;
 	unsigned int i;
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(binary == NULL) { return -1; }
 	if(symtab == NULL) { return -1; }
@@ -335,7 +335,7 @@ int ld_get_dynamic_strtab(void *binary, char **strtab, size_t *size) {
 	size_t sz;
 	unsigned int i;
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(binary == NULL) { return -1; }
 	if(strtab == NULL) { return -1; }
@@ -376,7 +376,7 @@ int ld_get_dynamic_relatab(void *binary, _Elf_Rela **relatab, size_t *size) {
 	size_t ent;
 	unsigned int i;
 
-	//printk(KERN_ALERT "%s\n", __FUNCTION__);
+	//printk(KERN_ALERT "%s\n", __func__);
 
 	if(binary == NULL) { return -1; }
 	if(relatab == NULL) { return -1; }
@@ -420,7 +420,7 @@ int ld_get_dynamic_reltab(void *binary, _Elf_Rel **reltab, size_t *size) {
 	size_t ent;
 	unsigned int i;
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(binary == NULL) { return -1; }
 	if(reltab == NULL) { return -1; }
@@ -466,7 +466,7 @@ int ld_get_dynamic_plttab(void *binary, _Elf_Rel **plttab, size_t *size) {
 	int type;
 	unsigned int i;
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(binary == NULL) { return -1; }
 	if(plttab == NULL) { return -1; }
@@ -518,7 +518,7 @@ int ld_fixup_dynamic_relatab(void *binary, ld_resolve_t resolve, ld_translate_t 
 	_Elf_Sxword *pointer;
 	_Elf_Sxword value;
 
-	//printk(KERN_ALERT "%s\n", __FUNCTION__);
+	//printk(KERN_ALERT "%s\n", __func__);
 
 	if(ld_get_base(binary, &base)) { return -1; }
 
@@ -576,7 +576,7 @@ int ld_fixup_dynamic_reltab(void *binary, ld_resolve_t resolve, ld_translate_t t
 	_Elf_Sword *pointer;
 	_Elf_Sword value;
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(ld_get_base(binary, &base)) { return -1; }
 
@@ -660,7 +660,7 @@ int ld_fixup_dynamic_plttab(void *binary, ld_resolve_t resolve, ld_translate_t t
 	_Elf_Sword value;
 #endif //__TARGET_64__ | __TARGET_32__
 
-	ld_log("%s\n", __FUNCTION__);
+	ld_log("%s\n", __func__);
 
 	if(ld_get_base(binary, &base)) { return -1; }
 	if(ld_get_dynamic_plttab(binary, &plttab, &plttabsz)) { return 0; }

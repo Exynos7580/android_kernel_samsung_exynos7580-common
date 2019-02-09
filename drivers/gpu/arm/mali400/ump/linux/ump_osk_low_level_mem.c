@@ -265,7 +265,7 @@ void _ump_osk_msync( ump_dd_mem * mem, void * virt, u32 offset, u32 size, ump_uk
 		}
 		else
 		{
-			DBG_MSG(4, ("Unkown state %s %d\n", __FUNCTION__, __LINE__));
+			DBG_MSG(4, ("Unkown state %s %d\n", __func__, __LINE__));
 			level1_cache_flush_all();
 		}
 	}

@@ -300,11 +300,11 @@ dhd_wl_ioctl_get_intiovar(dhd_pub_t *dhd_pub, char *name, uint *pval,
 			*pval = ltoh32(*((uint*)iovbuf));
 		} else {
 			DHD_ERROR(("%s: get int iovar %s failed, ERR %d\n",
-				__FUNCTION__, name, ret));
+				__func__, name, ret));
 		}
 	} else {
 		DHD_ERROR(("%s: mkiovar %s failed\n",
-			__FUNCTION__, name));
+			__func__, name));
 	}
 
 	return ret;
@@ -325,11 +325,11 @@ dhd_wl_ioctl_set_intiovar(dhd_pub_t *dhd_pub, char *name, uint val,
 		ret = dhd_wl_ioctl_cmd(dhd_pub, cmd, iovbuf, len, set, ifidx);
 		if (ret) {
 			DHD_ERROR(("%s: set int iovar %s failed, ERR %d\n",
-				__FUNCTION__, name, ret));
+				__func__, name, ret));
 		}
 	} else {
 		DHD_ERROR(("%s: mkiovar %s failed\n",
-			__FUNCTION__, name));
+			__func__, name));
 	}
 
 	return ret;
@@ -368,7 +368,7 @@ dhd_wl_ioctl(dhd_pub_t *dhd_pub, int ifindex, wl_ioctl_t *ioc, void *buf, int le
 		if (ret == -ETIMEDOUT && !dhd_pub->up) {
 			DHD_ERROR(("%s: 'resumed on timeout' error is "
 				"occurred before the interface does not"
-				" bring up\n", __FUNCTION__));
+				" bring up\n", __func__));
 			dhd_pub->busstate = DHD_BUS_DOWN;
 		}
 
@@ -420,13 +420,13 @@ dhd_wl_ioctl(dhd_pub_t *dhd_pub, int ifindex, wl_ioctl_t *ioc, void *buf, int le
 		if (ret < 0) {
 			if (ioc->cmd == WLC_GET_VAR)
 				DHD_ERROR(("%s: WLC_GET_VAR: %s, ret = %d\n",
-					__FUNCTION__, (char *)buf, ret));
+					__func__, (char *)buf, ret));
 			else if (ioc->cmd == WLC_SET_VAR)
 				DHD_ERROR(("%s: WLC_SET_VAR: %s, ret = %d\n",
-					__FUNCTION__, (char *)buf, ret));
+					__func__, (char *)buf, ret));
 			else
 				DHD_ERROR(("%s: WLC_IOCTL: cmd: %d, ret = %d\n",
-					__FUNCTION__, ioc->cmd, ret));
+					__func__, ioc->cmd, ret));
 		}
 #endif /* OEM_ANDROID && CUSTOMER_HW4 */
 
@@ -442,8 +442,8 @@ dhd_doiovar(dhd_pub_t *dhd_pub, const bcm_iovar_t *vi, uint32 actionid, const ch
 	int bcmerror = 0;
 	int32 int_val = 0;
 
-	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
-	DHD_TRACE(("%s: actionid = %d; name %s\n", __FUNCTION__, actionid, name));
+	DHD_TRACE(("%s: Enter\n", __func__));
+	DHD_TRACE(("%s: actionid = %d; name %s\n", __func__, actionid, name));
 
 	if ((bcmerror = bcm_iovar_lencheck(vi, arg, len, IOV_ISSET(actionid))) != 0)
 		goto exit;
@@ -729,7 +729,7 @@ dhd_doiovar(dhd_pub_t *dhd_pub, const bcm_iovar_t *vi, uint32 actionid, const ch
 	}
 
 exit:
-	DHD_TRACE(("%s: actionid %d, bcmerror %d\n", __FUNCTION__, actionid, bcmerror));
+	DHD_TRACE(("%s: actionid %d, bcmerror %d\n", __func__, actionid, bcmerror));
 	return bcmerror;
 }
 
@@ -787,7 +787,7 @@ dhd_prec_enq(dhd_pub_t *dhdp, struct pktq *q, void *pkt, int prec)
 #ifdef DHDTCPACK_SUPPRESS
 		if (dhd_tcpack_check_xmit(dhdp, p) == BCME_ERROR) {
 			DHD_ERROR(("%s %d: tcpack_suppress ERROR!!! Stop using it\n",
-				__FUNCTION__, __LINE__));
+				__func__, __LINE__));
 			dhd_tcpack_suppress_set(dhdp, TCPACK_SUP_OFF);
 		}
 #endif /* DHDTCPACK_SUPPRESS */
@@ -897,7 +897,7 @@ dhd_iovar_op(dhd_pub_t *dhd_pub, const char *name,
 	const bcm_iovar_t *vi = NULL;
 	uint32 actionid;
 
-	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
+	DHD_TRACE(("%s: Enter\n", __func__));
 
 	ASSERT(name);
 	ASSERT(len >= 0);
@@ -913,7 +913,7 @@ dhd_iovar_op(dhd_pub_t *dhd_pub, const char *name,
 		goto exit;
 	}
 
-	DHD_CTL(("%s: %s %s, len %d plen %d\n", __FUNCTION__,
+	DHD_CTL(("%s: %s %s, len %d plen %d\n", __func__,
 		name, (set ? "set" : "get"), len, plen));
 
 	/* set up 'params' pointer in case this is a set command so that
@@ -945,7 +945,7 @@ dhd_ioctl(dhd_pub_t * dhd_pub, dhd_ioctl_t *ioc, void *buf, uint buflen)
 {
 	int bcmerror = 0;
 
-	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
+	DHD_TRACE(("%s: Enter\n", __func__));
 
 	if (!buf) {
 		return BCME_BADARG;
@@ -1322,7 +1322,7 @@ wl_host_event_get_data(void *pktdata, uint pktlen, bcm_event_msg_u_t *evu)
 	ret = is_wlc_event_frame(pktdata, pktlen, 0, evu);
 	if (ret != BCME_OK) {
 		DHD_ERROR(("%s: Invalid event frame, err = %d\n",
-			__FUNCTION__, ret));
+			__func__, ret));
 	}
 
 	return ret;
@@ -1380,7 +1380,7 @@ wl_process_host_event(dhd_pub_t *dhd_pub, int *ifidx, void *pktdata, uint pktlen
 #ifdef PROP_TXSTATUS
 	case WLC_E_FIFO_CREDIT_MAP:
 		if (dhd_wlfc_enable(dhd_pub) != BCME_OK) {
-			DHD_ERROR(("%s: dhd_wlfc_enable failed\n", __FUNCTION__));
+			DHD_ERROR(("%s: dhd_wlfc_enable failed\n", __func__));
 			return (BCME_ERROR);
 		}
 		dhd_wlfc_FIFOcreditmap_event(dhd_pub, event_data);
@@ -1437,7 +1437,7 @@ wl_process_host_event(dhd_pub_t *dhd_pub, int *ifidx, void *pktdata, uint pktlen
 					event->addr.octet)) {
 
 					DHD_ERROR(("%s: dhd_event_ifadd failed ifidx: %d  %s\n",
-						__FUNCTION__, ifevent->ifidx, event->ifname));
+						__func__, ifevent->ifidx, event->ifname));
 					return (BCME_ERROR);
 				}
 			} else if (ifevent->opcode == WLC_E_IF_DEL) {
@@ -1457,7 +1457,7 @@ wl_process_host_event(dhd_pub_t *dhd_pub, int *ifidx, void *pktdata, uint pktlen
 		} else {
 #ifndef PROP_TXSTATUS
 			DHD_ERROR(("%s: Invalid ifidx %d for %s\n",
-				__FUNCTION__, ifevent->ifidx, event->ifname));
+				__func__, ifevent->ifidx, event->ifname));
 #endif /* !PROP_TXSTATUS */
 		}
 
@@ -1496,14 +1496,14 @@ wl_process_host_event(dhd_pub_t *dhd_pub, int *ifidx, void *pktdata, uint pktlen
 	case WLC_E_DISASSOC:
 	case WLC_E_DISASSOC_IND:
 		DHD_EVENT(("%s: Link event %d, flags %x, status %x\n",
-		           __FUNCTION__, type, flags, status));
+		           __func__, type, flags, status));
 		/* fall through */
 	default:
 		*ifidx = dhd_ifname2idx(dhd_pub->info, event->ifname);
 		/* push up to external supp/auth */
 		dhd_event(dhd_pub->info, (char *)pvt_data, evlen, *ifidx);
 		DHD_TRACE(("%s: MAC event %d, flags %x, status %x\n",
-		           __FUNCTION__, type, flags, status));
+		           __func__, type, flags, status));
 		BCM_REFERENCE(flags);
 		BCM_REFERENCE(status);
 
@@ -1613,7 +1613,7 @@ dhd_pktfilter_offload_enable(dhd_pub_t * dhd, char *arg, int enable, int master_
 		return;
 
 	if (!(arg_save = MALLOC(dhd->osh, strlen(arg) + 1))) {
-		DHD_ERROR(("%s: kmalloc failed\n", __FUNCTION__));
+		DHD_ERROR(("%s: kmalloc failed\n", __func__));
 		goto fail;
 	}
 	arg_org = arg_save;
@@ -1651,10 +1651,10 @@ dhd_pktfilter_offload_enable(dhd_pub_t * dhd, char *arg, int enable, int master_
 	rc = rc >= 0 ? 0 : rc;
 	if (rc)
 		DHD_TRACE(("%s: failed to add pktfilter %s, retcode = %d\n",
-		__FUNCTION__, arg, rc));
+		__func__, arg, rc));
 	else
 		DHD_TRACE(("%s: successfully added pktfilter %s\n",
-		__FUNCTION__, arg));
+		__func__, arg));
 
 	/* Contorl the master mode */
 	rc = dhd_wl_ioctl_set_intiovar(dhd, "pkt_filter_mode",
@@ -1662,7 +1662,7 @@ dhd_pktfilter_offload_enable(dhd_pub_t * dhd, char *arg, int enable, int master_
 	rc = rc >= 0 ? 0 : rc;
 	if (rc)
 		DHD_TRACE(("%s: failed to add pktfilter %s, retcode = %d\n",
-		__FUNCTION__, arg, rc));
+		__func__, arg, rc));
 
 fail:
 	if (arg_org)
@@ -1722,14 +1722,14 @@ dhd_pktfilter_offload_set(dhd_pub_t * dhd, char *arg)
 		return;
 
 	if (!(arg_save = MALLOC(dhd->osh, strlen(arg) + 1))) {
-		DHD_ERROR(("%s: kmalloc failed\n", __FUNCTION__));
+		DHD_ERROR(("%s: kmalloc failed\n", __func__));
 		goto fail;
 	}
 
 	arg_org = arg_save;
 
 	if (!(buf = MALLOC(dhd->osh, BUF_SIZE))) {
-		DHD_ERROR(("%s: kmalloc failed\n", __FUNCTION__));
+		DHD_ERROR(("%s: kmalloc failed\n", __func__));
 		goto fail;
 	}
 	memset(buf, 0, BUF_SIZE);
@@ -1946,10 +1946,10 @@ dhd_pktfilter_offload_set(dhd_pub_t * dhd, char *arg)
 
 	if (rc)
 		DHD_TRACE(("%s: failed to add pktfilter %s, retcode = %d\n",
-		__FUNCTION__, arg, rc));
+		__func__, arg, rc));
 	else
 		DHD_TRACE(("%s: successfully added pktfilter %s\n",
-		__FUNCTION__, arg));
+		__func__, arg));
 
 fail:
 	if (arg_org)
@@ -1967,7 +1967,7 @@ void dhd_pktfilter_offload_delete(dhd_pub_t *dhd, int id)
 		id, WLC_SET_VAR, TRUE, 0);
 	if (ret < 0) {
 		DHD_ERROR(("%s: Failed to delete filter ID:%d, ret=%d\n",
-			__FUNCTION__, id, ret));
+			__func__, id, ret));
 	}
 }
 #endif /* PKT_FILTER_SUPPORT */
@@ -1987,10 +1987,10 @@ dhd_arp_offload_set(dhd_pub_t * dhd, int arp_mode)
 	retcode = retcode >= 0 ? 0 : retcode;
 	if (retcode)
 		DHD_TRACE(("%s: failed to set ARP offload mode to 0x%x, retcode = %d\n",
-			__FUNCTION__, arp_mode, retcode));
+			__func__, arp_mode, retcode));
 	else
 		DHD_TRACE(("%s: successfully set ARP offload mode to 0x%x\n",
-			__FUNCTION__, arp_mode));
+			__func__, arp_mode));
 }
 
 void
@@ -2004,21 +2004,21 @@ dhd_arp_offload_enable(dhd_pub_t * dhd, int arp_enable)
 	retcode = retcode >= 0 ? 0 : retcode;
 	if (retcode)
 		DHD_TRACE(("%s: failed to enabe ARP offload to %d, retcode = %d\n",
-			__FUNCTION__, arp_enable, retcode));
+			__func__, arp_enable, retcode));
 	else
 		DHD_TRACE(("%s: successfully enabed ARP offload to %d\n",
-			__FUNCTION__, arp_enable));
+			__func__, arp_enable));
 	if (arp_enable) {
 		uint32 version;
 		retcode = dhd_wl_ioctl_get_intiovar(dhd, "arp_version",
 			&version, WLC_GET_VAR, FALSE, 0);
 		if (retcode) {
 			DHD_INFO(("%s: fail to get version (maybe version 1:retcode = %d\n",
-				__FUNCTION__, retcode));
+				__func__, retcode));
 			dhd->arp_version = 1;
 		}
 		else {
-			DHD_INFO(("%s: ARP Version= %x\n", __FUNCTION__, version));
+			DHD_INFO(("%s: ARP Version= %x\n", __func__, version));
 			dhd->arp_version = version;
 		}
 	}
@@ -2035,7 +2035,7 @@ dhd_aoe_arp_clr(dhd_pub_t *dhd, int idx)
 
 	ret = dhd_iovar(dhd, idx, "arp_table_clear", NULL, 0, NULL, 0, TRUE);
 	if (ret < 0)
-		DHD_ERROR(("%s failed code %d\n", __FUNCTION__, ret));
+		DHD_ERROR(("%s failed code %d\n", __func__, ret));
 }
 
 void
@@ -2049,7 +2049,7 @@ dhd_aoe_hostip_clr(dhd_pub_t *dhd, int idx)
 
 	ret = dhd_iovar(dhd, idx, "arp_hostip_clear", NULL, 0, NULL, 0, TRUE);
 	if (ret < 0)
-		DHD_ERROR(("%s failed code %d\n", __FUNCTION__, ret));
+		DHD_ERROR(("%s failed code %d\n", __func__, ret));
 }
 
 void
@@ -2064,10 +2064,10 @@ dhd_arp_offload_add_ip(dhd_pub_t *dhd, uint32 ipaddr, int idx)
 	ret = dhd_iovar(dhd, idx, "arp_hostip", (char *)&ipaddr, sizeof(ipaddr),
 			NULL, 0, TRUE);
 	if (ret)
-		DHD_TRACE(("%s: ARP ip addr add failed, ret = %d\n", __FUNCTION__, ret));
+		DHD_TRACE(("%s: ARP ip addr add failed, ret = %d\n", __func__, ret));
 	else
 		DHD_TRACE(("%s: sARP H ipaddr entry added \n",
-		__FUNCTION__));
+		__func__));
 }
 
 int
@@ -2087,7 +2087,7 @@ dhd_arp_get_arp_hostip_table(dhd_pub_t *dhd, void *buf, int buflen, int idx)
 			FALSE);
 	if (ret) {
 		DHD_TRACE(("%s: ioctl WLC_GET_VAR error %d\n",
-		__FUNCTION__, ret));
+		__func__, ret));
 
 		return -1;
 	}
@@ -2123,10 +2123,10 @@ dhd_ndo_enable(dhd_pub_t * dhd, int ndo_enable)
 		ndo_enable, WLC_SET_VAR, TRUE, 0);
 	if (retcode)
 		DHD_ERROR(("%s: failed to enabe ndo to %d, retcode = %d\n",
-			__FUNCTION__, ndo_enable, retcode));
+			__func__, ndo_enable, retcode));
 	else
 		DHD_TRACE(("%s: successfully enabed ndo offload to %d\n",
-			__FUNCTION__, ndo_enable));
+			__func__, ndo_enable));
 
 	return retcode;
 }
@@ -2149,17 +2149,17 @@ dhd_ndo_add_ip(dhd_pub_t *dhd, char* ipv6addr, int idx)
 		IPV6_ADDR_LEN, iovbuf, sizeof(iovbuf));
 	if (!iov_len) {
 		DHD_ERROR(("%s: Insufficient iovar buffer size %zu \n",
-			__FUNCTION__, sizeof(iovbuf)));
+			__func__, sizeof(iovbuf)));
 		return -1;
 	}
 	retcode = dhd_wl_ioctl_cmd(dhd, WLC_SET_VAR, iovbuf, iov_len, TRUE, idx);
 
 	if (retcode)
 		DHD_ERROR(("%s: ndo ip addr add failed, retcode = %d\n",
-		__FUNCTION__, retcode));
+		__func__, retcode));
 	else
 		DHD_TRACE(("%s: ndo ipaddr entry added \n",
-		__FUNCTION__));
+		__func__));
 
 	return retcode;
 }
@@ -2181,17 +2181,17 @@ dhd_ndo_remove_ip(dhd_pub_t *dhd, int idx)
 		0, iovbuf, sizeof(iovbuf));
 	if (!iov_len) {
 		DHD_ERROR(("%s: Insufficient iovar buffer size %zu \n",
-			__FUNCTION__, sizeof(iovbuf)));
+			__func__, sizeof(iovbuf)));
 		return -1;
 	}
 	retcode = dhd_wl_ioctl_cmd(dhd, WLC_SET_VAR, iovbuf, iov_len, TRUE, idx);
 
 	if (retcode) {
 		DHD_ERROR(("%s: ndo ip addr remove returned (%d)\n",
-		__FUNCTION__, retcode));
+		__func__, retcode));
 	} else {
 		DHD_TRACE(("%s: ndo ipaddr entry removed \n",
-		__FUNCTION__));
+		__func__));
 	}
 
 	return retcode;
@@ -2225,7 +2225,7 @@ dhd_iscan_allocate_buf(dhd_pub_t *dhd, iscan_buf_t **iscanbuf)
 	iscan_buf_t *iscanbuf_alloc = 0;
 	iscan_buf_t *iscanbuf_head;
 
-	DHD_ISCAN(("%s: Entered\n", __FUNCTION__));
+	DHD_ISCAN(("%s: Entered\n", __func__));
 	dhd_iscan_lock();
 
 	iscanbuf_alloc = (iscan_buf_t*)MALLOC(dhd->osh, sizeof(iscan_buf_t));
@@ -2237,11 +2237,11 @@ dhd_iscan_allocate_buf(dhd_pub_t *dhd, iscan_buf_t **iscanbuf)
 
 	DHD_ISCAN(("%s: addr of allocated node = 0x%X"
 		   "addr of iscanbuf_head = 0x%X dhd = 0x%X\n",
-		   __FUNCTION__, iscanbuf_alloc, iscanbuf_head, dhd));
+		   __func__, iscanbuf_alloc, iscanbuf_head, dhd));
 
 	if (iscanbuf_head == NULL) {
 		*iscanbuf = iscanbuf_alloc;
-		DHD_ISCAN(("%s: Head is allocated\n", __FUNCTION__));
+		DHD_ISCAN(("%s: Head is allocated\n", __func__));
 		goto fail;
 	}
 
@@ -2262,7 +2262,7 @@ dhd_iscan_free_buf(void *dhdp, iscan_buf_t *iscan_delete)
 	iscan_buf_t *iscanbuf_prv = 0;
 	iscan_buf_t *iscanbuf_cur;
 	dhd_pub_t *dhd = dhd_bus_pub(dhdp);
-	DHD_ISCAN(("%s: Entered\n", __FUNCTION__));
+	DHD_ISCAN(("%s: Entered\n", __func__));
 
 	dhd_iscan_lock();
 
@@ -2319,14 +2319,14 @@ dhd_iscan_issue_request(void * dhdp, wl_iscan_params_t *pParams, uint32 size)
 		if ((allocSize < size) || (allocSize < strlen(iovar)))
 		{
 			DHD_ERROR(("%s: overflow - allocation size too large %d < %d + %d!\n",
-				__FUNCTION__, allocSize, size, strlen(iovar)));
+				__func__, allocSize, size, strlen(iovar)));
 			goto cleanUp;
 		}
 		buf = MALLOC(dhd->osh, allocSize);
 
 		if (buf == NULL)
 			{
-			DHD_ERROR(("%s: malloc of size %d failed!\n", __FUNCTION__, allocSize));
+			DHD_ERROR(("%s: malloc of size %d failed!\n", __func__, allocSize));
 			goto cleanUp;
 			}
 		ioctl.cmd = WLC_SET_VAR;
@@ -2354,11 +2354,11 @@ dhd_iscan_get_partial_result(void *dhdp, uint *scan_count)
 	int rc;
 	wl_ioctl_t ioctl;
 
-	DHD_ISCAN(("%s: Enter\n", __FUNCTION__));
+	DHD_ISCAN(("%s: Enter\n", __func__));
 
 	iscan_cur = dhd_iscan_allocate_buf(dhd, &iscan_chain);
 	if (!iscan_cur) {
-		DHD_ERROR(("%s: Failed to allocate node\n", __FUNCTION__));
+		DHD_ERROR(("%s: Failed to allocate node\n", __func__));
 		dhd_iscan_free_buf(dhdp, 0);
 		dhd_iscan_request(dhdp, WL_SCAN_ACTION_ABORT);
 		dhd_ind_scan_confirm(dhdp, FALSE);
@@ -2386,7 +2386,7 @@ dhd_iscan_get_partial_result(void *dhdp, uint *scan_count)
 	results->version = dtoh32(results->version);
 	*scan_count = results->count = dtoh32(results->count);
 	status = dtoh32(list_buf->status);
-	DHD_ISCAN(("%s: Got %d resuls status = (%x)\n", __FUNCTION__, results->count, status));
+	DHD_ISCAN(("%s: Got %d resuls status = (%x)\n", __func__, results->count, status));
 
 	dhd_iscan_unlock();
 
@@ -2413,10 +2413,10 @@ bool dhd_is_associated(dhd_pub_t *dhd, uint8 ifidx, int *retval)
 
 	ret  = dhd_wl_ioctl_cmd(dhd, WLC_GET_BSSID, (char *)&bssid,
 		ETHER_ADDR_LEN, FALSE, ifidx);
-	DHD_TRACE((" %s WLC_GET_BSSID ioctl res = %d\n", __FUNCTION__, ret));
+	DHD_TRACE((" %s WLC_GET_BSSID ioctl res = %d\n", __func__, ret));
 
 	if (ret == BCME_NOTASSOCIATED) {
-		DHD_TRACE(("%s: not associated! res:%d\n", __FUNCTION__, ret));
+		DHD_TRACE(("%s: not associated! res:%d\n", __func__, ret));
 	}
 
 	if (retval)
@@ -2426,7 +2426,7 @@ bool dhd_is_associated(dhd_pub_t *dhd, uint8 ifidx, int *retval)
 		return FALSE;
 
 	if ((memcmp(bssid, zbuf, ETHER_ADDR_LEN) == 0)) {
-		DHD_TRACE(("%s: WLC_GET_BSSID ioctl returned zero bssid\n", __FUNCTION__));
+		DHD_TRACE(("%s: WLC_GET_BSSID ioctl returned zero bssid\n", __func__));
 		return FALSE;
 	}
 	return TRUE;
@@ -2443,21 +2443,21 @@ dhd_get_suspend_bcn_li_dtim(dhd_pub_t *dhd)
 	int allowed_skip_dtim_cnt = 0;
 	/* Check if associated */
 	if (dhd_is_associated(dhd, 0, NULL) == FALSE) {
-		DHD_TRACE(("%s NOT assoc ret %d\n", __FUNCTION__, ret));
+		DHD_TRACE(("%s NOT assoc ret %d\n", __func__, ret));
 		goto exit;
 	}
 
 	/* read associated AP beacon interval */
 	if ((ret = dhd_wl_ioctl_cmd(dhd, WLC_GET_BCNPRD,
 		&ap_beacon, sizeof(ap_beacon), FALSE, 0)) < 0) {
-		DHD_ERROR(("%s get beacon failed code %d\n", __FUNCTION__, ret));
+		DHD_ERROR(("%s get beacon failed code %d\n", __func__, ret));
 		goto exit;
 	}
 
 	/* read associated ap's dtim setup */
 	if ((ret = dhd_wl_ioctl_cmd(dhd, WLC_GET_DTIMPRD,
 		&dtim_period, sizeof(dtim_period), FALSE, 0)) < 0) {
-		DHD_ERROR(("%s failed code %d\n", __FUNCTION__, ret));
+		DHD_ERROR(("%s failed code %d\n", __func__, ret));
 		goto exit;
 	}
 
@@ -2480,7 +2480,7 @@ dhd_get_suspend_bcn_li_dtim(dhd_pub_t *dhd)
 			/* AP DTIM to big for our Listen Interval : no dtim skiping */
 			bcn_li_dtim = NO_DTIM_SKIP;
 			DHD_ERROR(("%s DTIM=%d > Listen=%d : too big ...\n",
-				__FUNCTION__, dtim_period, CUSTOM_LISTEN_INTERVAL));
+				__func__, dtim_period, CUSTOM_LISTEN_INTERVAL));
 			goto exit;
 		}
 
@@ -2494,12 +2494,12 @@ dhd_get_suspend_bcn_li_dtim(dhd_pub_t *dhd)
 		if ((bcn_li_dtim * dtim_period) > CUSTOM_LISTEN_INTERVAL) {
 			/* Round up dtim_skip to fit into STAs Listen Interval */
 			bcn_li_dtim = (int)(CUSTOM_LISTEN_INTERVAL / dtim_period);
-			DHD_TRACE(("%s agjust dtim_skip as %d\n", __FUNCTION__, bcn_li_dtim));
+			DHD_TRACE(("%s agjust dtim_skip as %d\n", __func__, bcn_li_dtim));
 		}
 	}
 
 	DHD_ERROR(("%s beacon=%d bcn_li_dtim=%d DTIM=%d Listen=%d\n",
-		__FUNCTION__, ap_beacon, bcn_li_dtim, dtim_period, CUSTOM_LISTEN_INTERVAL));
+		__func__, ap_beacon, bcn_li_dtim, dtim_period, CUSTOM_LISTEN_INTERVAL));
 
 exit:
 	return bcn_li_dtim;
@@ -2525,7 +2525,7 @@ int dhd_keep_alive_onoff(dhd_pub_t *dhd)
 	if (!dhd_support_sta_mode(dhd))
 		return -1;
 
-	DHD_TRACE(("%s execution\n", __FUNCTION__));
+	DHD_TRACE(("%s execution\n", __func__));
 
 	mkeep_alive_pkt.period_msec = CUSTOM_KEEP_ALIVE_SETTING;
 	mkeep_alive_pkt.version = htod16(WL_MKEEP_ALIVE_VERSION);
@@ -2550,7 +2550,7 @@ wl_parse_ssid_list_tlv(char** list_str, wlc_ssid_t* ssid, int max, int *bytes_le
 	uint8 len;
 
 	if ((list_str == NULL) || (*list_str == NULL) || (*bytes_left < 0)) {
-		DHD_ERROR(("%s error paramters\n", __FUNCTION__));
+		DHD_ERROR(("%s error paramters\n", __func__));
 		return BCME_BADARG;
 	}
 	str = *list_str;
@@ -2562,14 +2562,14 @@ wl_parse_ssid_list_tlv(char** list_str, wlc_ssid_t* ssid, int max, int *bytes_le
 		}
 
 		if (idx >= max) {
-			DHD_ERROR(("%s number of SSIDs more than %d\n", __FUNCTION__, idx));
+			DHD_ERROR(("%s number of SSIDs more than %d\n", __func__, idx));
 			return BCME_BADARG;
 		}
 
 		/* Get proper CSCAN_TLV_TYPE_SSID_IE */
 		*bytes_left -= 1;
 		if (*bytes_left == 0) {
-			DHD_ERROR(("%s no length field.\n", __FUNCTION__));
+			DHD_ERROR(("%s no length field.\n", __func__));
 			return BCME_BADARG;
 		}
 		str += 1;
@@ -2590,7 +2590,7 @@ wl_parse_ssid_list_tlv(char** list_str, wlc_ssid_t* ssid, int max, int *bytes_le
 			/* Get SSID */
 			if (ssid[idx].SSID_len > *bytes_left) {
 				DHD_ERROR(("%s out of memory range len=%d but left=%d\n",
-				__FUNCTION__, ssid[idx].SSID_len, *bytes_left));
+				__func__, ssid[idx].SSID_len, *bytes_left));
 				return BCME_BADARG;
 			}
 			str += 1;
@@ -2627,7 +2627,7 @@ wl_iw_parse_data_tlv(char** list_str, void *dst, int dst_size, const char token,
 	uint32 int_temp;
 
 	if ((list_str == NULL) || (*list_str == NULL) ||(bytes_left == NULL) || (*bytes_left < 0)) {
-		DHD_ERROR(("%s error paramters\n", __FUNCTION__));
+		DHD_ERROR(("%s error paramters\n", __func__));
 		return -1;
 	}
 	str = *list_str;
@@ -2638,7 +2638,7 @@ wl_iw_parse_data_tlv(char** list_str, void *dst, int dst_size, const char token,
 
 		if (str[0] != token) {
 			DHD_TRACE(("%s NOT Type=%d get=%d left_parse=%d \n",
-				__FUNCTION__, token, str[0], *bytes_left));
+				__func__, token, str[0], *bytes_left));
 			return -1;
 		}
 
@@ -2676,7 +2676,7 @@ wl_iw_parse_channel_list_tlv(char** list_str, uint16* channel_list,
 	int idx = 0;
 
 	if ((list_str == NULL) || (*list_str == NULL) ||(bytes_left == NULL) || (*bytes_left < 0)) {
-		DHD_ERROR(("%s error paramters\n", __FUNCTION__));
+		DHD_ERROR(("%s error paramters\n", __func__));
 		return -1;
 	}
 	str = *list_str;
@@ -2698,13 +2698,13 @@ wl_iw_parse_channel_list_tlv(char** list_str, uint16* channel_list,
 		}
 		else {
 			channel_list[idx] = (uint16)str[0];
-			DHD_TRACE(("%s channel=%d \n", __FUNCTION__,  channel_list[idx]));
+			DHD_TRACE(("%s channel=%d \n", __func__,  channel_list[idx]));
 		}
 		*bytes_left -= 1;
 		str += 1;
 
 		if (idx++ > 255) {
-			DHD_ERROR(("%s Too many channels \n", __FUNCTION__));
+			DHD_ERROR(("%s Too many channels \n", __func__));
 			return -1;
 		}
 	}

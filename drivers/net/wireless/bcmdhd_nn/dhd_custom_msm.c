@@ -246,7 +246,7 @@ dhd_init_wlan_mem(void)
 		goto err_mem_alloc;
 	}
 
-	pr_err("%s: WIFI MEM Allocated\n", __FUNCTION__);
+	pr_err("%s: WIFI MEM Allocated\n", __func__);
 	return 0;
 
 err_mem_alloc:
@@ -303,11 +303,11 @@ dhd_wlan_power(int onoff)
 
 	printk(KERN_INFO"------------------------------------------------");
 	printk(KERN_INFO"------------------------------------------------\n");
-	printk(KERN_INFO"%s Enter: power %s\n", __FUNCTION__, onoff ? "on" : "off");
+	printk(KERN_INFO"%s Enter: power %s\n", __func__, onoff ? "on" : "off");
 
 	if (gpio_direction_output(wlan_reg_on, onoff)) {
 		printk(KERN_ERR "%s failed to control WLAN_REG_ON to %s\n",
-			__FUNCTION__, onoff ? "HIGH" : "LOW");
+			__func__, onoff ? "HIGH" : "LOW");
 		return -EIO;
 	}
 
@@ -327,12 +327,12 @@ static int
 dhd_wlan_set_carddetect(int val)
 {
 	printk("%s: notify_func=%p, mmc_host_dev=%p, val=%d\n",
-		__FUNCTION__, notify_func_callback, mmc_host_dev, val);
+		__func__, notify_func_callback, mmc_host_dev, val);
 
 	if (notify_func_callback) {
 		notify_func_callback(mmc_host_dev, val);
 	} else {
-		pr_warning("%s: Nobody to notify\n", __FUNCTION__);
+		pr_warning("%s: Nobody to notify\n", __func__);
 	}
 
 	return 0;
@@ -362,29 +362,29 @@ __init dhd_wlan_init_gpio(void)
 
 	/* ========== WLAN_PWR_EN ============ */
 	wlan_reg_on = of_get_named_gpio(root_node, WIFI_WL_REG_ON_PROPNAME, 0);
-	printk(KERN_INFO "%s: gpio_wlan_power : %d\n", __FUNCTION__, wlan_reg_on);
+	printk(KERN_INFO "%s: gpio_wlan_power : %d\n", __func__, wlan_reg_on);
 
 	if (gpio_request_one(wlan_reg_on, GPIOF_OUT_INIT_LOW, "WL_REG_ON")) {
 		printk(KERN_ERR "%s: Faiiled to request gpio %d for WL_REG_ON\n",
-			__FUNCTION__, wlan_reg_on);
+			__func__, wlan_reg_on);
 	} else {
 		printk(KERN_ERR "%s: gpio_request WL_REG_ON done - WLAN_EN: GPIO %d\n",
-			__FUNCTION__, wlan_reg_on);
+			__func__, wlan_reg_on);
 	}
 
 
 	/* ========== WLAN_HOST_WAKE ============ */
 	wlan_host_wake_up = of_get_named_gpio(root_node, WIFI_WLAN_HOST_WAKE_PROPNAME, 0);
-	printk(KERN_INFO "%s: gpio_wlan_host_wake : %d\n", __FUNCTION__, wlan_host_wake_up);
+	printk(KERN_INFO "%s: gpio_wlan_host_wake : %d\n", __func__, wlan_host_wake_up);
 
 	if (gpio_request_one(wlan_host_wake_up, GPIOF_IN, "WLAN_HOST_WAKE")) {
 		printk(KERN_ERR "%s: Failed to request gpio %d for WLAN_HOST_WAKE\n",
-			__FUNCTION__, wlan_host_wake_up);
+			__func__, wlan_host_wake_up);
 			return -ENODEV;
 	} else {
 		printk(KERN_ERR "%s: gpio_request WLAN_HOST_WAKE done"
 			" - WLAN_HOST_WAKE: GPIO %d\n",
-			__FUNCTION__, wlan_host_wake_up);
+			__func__, wlan_host_wake_up);
 	}
 
 	gpio_direction_input(wlan_host_wake_up);
@@ -415,11 +415,11 @@ __init dhd_wlan_init(void)
 {
 	int ret;
 
-	printk(KERN_INFO "%s: start\n", __FUNCTION__);
+	printk(KERN_INFO "%s: start\n", __func__);
 	ret = dhd_wlan_init_gpio();
 	if (ret < 0) {
 		printk(KERN_ERR "%s: failed to initiate GPIO, ret=%d\n",
-			__FUNCTION__, ret);
+			__func__, ret);
 		return ret;
 	}
 

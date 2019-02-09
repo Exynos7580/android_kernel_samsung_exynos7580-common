@@ -1012,7 +1012,7 @@ int fimc_is_power_binning(struct fimc_is_core *core)
 			pr_err("%s: error, dcdc set_vout(%d). sel %d\n", __func__, ret, vout_sel);
 
 		pr_info("[%s::%d][BIN_INFO::%s, sel %d] read path(%s), DCDC %s\n",
-				__FUNCTION__, __LINE__, buf, vout_sel, FIMC_IS_ISP_CV, dcdc_name);
+				__func__, __LINE__, buf, vout_sel, FIMC_IS_ISP_CV, dcdc_name);
 		return vout_sel;
 	}
 
@@ -1034,7 +1034,7 @@ int fimc_is_power_binning(struct fimc_is_core *core)
 		err("fimc_is_comp_single_read() fail");
 	}
 
-	pr_info("[%s::%d][BIN_INFO::0x%04x]\n", __FUNCTION__, __LINE__, read_value);
+	pr_info("[%s::%d][BIN_INFO::0x%04x]\n", __func__, __LINE__, read_value);
 
 	if (read_value & 0x3F) {
 		if (read_value & (1<<CC_BIN6)) {
@@ -1071,7 +1071,7 @@ int fimc_is_power_binning(struct fimc_is_core *core)
 	}
 
 	pr_info("[%s::%d][BIN_INFO::0x%04x] buf(%s) write. sel %d, DCDC %s\n",
-			__FUNCTION__, __LINE__, read_value,buf, vout_sel, dcdc_name);
+			__func__, __LINE__, read_value,buf, vout_sel, dcdc_name);
 
 	return vout_sel;
 }

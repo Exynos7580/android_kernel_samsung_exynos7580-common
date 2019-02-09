@@ -928,13 +928,13 @@ static int wl_cfgvendor_epno_cfg(struct wiphy *wiphy,
 				params.band_5g_bonus = nla_get_s16(iter);
 				break;
 			default:
-				WL_ERR(("%s: No such attribute %d\n", __FUNCTION__, type));
+				WL_ERR(("%s: No such attribute %d\n", __func__, type));
 				err = -EINVAL;
 				goto exit;
 			}
 	}
 	if (i != num) {
-		WL_ERR(("%s: num_ssid %d does not match ssids sent %d\n", __FUNCTION__,
+		WL_ERR(("%s: num_ssid %d does not match ssids sent %d\n", __func__,
 		     num, i));
 		err = -EINVAL;
 	}
@@ -1126,7 +1126,7 @@ wl_cfgvendor_get_wake_reason_stats(struct wiphy *wiphy,
 
 	skb = cfg80211_vendor_cmd_alloc_reply_skb(wiphy, mem_needed);
 	if (unlikely(!skb)) {
-		WL_ERR(("%s: can't allocate %d bytes\n", __FUNCTION__, mem_needed));
+		WL_ERR(("%s: can't allocate %d bytes\n", __func__, mem_needed));
 		return -ENOMEM;
 		goto exit;
 	}
@@ -1830,7 +1830,7 @@ wl_cfgvendor_set_bssid_pref(struct wiphy *wiphy,
 				}
 				break;
 			default:
-				WL_ERR(("%s: No such attribute %d\n", __FUNCTION__, type));
+				WL_ERR(("%s: No such attribute %d\n", __func__, type));
 				break;
 			}
 	}
@@ -1839,7 +1839,7 @@ wl_cfgvendor_set_bssid_pref(struct wiphy *wiphy,
 		/* What if only flush is desired? */
 		if (flush) {
 			if ((bssid_pref = create_bssid_pref_cfg(0)) == NULL) {
-				WL_ERR(("%s: Can't malloc memory\n", __FUNCTION__));
+				WL_ERR(("%s: Can't malloc memory\n", __func__));
 				err = -ENOMEM;
 				goto exit;
 			}
@@ -2462,12 +2462,12 @@ static int wl_cfgvendor_lstats_get_info(struct wiphy *wiphy,
 	err = wl_cntbuf_to_xtlv_format(NULL, iovar_buf, WLC_IOCTL_MAXLEN, revinfo.corerev);
 	if (err != BCME_OK) {
 		WL_ERR(("%s wl_cntbuf_to_xtlv_format ERR %d\n",
-			__FUNCTION__, err));
+			__func__, err));
 		goto exit;
 	}
 
 	if (!(wlc_cnt = GET_WLCCNT_FROM_CNTBUF(iovar_buf))) {
-		WL_ERR(("%s wlc_cnt NULL!\n", __FUNCTION__));
+		WL_ERR(("%s wlc_cnt NULL!\n", __func__));
 		err = BCME_ERROR;
 		goto exit;
 	}
@@ -2996,7 +2996,7 @@ static int __wl_cfgvendor_dbg_get_pkt_fates(struct wiphy *wiphy,
 				user_buf = (void __user *)(unsigned long) nla_get_u64(iter);
 				break;
 			default:
-				WL_ERR(("%s: no such attribute %d\n", __FUNCTION__, type));
+				WL_ERR(("%s: no such attribute %d\n", __func__, type));
 				ret = -EINVAL;
 				goto exit;
 		}
@@ -3004,7 +3004,7 @@ static int __wl_cfgvendor_dbg_get_pkt_fates(struct wiphy *wiphy,
 
 	if (!req_count || !user_buf) {
 		WL_ERR(("%s: invalid request, user_buf=%p, req_count=%u\n",
-			__FUNCTION__, user_buf, req_count));
+			__func__, user_buf, req_count));
 		ret = -EINVAL;
 		goto exit;
 	}
@@ -3205,7 +3205,7 @@ wl_cfgvendor_apf_get_capabilities(struct wiphy *wiphy,
 
 	skb = cfg80211_vendor_cmd_alloc_reply_skb(wiphy, mem_needed);
 	if (unlikely(!skb)) {
-		WL_ERR(("%s: can't allocate %d bytes\n", __FUNCTION__, mem_needed));
+		WL_ERR(("%s: can't allocate %d bytes\n", __func__, mem_needed));
 		return -ENOMEM;
 	}
 
@@ -3272,14 +3272,14 @@ wl_cfgvendor_apf_set_filter(struct wiphy *wiphy,
 				program = kzalloc(program_len, kflags);
 				if (unlikely(!program)) {
 					WL_ERR(("%s: can't allocate %d bytes\n",
-					      __FUNCTION__, program_len));
+					      __func__, program_len));
 					ret = -ENOMEM;
 					goto exit;
 				}
 				memcpy(program, (u8*)nla_data(iter), program_len);
 				break;
 			default:
-				WL_ERR(("%s: no such attribute %d\n", __FUNCTION__, type));
+				WL_ERR(("%s: no such attribute %d\n", __func__, type));
 				ret = -EINVAL;
 				goto exit;
 		}

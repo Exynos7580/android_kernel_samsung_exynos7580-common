@@ -79,12 +79,12 @@ int dhd_customer_oob_irq_map(void *adapter, unsigned long *irq_flags_ptr)
 
 	if (dhd_oob_gpio_num < 0) {
 		WL_ERROR(("%s: ERROR customer specific Host GPIO is NOT defined \n",
-		__FUNCTION__));
+		__func__));
 		return (dhd_oob_gpio_num);
 	}
 
 	WL_ERROR(("%s: customer specific Host GPIO number is (%d)\n",
-	         __FUNCTION__, dhd_oob_gpio_num));
+	         __func__, dhd_oob_gpio_num));
 
 #endif 
 
@@ -108,7 +108,7 @@ dhd_custom_get_mac_address(void *adapter, unsigned char *buf)
 {
 	int ret = 0;
 
-	WL_TRACE(("%s Enter\n", __FUNCTION__));
+	WL_TRACE(("%s Enter\n", __func__));
 	if (!buf)
 		return -EINVAL;
 

@@ -689,7 +689,7 @@ static u64 gator_get_time(void)
 		delta = prev_timestamp - timestamp;
 		// Log the error once
 		if (!printed_monotonic_warning && delta > 500000) {
-			printk(KERN_ERR "%s: getrawmonotonic is not monotonic  cpu: %i  delta: %lli\nSkew in Streamline data may be present at the fine zoom levels\n", __FUNCTION__, cpu, delta);
+			printk(KERN_ERR "%s: getrawmonotonic is not monotonic  cpu: %i  delta: %lli\nSkew in Streamline data may be present at the fine zoom levels\n", __func__, cpu, delta);
 			printed_monotonic_warning = true;
 		}
 		timestamp = prev_timestamp;

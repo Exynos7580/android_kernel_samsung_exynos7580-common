@@ -124,7 +124,7 @@ void* wifi_platform_prealloc(wifi_adapter_info_t *adapter, int section, unsigned
 		}
 	}
 
-	DHD_ERROR(("%s: failed to alloc static mem section %d\n", __FUNCTION__, section));
+	DHD_ERROR(("%s: failed to alloc static mem section %d\n", __func__, section));
 	return NULL;
 }
 
@@ -160,7 +160,7 @@ int wifi_platform_set_power(wifi_adapter_info_t *adapter, bool on, unsigned long
 		is_power_on = FALSE;
 	}
 	if (err < 0)
-		DHD_ERROR(("%s: regulator enable/disable failed", __FUNCTION__));
+		DHD_ERROR(("%s: regulator enable/disable failed", __func__));
 #else
 	struct wifi_platform_data *plat_data;
 
@@ -168,14 +168,14 @@ int wifi_platform_set_power(wifi_adapter_info_t *adapter, bool on, unsigned long
 		return -EINVAL;
 	plat_data = adapter->wifi_plat_data;
 
-	DHD_ERROR(("%s = %d\n", __FUNCTION__, on));
+	DHD_ERROR(("%s = %d\n", __func__, on));
 	if (plat_data->set_power) {
 #ifdef ENABLE_4335BT_WAR
 		if (on) {
 			printk("WiFi: trying to acquire BT lock\n");
 			if (bcm_bt_lock(lock_cookie_wifi) != 0)
 				printk("** WiFi: timeout in acquiring bt lock**\n");
-			printk("%s: btlock acquired\n", __FUNCTION__);
+			printk("%s: btlock acquired\n", __func__);
 		}
 		else {
 			/* For a exceptional case, release btlock */
@@ -208,7 +208,7 @@ int wifi_platform_bus_enumerate(wifi_adapter_info_t *adapter, bool device_presen
 		return -EINVAL;
 	plat_data = adapter->wifi_plat_data;
 
-	DHD_ERROR(("%s device present %d\n", __FUNCTION__, device_present));
+	DHD_ERROR(("%s device present %d\n", __func__, device_present));
 	if (plat_data->set_carddetect) {
 		err = plat_data->set_carddetect(device_present);
 	}
@@ -220,7 +220,7 @@ int wifi_platform_get_mac_addr(wifi_adapter_info_t *adapter, unsigned char *buf)
 {
 	struct wifi_platform_data *plat_data;
 
-	DHD_ERROR(("%s\n", __FUNCTION__));
+	DHD_ERROR(("%s\n", __func__));
 	if (!buf || !adapter || !adapter->wifi_plat_data)
 		return -EINVAL;
 	plat_data = adapter->wifi_plat_data;
@@ -243,7 +243,7 @@ void *wifi_platform_get_country_code(wifi_adapter_info_t *adapter, char *ccode)
 		return NULL;
 	plat_data = adapter->wifi_plat_data;
 
-	DHD_TRACE(("%s\n", __FUNCTION__));
+	DHD_TRACE(("%s\n", __func__));
 	if (plat_data->get_country_code) {
 #if     (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 58))
 		return plat_data->get_country_code(ccode, WLAN_PLAT_NODFS_FLAG);
@@ -290,7 +290,7 @@ static int wifi_plat_dev_drv_probe(struct platform_device *pdev)
 #ifdef CONFIG_DTS
 	wifi_regulator = regulator_get(&pdev->dev, "wlreg_on");
 	if (wifi_regulator == NULL) {
-		DHD_ERROR(("%s regulator is null\n", __FUNCTION__));
+		DHD_ERROR(("%s regulator is null\n", __func__));
 		return -1;
 	}
 
@@ -298,12 +298,12 @@ static int wifi_plat_dev_drv_probe(struct platform_device *pdev)
 	gpio = of_get_gpio(pdev->dev.of_node, 0);
 
 	if (gpio < 0) {
-		DHD_ERROR(("%s gpio information is incorrect\n", __FUNCTION__));
+		DHD_ERROR(("%s gpio information is incorrect\n", __func__));
 		return -1;
 	}
 	irq = gpio_to_irq(gpio);
 	if (irq < 0) {
-		DHD_ERROR(("%s irq information is incorrect\n", __FUNCTION__));
+		DHD_ERROR(("%s irq information is incorrect\n", __func__));
 		return -1;
 	}
 	adapter->irq_num = irq;
@@ -345,7 +345,7 @@ static int wifi_plat_dev_drv_remove(struct platform_device *pdev)
 
 static int wifi_plat_dev_drv_suspend(struct platform_device *pdev, pm_message_t state)
 {
-	DHD_TRACE(("##> %s\n", __FUNCTION__));
+	DHD_TRACE(("##> %s\n", __func__));
 #if (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 39)) && defined(OOB_INTR_ONLY) && \
 	defined(BCMSDIO)
 	bcmsdh_oob_intr_set(0);
@@ -355,7 +355,7 @@ static int wifi_plat_dev_drv_suspend(struct platform_device *pdev, pm_message_t 
 
 static int wifi_plat_dev_drv_resume(struct platform_device *pdev)
 {
-	DHD_TRACE(("##> %s\n", __FUNCTION__));
+	DHD_TRACE(("##> %s\n", __func__));
 #if (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 39)) && defined(OOB_INTR_ONLY) && \
 	defined(BCMSDIO)
 	if (dhd_os_check_if_up(wl_cfg80211_get_dhdp()))
@@ -436,7 +436,7 @@ static int wifi_ctrlfunc_register_drv(void)
 	 */
 	adapter = kzalloc(sizeof(wifi_adapter_info_t), GFP_KERNEL);
 	if (adapter == NULL) {
-		DHD_ERROR(("%s:adapter alloc failed", __FUNCTION__));
+		DHD_ERROR(("%s:adapter alloc failed", __func__));
 		return ENOMEM;
 	}
 	adapter->name = "DHD generic adapter";
@@ -454,7 +454,7 @@ static int wifi_ctrlfunc_register_drv(void)
 		err = platform_driver_register(&wifi_platform_dev_driver);
 		if (err) {
 			DHD_ERROR(("%s: failed to register wifi ctrl func driver\n",
-				__FUNCTION__));
+				__func__));
 			return err;
 		}
 	}
@@ -462,7 +462,7 @@ static int wifi_ctrlfunc_register_drv(void)
 		err = platform_driver_register(&wifi_platform_dev_driver_legacy);
 		if (err) {
 			DHD_ERROR(("%s: failed to register wifi ctrl func legacy driver\n",
-				__FUNCTION__));
+				__func__));
 			return err;
 		}
 	}
@@ -654,7 +654,7 @@ static int dhd_wifi_platform_load_pcie(void)
 		err = dhd_bus_register();
 
 		if (err) {
-			DHD_ERROR(("%s: pcie_register_driver failed\n", __FUNCTION__));
+			DHD_ERROR(("%s: pcie_register_driver failed\n", __func__));
 			if (dhd_download_fw_on_driverload) {
 				/* power down all adapters */
 				for (i = 0; i < dhd_wifi_platdata->num_adapters; i++) {
@@ -740,7 +740,7 @@ static int dhd_wifi_platform_load_sdio(void)
 			err = dhd_bus_reg_sdio_notify(&dhd_chipup_sem);
 			if (err) {
 				DHD_ERROR(("%s dhd_bus_reg_sdio_notify fail(%d)\n\n",
-					__FUNCTION__, err));
+					__func__, err));
 				return err;
 			}
 			err = wifi_platform_set_power(adapter, TRUE, WIFI_TURNON_DELAY);
@@ -775,7 +775,7 @@ static int dhd_wifi_platform_load_sdio(void)
 	err = dhd_bus_register();
 
 	if (err) {
-		DHD_ERROR(("%s: sdio_register_driver failed\n", __FUNCTION__));
+		DHD_ERROR(("%s: sdio_register_driver failed\n", __func__));
 		goto fail;
 	}
 
@@ -786,7 +786,7 @@ static int dhd_wifi_platform_load_sdio(void)
 	 */
 	err = down_timeout(&dhd_registration_sem, msecs_to_jiffies(DHD_REGISTRATION_TIMEOUT));
 	if (err) {
-		DHD_ERROR(("%s: sdio_register_driver timeout or error \n", __FUNCTION__));
+		DHD_ERROR(("%s: sdio_register_driver timeout or error \n", __func__));
 		dhd_bus_unregister();
 		goto fail;
 	}

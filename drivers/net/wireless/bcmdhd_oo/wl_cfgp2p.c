@@ -877,7 +877,7 @@ wl_cfgp2p_disable_discovery(struct bcm_cfg80211 *cfg)
 	wl_clr_p2p_status(cfg, DISCOVERY_ON);
 #ifdef DHD_IFDEBUG
 	WL_ERR(("%s: bssidx: %d\n",
-		__FUNCTION__, (cfg)->p2p->bss[P2PAPI_BSSCFG_DEVICE].bssidx));
+		__func__, (cfg)->p2p->bss[P2PAPI_BSSCFG_DEVICE].bssidx));
 #endif // endif
 	bssidx = wl_to_p2p_bss_bssidx(cfg, P2PAPI_BSSCFG_DEVICE);
 	if (bssidx <= 0) {
@@ -2046,7 +2046,7 @@ wl_cfgp2p_set_p2p_ecsa(struct bcm_cfg80211 *cfg, struct net_device *ndev, char* 
 		snprintf(buf, len, "%d/%d", ch, bw);
 		chnsp = wf_chspec_aton(buf);
 		if (chnsp == 0) {
-			CFGP2P_ERR(("%s:chsp is not correct\n", __FUNCTION__));
+			CFGP2P_ERR(("%s:chsp is not correct\n", __func__));
 			return BCME_ERROR;
 		}
 		chnsp = wl_chspec_host_to_driver(chnsp);
@@ -2055,7 +2055,7 @@ wl_cfgp2p_set_p2p_ecsa(struct bcm_cfg80211 *cfg, struct net_device *ndev, char* 
 		err = wldev_iovar_setbuf(dev, "csa", &csa_arg, sizeof(csa_arg),
 			smbuf, sizeof(smbuf), NULL);
 		if (err) {
-			CFGP2P_ERR(("%s:set p2p_ecsa failed:%d\n", __FUNCTION__, err));
+			CFGP2P_ERR(("%s:set p2p_ecsa failed:%d\n", __func__, err));
 			return BCME_ERROR;
 		}
 	} else {
@@ -2253,7 +2253,7 @@ wl_cfgp2p_register_ndev(struct bcm_cfg80211 *cfg)
 
 	/* Allocate etherdev, including space for private structure */
 	if (!(net = alloc_etherdev(sizeof(struct bcm_cfg80211 *)))) {
-		CFGP2P_ERR(("%s: OOM - alloc_etherdev\n", __FUNCTION__));
+		CFGP2P_ERR(("%s: OOM - alloc_etherdev\n", __func__));
 		return -ENODEV;
 	}
 
@@ -2374,7 +2374,7 @@ static int wl_cfgp2p_do_ioctl(struct net_device *net, struct ifreq *ifr, int cmd
 
 	} else {
 		CFGP2P_ERR(("%s: IOCTL req 0x%x on p2p0 I/F. Ignoring. \n",
-		__FUNCTION__, cmd));
+		__func__, cmd));
 		return -1;
 	}
 

@@ -935,10 +935,10 @@ unsigned int process_nvram_vars(char *varbuf, unsigned int len);
 #define bcm_pkt_validate_chk(obj)	do { \
 	void * pkttag; \
 	bcm_object_trace_chk(obj, 0, 0, \
-		__FUNCTION__, __LINE__); \
+		__func__, __LINE__); \
 	if ((pkttag = PKTTAG(obj))) { \
 		bcm_object_trace_chk(obj, 1, DHD_PKTTAG_SN(pkttag), \
-			__FUNCTION__, __LINE__); \
+			__func__, __LINE__); \
 	} \
 } while (0)
 extern void bcm_object_trace_opr(void *obj, uint32 opt, const char *caller, int line);
