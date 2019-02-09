@@ -21,7 +21,7 @@
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
  *
- * $Id: bcmsdh_sdmmc.c 591220 2015-10-07 08:12:29Z $
+ * $Id: bcmsdh_sdmmc.c 711173 2017-07-17 07:39:28Z $
  */
 #include <typedefs.h>
 
@@ -618,7 +618,6 @@ sdioh_iovar_op(sdioh_info_t *si, const char *name,
 		int_val = (int32)0;
 		bcopy(&int_val, arg, val_size);
 		break;
-
 	default:
 		bcmerror = BCME_UNSUPPORTED;
 		break;

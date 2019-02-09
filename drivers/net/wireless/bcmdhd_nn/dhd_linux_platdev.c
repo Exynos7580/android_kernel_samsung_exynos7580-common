@@ -86,6 +86,10 @@ extern void bcm_bt_unlock(int cookie);
 static int lock_cookie_wifi = 'W' | 'i'<<8 | 'F'<<16 | 'i'<<24;	/* cookie is "WiFi" */
 #endif /* ENABLE_4335BT_WAR */
 
+#ifdef BCM4335_XTAL_WAR
+extern bool check_bcm4335_rev(void);
+#endif /* BCM4335_XTAL_WAR */
+
 wifi_adapter_info_t* dhd_wifi_platform_get_adapter(uint32 bus_type, uint32 bus_num, uint32 slot_num)
 {
 	int i;
@@ -170,7 +174,11 @@ int wifi_platform_set_power(wifi_adapter_info_t *adapter, bool on, unsigned long
 		}
 #endif /* ENABLE_4335BT_WAR */
 
+#ifdef BCM4335_XTAL_WAR
+		err = plat_data->set_power(on, check_bcm4335_rev());
+#else /* BCM4335_XTAL_WAR */
 		err = plat_data->set_power(on);
+#endif /* BCM4335_XTAL_WAR */
 	}
 
 	if (msec && !err)

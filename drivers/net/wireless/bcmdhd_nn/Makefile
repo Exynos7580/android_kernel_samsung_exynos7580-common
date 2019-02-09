@@ -156,6 +156,24 @@ DHDCFLAGS += -DSUPPORT_TRIGGER_HANG_EVENT
 # Random mac scan
 DHDCFLAGS += -DSUPPORT_RANDOM_MAC_SCAN
 
+# Android Version Check from Platform source
+CANDIDATE_VERSION_PATH := ./../../build/core ../../../../../../build/core out
+FOUND_VERSION_PATH := $(foreach dir,$(CANDIDATE_VERSION_PATH), $(wildcard $(dir)/version_defaults.mk))
+FOUND_VERSION_PATH := $(word 1, $(FOUND_VERSION_PATH))
+ifeq ($(FOUND_VERSION_PATH),)
+$(warning Not found Android version file. Set as Legacy mode)
+DHDCFLAGS += -DDHD_LEGACY_FILE_PATH
+else
+# Extract version string and get major number
+ANDROID_PLATFORM_VERSION := $(shell grep "PLATFORM_VERSION := " $(FOUND_VERSION_PATH) | cut -d "=" -f 2 | cut -d "." -f 1 | sed 's/ //g')
+$(warning WiFi - Android Platform Version - $(ANDROID_PLATFORM_VERSION))
+# If Android version lower than 7(Nougat) => Use Legacy File path
+ifeq ($(shell expr $(ANDROID_PLATFORM_VERSION) \< 7),1)
+DHDCFLAGS += -DDHD_LEGACY_FILE_PATH
+$(warning WiFi will be using Legacy file path)
+endif
+endif
+
 ##############################
 # Android Platform Definition
 ##############################
@@ -389,6 +407,7 @@ ifneq ($(CONFIG_BCM4335),)
   DHDCFLAGS += -DUSE_CID_CHECK
   DHDCFLAGS += -DENABLE_BCN_LI_BCN_WAKEUP
   DHDCFLAGS += -DUSE_SDIOFIFO_IOVAR
+  DHDCFLAGS += -DBCM4335_XTAL_WAR
 
   # tput enhancement
   DHDCFLAGS += -DCUSTOM_GLOM_SETTING=8 -DCUSTOM_RXCHAIN=1
@@ -449,7 +468,13 @@ ifeq ($(CONFIG_ARCH_MSM8960),y)
   DHDCFLAGS += -DDHD_SDALIGN=4
 endif
   # New Features
+  DHDCFLAGS += -DBCMCCX
+  DHDCFLAGS += -DOKC_SUPPORT
+  DHDCFLAGS += -DWES_SUPPORT
+  DHDCFLAGS += -DWLFBT
+ifeq ($(filter y,$(CONFIG_MACH_M0) $(CONFIG_MACH_C1) $(CONFIG_MACH_C1)),y)
   DHDCFLAGS += -DWL11U
+endif
 ifeq ($(CONFIG_BCM4334),y)
   DHDCFLAGS += -DENABLE_INSMOD_NO_FW_LOAD
   DHDCFLAGS += -DUSE_LATE_INITCALL_SYNC
@@ -531,6 +556,7 @@ ifneq ($(CONFIG_BCM4330),)
   DHDCFLAGS += -DMCAST_LIST_ACCUMULATION
   DHDCFLAGS += -DCUSTOM_GLOM_SETTING=0
   DHDCFLAGS += -DWL_CFG80211_GON_COLLISION
+  DHDCFLAGS += -DRSSI_OFFSET=0
 ifeq ($(CONFIG_BCM4330),y)
   DHDCFLAGS += -DENABLE_INSMOD_NO_FW_LOAD
   DHDCFLAGS += -DUSE_LATE_INITCALL_SYNC
@@ -599,6 +625,10 @@ ifeq ($(GGSM_WIFI_5GHz_CHANNELS),true)
 endif
 
 ifeq ($(CONFIG_OF),y)
+ifneq ($(CONFIG_SOC_EXYNOS5433),)
+obj-$(CONFIG_SOC_EXYNOS5433) += dhd_custom_exynos.o
+DHDCFLAGS += -DDHD_OF_SUPPORT
+endif
 ifneq ($(CONFIG_MACH_UNIVERSAL5430),)
 obj-$(CONFIG_MACH_UNIVERSAL5430) += dhd_custom_exynos.o
 DHDCFLAGS += -DDHD_OF_SUPPORT
@@ -644,7 +674,7 @@ DHDCFLAGS += -include "dhd_sec_feature.h"
 
 #EXTRA_LDFLAGS += --strip-debug
 
-EXTRA_CFLAGS += $(DHDCFLAGS)
+EXTRA_CFLAGS += $(DHDCFLAGS) -DDHD_DEBUG
 EXTRA_CFLAGS += -DSRCBASE=\"$(src)\"
 EXTRA_CFLAGS += -I$(src)/include/ -I$(src)/
 KBUILD_CFLAGS += -I$(LINUXDIR)/include -I$(shell pwd)
