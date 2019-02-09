@@ -38,6 +38,7 @@
 #include <linux/uio.h>
 #include <linux/uaccess.h>
 #include <linux/module.h>
+#include <linux/compat.h>
 #include <sound/core.h>
 #include <sound/initval.h>
 #include <sound/compress_params.h>
@@ -717,8 +718,8 @@ static int snd_compress_wait_for_drain(struct snd_compr_stream *stream)
 	return ret;
 }
 
-/* this fn is called without lock being held and we change stream states here
- * so while using the stream state auquire the lock but relase before invoking
+/* This fn is called without lock being held and we change stream states here
+ * so while using the stream state acquire the lock but release before invoking
  * DSP as the call will possibly take a while
  */
 static int snd_compr_drain(struct snd_compr_stream *stream)
@@ -790,6 +791,39 @@ static int snd_compr_partial_drain(struct snd_compr_stream *stream)
 	stream->next_track = false;
 	return snd_compress_wait_for_drain(stream);
 }
+
+/*
+ * ioctl32 compat
+ */
+#ifdef CONFIG_COMPAT
+static long snd_compr_ioctl_unlocked(struct file *file, unsigned int cmd, unsigned long arg)
+{
+	switch (_IOC_NR(cmd)) {
+	case _IOC_NR(SNDRV_COMPRESS_IOCTL_VERSION):
+	case _IOC_NR(SNDRV_COMPRESS_GET_CAPS):
+	case _IOC_NR(SNDRV_COMPRESS_GET_CODEC_CAPS):
+	case _IOC_NR(SNDRV_COMPRESS_SET_PARAMS):
+	case _IOC_NR(SNDRV_COMPRESS_GET_PARAMS):
+	case _IOC_NR(SNDRV_COMPRESS_SET_METADATA):
+	case _IOC_NR(SNDRV_COMPRESS_GET_METADATA):
+	case _IOC_NR(SNDRV_COMPRESS_TSTAMP):
+	case _IOC_NR(SNDRV_COMPRESS_AVAIL):
+	case _IOC_NR(SNDRV_COMPRESS_PAUSE):
+	case _IOC_NR(SNDRV_COMPRESS_RESUME):
+	case _IOC_NR(SNDRV_COMPRESS_START):
+	case _IOC_NR(SNDRV_COMPRESS_STOP):
+	case _IOC_NR(SNDRV_COMPRESS_DRAIN):
+	case _IOC_NR(SNDRV_COMPRESS_PARTIAL_DRAIN):
+	case _IOC_NR(SNDRV_COMPRESS_NEXT_TRACK):
+		return file->f_op->unlocked_ioctl(file, cmd, arg);
+		break;
+	}
+
+	return -ENOTTY;
+}
+#else
+#define snd_compr_ioctl_unlocked   NULL
+#endif
 
 static int snd_compress_simple_ioctls(struct file *file,
 				struct snd_compr_stream *stream,
@@ -902,7 +936,7 @@ static const struct file_operations snd_compr_file_ops = {
 		.release =	snd_compr_free,
 		.write =	snd_compr_write,
 		.read =		snd_compr_read,
-		.unlocked_ioctl = snd_compr_ioctl,
+		.unlocked_ioctl = snd_compr_ioctl_unlocked,
 		.compat_ioctl   = snd_compr_ioctl,
 		.mmap =		snd_compr_mmap,
 		.poll =		snd_compr_poll,

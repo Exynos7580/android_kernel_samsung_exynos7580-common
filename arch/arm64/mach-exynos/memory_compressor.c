@@ -21,8 +21,8 @@
 #include <linux/printk.h>
 #include <linux/slab.h>
 #include <linux/debugfs.h>
-#include <mach/memory_compressor.h>
 #include <linux/delay.h>
+#include <mach/exynos-memory_compressor.h>
 
 /* file rw */
 #include <linux/file.h>
@@ -32,7 +32,7 @@
 #include <linux/uaccess.h>
 
 #define WITH_PLAT		0
-#define NUM_INTERRUPT		289 
+#define NUM_INTERRUPT		289
 #define SFR_BASE_ADDR		0x11170000
 #define NUM_DISK		4
 
@@ -40,8 +40,8 @@
 #define PATTERN_SRC		0x80
 #define PATTERN_COUNT_MASK	0x2f
 
-//test 
-#define test_size		SZ_2M 
+//test
+#define test_size		SZ_2M
 
 u32 **test_swap_disk;
 u32 **test_comp_buf;
@@ -67,7 +67,7 @@ static long update_timeval(struct timespec lhs, struct timespec rhs)
 }
 #endif
 
-static const char driver_name[] = "mem_comp";
+static const char driver_name[] = "exynos-mcomp";
 
 /* irq, SFR base, address information and tasklet */
 struct memory_comp {
@@ -96,7 +96,7 @@ static void file_read(void)
 	old_fs = get_fs();
 	set_fs(KERNEL_DS);
 
-#if 1 
+#if 1
 	for(i = 0; i < 512; i++) {
 		sprintf(fname, "/data/dump/%d", i);
 		fp = filp_open(fname, O_RDONLY, 0);
@@ -149,7 +149,7 @@ static void file_read(void)
 #endif
 	set_fs(old_fs);
 
-	return; 
+	return;
 }
 
 int memory_decomp(unsigned char *decout_data, unsigned char *comp_data,
@@ -157,14 +157,14 @@ int memory_decomp(unsigned char *decout_data, unsigned char *comp_data,
 {
 	register unsigned int Chdr_data;
 	register unsigned int Dhdin;		// inner header of DAE
-	unsigned char* start_comp_data; 
-	unsigned char* start_Cout_data; 
-	unsigned char* start_decout_data; 
+	unsigned char* start_comp_data;
+	unsigned char* start_Cout_data;
+	unsigned char* start_decout_data;
 
 	pr_info(" %s > \n", __func__);
 	start_comp_data = comp_data;
 	pr_info("comp_data %p 1> \n", start_comp_data);
-	start_Cout_data = Cout_data; 
+	start_Cout_data = Cout_data;
 	pr_info("ccout %p 2> \n", start_Cout_data);
 	start_decout_data = decout_data;
 	pr_info("decout %p 3> \n", start_decout_data);
@@ -180,23 +180,22 @@ int memory_decomp(unsigned char *decout_data, unsigned char *comp_data,
 		if(~Chdr_data & 0x01) {
 			*((unsigned short*)Cout_data) = *((unsigned short*)comp_data);
 			Cout_data += 2;
-			comp_data += 2; 
+			comp_data += 2;
 		} else {
 			*((unsigned short*)Cout_data) = *((unsigned short*)(Cout_data - ((*comp_data) & 0x7f)));
-			Cout_data+=2; 
+			Cout_data+=2;
 
 			if((*comp_data) >> 7) {
 				*((unsigned short*)(Cout_data)) = *((unsigned short*)(Cout_data - ((*comp_data) & 0x7f)));
-				Cout_data += 2; 
+				Cout_data += 2;
 			}
-			comp_data++; 
+			comp_data++;
 		}
-		
-	
+
 		if(~Chdr_data & 0x02) {
 			*((unsigned short*)Cout_data) = *((unsigned short*)comp_data);
 			Cout_data+=2;
-			comp_data+=2; 
+			comp_data+=2;
 		} else {
 			*((unsigned short*)Cout_data) = *((unsigned short*)(Cout_data - ((*comp_data) & 0x7f)));
 			Cout_data += 2;
@@ -205,7 +204,7 @@ int memory_decomp(unsigned char *decout_data, unsigned char *comp_data,
 				*((unsigned short*)(Cout_data)) = *((unsigned short*)(Cout_data - ((*comp_data) & 0x7f)));
 				Cout_data += 2;
 			}
-			comp_data++; 
+			comp_data++;
 		}
 
 		if(~Chdr_data & 0x04) {
@@ -219,13 +218,13 @@ int memory_decomp(unsigned char *decout_data, unsigned char *comp_data,
 				*((unsigned short*)(Cout_data)) = *((unsigned short*)(Cout_data - ((*comp_data) & 0x7f)));
 				Cout_data+=2;
 			}
-			comp_data++; 
+			comp_data++;
 		}
 
 		if(~Chdr_data & 0x08) {
 			*((unsigned short*)Cout_data) = *((unsigned short*)comp_data);
 			Cout_data += 2;
-			comp_data += 2; 
+			comp_data += 2;
 		} else {
 			*((unsigned short*)Cout_data) = *((unsigned short*)(Cout_data - ((*comp_data) & 0x7f)));
 			Cout_data += 2;
@@ -234,7 +233,7 @@ int memory_decomp(unsigned char *decout_data, unsigned char *comp_data,
 				*((unsigned short*)(Cout_data)) = *((unsigned short*)(Cout_data - ((*comp_data) & 0x7f)));
 				Cout_data += 2;
 			}
-			comp_data++; 
+			comp_data++;
 		}
 
 		if(~Chdr_data & 0x10) {
@@ -249,13 +248,13 @@ int memory_decomp(unsigned char *decout_data, unsigned char *comp_data,
 				*((unsigned short*)(Cout_data)) = *((unsigned short*)(Cout_data - ((*comp_data) & 0x7f)));
 				Cout_data += 2;
 			}
-			comp_data++; 
+			comp_data++;
 		}
 
 		if(~Chdr_data & 0x20) {
 			*((unsigned short*)Cout_data) = *((unsigned short*)comp_data);
 			Cout_data += 2;
-			comp_data += 2; 
+			comp_data += 2;
 		} else {
 			*((unsigned short*)Cout_data) = *((unsigned short*)(Cout_data - ((*comp_data) & 0x7f)));
 			Cout_data += 2;
@@ -264,7 +263,7 @@ int memory_decomp(unsigned char *decout_data, unsigned char *comp_data,
 				*((unsigned short*)(Cout_data)) = *((unsigned short*)(Cout_data - ((*comp_data) & 0x7f)));
 				Cout_data += 2;
 			}
-			comp_data++; 
+			comp_data++;
 		}
 
 		if(~Chdr_data & 0x40) {
@@ -279,13 +278,13 @@ int memory_decomp(unsigned char *decout_data, unsigned char *comp_data,
 				*((unsigned short*)(Cout_data)) = *((unsigned short*)(Cout_data - ((*comp_data) & 0x7f)));
 				Cout_data += 2;
 			}
-			comp_data++; 
+			comp_data++;
 		}
 
 		if(~Chdr_data & 0x80) {
 			*((unsigned short*)Cout_data) = *((unsigned short*)comp_data);
 			Cout_data += 2;
-			comp_data += 2; 
+			comp_data += 2;
 		} else {
 			*((unsigned short*)Cout_data) = *((unsigned short*)(Cout_data - ((*comp_data) & 0x7f)));
 			Cout_data += 2;
@@ -294,7 +293,7 @@ int memory_decomp(unsigned char *decout_data, unsigned char *comp_data,
 				*((unsigned short*)(Cout_data)) = *((unsigned short*)(Cout_data - ((*comp_data) & 0x7f)));
 				Cout_data += 2;
 			}
-			comp_data++; 
+			comp_data++;
 		}
 
 	} while(comp_data - start_comp_data < comp_len);
@@ -304,21 +303,21 @@ int memory_decomp(unsigned char *decout_data, unsigned char *comp_data,
 	do {
 		Dhdin = (*Cout_data);
 		Cout_data += ((Dhdin & 0x01));
-		*decout_data = ((Dhdin >> 0 & 0x01)) * (*Cout_data); 
-		Cout_data += ((Dhdin >> 1 & 0x01)); 
-		*(decout_data + 1) = ((Dhdin >> 1 & 0x01)) * (*Cout_data); 
+		*decout_data = ((Dhdin >> 0 & 0x01)) * (*Cout_data);
+		Cout_data += ((Dhdin >> 1 & 0x01));
+		*(decout_data + 1) = ((Dhdin >> 1 & 0x01)) * (*Cout_data);
 		Cout_data += ((Dhdin >> 2 & 0x01));
-		*(decout_data + 2) = ((Dhdin >> 2 & 0x01)) * (*Cout_data); 
+		*(decout_data + 2) = ((Dhdin >> 2 & 0x01)) * (*Cout_data);
 		Cout_data += ((Dhdin >> 3 & 0x01));
-		*(decout_data + 3) = ((Dhdin >> 3 & 0x01)) * (*Cout_data); 
+		*(decout_data + 3) = ((Dhdin >> 3 & 0x01)) * (*Cout_data);
 		Cout_data += ((Dhdin >> 4 & 0x01));
-		*(decout_data + 4) = ((Dhdin >> 4 & 0x01)) * (*Cout_data); 
+		*(decout_data + 4) = ((Dhdin >> 4 & 0x01)) * (*Cout_data);
 		Cout_data += ((Dhdin >> 5 & 0x01));
-		*(decout_data + 5) = ((Dhdin >> 5 & 0x01)) * (*Cout_data); 
+		*(decout_data + 5) = ((Dhdin >> 5 & 0x01)) * (*Cout_data);
 		Cout_data += ((Dhdin >> 6 & 0x01));
-		*(decout_data + 6) = ((Dhdin >> 6 & 0x01)) * (*Cout_data); 
+		*(decout_data + 6) = ((Dhdin >> 6 & 0x01)) * (*Cout_data);
  		Cout_data += ((Dhdin >> 7 & 0x01));
-		*(decout_data + 7) = ((Dhdin >> 7 & 0x01)) * (*Cout_data); 
+		*(decout_data + 7) = ((Dhdin >> 7 & 0x01)) * (*Cout_data);
 		decout_data += 8;
 		Cout_data += 1;
 	} while(decout_data - start_decout_data < CHK_SIZE);
@@ -331,7 +330,7 @@ int memory_decomp(unsigned char *decout_data, unsigned char *comp_data,
 		pr_info("%x", *decout_data);
 		decout_data += 1;
 	} while(decout_data - start_decout_data < CHK_SIZE);
-	return 1; 
+	return 1;
 }
 EXPORT_SYMBOL_GPL(memory_decomp);
 
@@ -360,7 +359,7 @@ static irqreturn_t mem_comp_irq_handler(int irq, void *dev_id)
 
 	pr_info("%10u byte \t time: %10lu \t MB/s: %10lu\n",
 				test_s, time , (test_s * 954) / time);
-	
+
 	/* clear interrupt */
 	writel(ISR_CLEAR, mem_comp.base + ISR);
 	/* scheduling the sswap thread */
@@ -457,8 +456,8 @@ static void mcomp_test_src_init(void)
 #if 0
 static void mcomp_dotask(unsigned long data)
 {
-	
-//	struct memory_comp *mem_comp = (struct memory_comp *)data; 
+
+//	struct memory_comp *mem_comp = (struct memory_comp *)data;
 	pr_info("%s] \n", __func__);
 //	pr_info("%d \n", mem_comp.comp_buf_addr[0]);
 }
@@ -491,12 +490,12 @@ static int unitest_init(void)
 //	test_swap_disk[disk_num] = dma_alloc_writecombine(NULL, test_s, disk, GFP_KERNEL);
 	test_comp_buf[disk_num] = dma_alloc_coherent(NULL, test_s, comp, GFP_KERNEL);
 	test_comp_info[disk_num] = dma_alloc_coherent(NULL, test_s, info, GFP_KERNEL);
-	
+
 
 	memory_comp_init(nr_disk, test_swap_disk, test_comp_buf,
 					test_comp_info);//, mem_comp.tasklet);
 
-#if 1 
+#if 1
 	for(disk_num = 0; disk_num < nr_disk; disk_num++) {
 		memset(mem_comp.sswap_disk_addr[disk_num], 0x80, test_size);
 		pr_info("disk_num: %d addr: %lx --- value: %x \n", disk_num,
@@ -517,7 +516,7 @@ static int unitest_init(void)
 		pr_info("addr: %x - value: %x\n",(unsigned int)buff, (unsigned int)*buff);
 		buff++;
 	} while ((buff - mem_comp.sswap_disk_addr[0]) < SZ_32K);
-#endif	
+#endif
 	mcomp_test_src_init();
 	return 0;
 }
@@ -525,8 +524,8 @@ static int unitest_init(void)
 static int debug_mcomp_init_get(void *data, u64 *val)
 {
 	pr_info("%s] \n", __func__);
-	unitest_init(); 
-	
+	unitest_init();
+
 	*val = 1;
 	return 0;
 }
@@ -557,8 +556,8 @@ static int debug_mcomp_unitest_set(void *data, u64 val)
 		pr_info("compressed done\n");
 
 		/* decompress data */
-#if 0 
-		memory_decomp(decout_data, 
+#if 0
+		memory_decomp(decout_data,
 			(unsigned char *)mem_comp.comp_buf_addr[0], 1024, decomp_data);
 #endif
 	}
@@ -610,7 +609,7 @@ static int memory_compressor_probe(struct platform_device *pdev)
 		mem_comp.sswap_disk_addr[i] = NULL;
 	}
 
-//	tasklet_init(mem_comp.tasklet, mcomp_dotask), (unsigned int) mem_comp); 
+//	tasklet_init(mem_comp.tasklet, mcomp_dotask), (unsigned int) mem_comp);
 	/* debugfs init */
 	d = debugfs_create_dir("exynos_mcomp", NULL);
 
@@ -636,7 +635,10 @@ static int memory_compressor_remove(struct platform_device *pdev)
 
 #ifdef CONFIG_OF
 static const struct of_device_id mcomp_dt_match[] = {
-	{ .compatible = "samsung,exynos-mcomp",},
+	{
+		.compatible = "samsung,exynos-mcomp",
+	},
+	{},
 };
 MODULE_DEVICE_TABLE(of, exynos_cpufreq_match);
 #endif
@@ -654,6 +656,7 @@ static struct platform_driver mem_comp_driver = {
 static int __init memory_compressor_init(void)
 {
 	int ret = 0;
+
 	ret = platform_driver_register(&mem_comp_driver);
 	if (!ret)
 		pr_info("%s: init\n",

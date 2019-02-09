@@ -1479,6 +1479,7 @@ static int detach_jig_uart_boot_off(struct s2mu005_muic_data *muic_data)
 	return ret;
 }
 
+#if 0
 static int attach_jig_uart_boot_on(struct s2mu005_muic_data *muic_data,
 				muic_attached_dev_t new_dev)
 {
@@ -1504,6 +1505,7 @@ static int dettach_jig_uart_boot_on(struct s2mu005_muic_data *muic_data)
 
 	return 0;
 }
+#endif
 
 static int attach_jig_usb_boot_off(struct s2mu005_muic_data *muic_data,
 				u8 vbvolt)
@@ -1602,17 +1604,19 @@ static void s2mu005_muic_handle_attach(struct s2mu005_muic_data *muic_data,
 		break;
 
 	case ATTACHED_DEV_JIG_UART_ON_MUIC:
+		if (new_dev != muic_data->attached_dev) {
+			pr_info("[muic] %s new(%d)!=attached(%d)\n",
+				__func__, new_dev, muic_data->attached_dev);
+
+			ret = detach_jig_uart_boot_off(muic_data);
+		}
+		break;
 	case ATTACHED_DEV_DESKDOCK_MUIC:
 		if (new_dev != muic_data->attached_dev) {
 			pr_err("[muic] %s new(%d)!=attached(%d)\n",
 				__func__, new_dev, muic_data->attached_dev);
 
-			if(muic_data->is_factory_start)
-				ret = detach_deskdock(muic_data);
-			else {
-				noti = false;
-				ret = dettach_jig_uart_boot_on(muic_data);
-			}
+			ret = detach_deskdock(muic_data);
 		}
 		break;
 	default:
@@ -1652,14 +1656,8 @@ static void s2mu005_muic_handle_attach(struct s2mu005_muic_data *muic_data,
 		ret = attach_jig_uart_boot_off(muic_data, new_dev);
 		break;
 	case ATTACHED_DEV_JIG_UART_ON_MUIC:
-		/* call attach_deskdock to wake up the device */
 		muic_data->is_jig_on = true;
-		if(muic_data->is_factory_start)
-			ret = attach_deskdock(muic_data, new_dev, vbvolt);
-		else {
-			noti = false;
-			ret = attach_jig_uart_boot_on(muic_data, new_dev);
-		}
+		ret = attach_jig_uart_boot_off(muic_data, new_dev);
 		break;
 	case ATTACHED_DEV_JIG_USB_OFF_MUIC:
 		muic_data->is_jig_on = true;
@@ -1732,13 +1730,10 @@ static void s2mu005_muic_handle_detach(struct s2mu005_muic_data *muic_data)
 		ret = detach_jig_uart_boot_off(muic_data);
 		break;
 	case ATTACHED_DEV_JIG_UART_ON_MUIC:
+		ret = detach_jig_uart_boot_off(muic_data);
+		break;
 	case ATTACHED_DEV_DESKDOCK_MUIC:
-		if(muic_data->is_factory_start)
-			ret = detach_deskdock(muic_data);
-		else {
-			noti = false;
-			ret = dettach_jig_uart_boot_on(muic_data);
-		}
+		ret = detach_deskdock(muic_data);
 		break;
 	case ATTACHED_DEV_AUDIODOCK_MUIC:
 		ret = detach_audiodock(muic_data);

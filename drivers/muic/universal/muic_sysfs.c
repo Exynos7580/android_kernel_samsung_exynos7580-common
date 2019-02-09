@@ -29,6 +29,7 @@
 #include <linux/delay.h>
 #include <linux/host_notify.h>
 #include <linux/string.h>
+#include <linux/sec_ext.h>
 
 #include <linux/muic/muic.h>
 
@@ -204,98 +205,6 @@ static ssize_t muic_show_usb_state(struct device *dev,
 	return 0;
 }
 
-#ifdef DEBUG_MUIC
-static ssize_t muic_show_registers(struct device *dev,
-					   struct device_attribute *attr,
-					   char *buf)
-{
-	muic_data_t *pmuic = dev_get_drvdata(dev);
-	char mesg[256] = "";
-
-	mutex_lock(&pmuic->muic_mutex);
-	muic_read_reg_dump(pmuic, mesg);
-	mutex_unlock(&pmuic->muic_mutex);
-	pr_info("%s:%s\n", __func__, mesg);
-
-	return sprintf(buf, "%s\n", mesg);
-}
-
-static char reg_dump_buf[256];
-static ssize_t muic_show_reg_sel(struct device *dev,
-					   struct device_attribute *attr,
-					   char *buf)
-{
-	pr_info("%s:%s\n", __func__, reg_dump_buf);
-
-	return sprintf(buf, "%s\n", reg_dump_buf);
-}
-
-static ssize_t muic_set_reg_sel(struct device *dev,
-					  struct device_attribute *attr,
-					  const char *buf, size_t count)
-{
-	muic_data_t *pmuic = dev_get_drvdata(dev);
-	int len = strlen(buf);
-	unsigned int reg_base = 0, reg_num = 0;
-	int ret = -EINVAL, i = 0;
-
-#if 0 /* For the compatibility in 64 bit */
-	pr_info("%s:%s -> %s(%d, %d)\n", MUIC_DEV_NAME, __func__,
-		buf, count, len);
-#endif
-	if (len < 6) {
-		ret = kstrtoint(buf, 0, &reg_base);
-		if (ret) {
-			pr_err("%s: Undefined Regs\n", __func__);
-			goto err;
-		}
-		reg_num = 1;
-	} else if (len < 10) {
-		char *ptr;
-		char reg_buf[8];
-
-		strcpy(reg_buf, buf);
-		ptr = strstr(reg_buf, "++");
-		*ptr = 0x00;
-		ret = kstrtoint(reg_buf, 0, &reg_base);
-		if (ret) {
-			pr_err("%s: Undefined Regs\n", __func__);
-			goto err;
-		}
-		ret = kstrtoint(ptr + 2, 0, &reg_num);
-		if (ret) {
-			pr_err("%s: Undefined Regs\n", __func__);
-			goto err;
-		}
-	} else {
-		pr_err("%s: Undefined Regs\n", __func__);
-		goto err;
-	}
-
-	pr_info(" (reg_base,reg_num) = (0x%02x,%d)\n", reg_base, reg_num);
-
-	memset(reg_dump_buf, 0x00, sizeof(reg_dump_buf));
-
-	while (reg_num--) {
-		mutex_lock(&pmuic->muic_mutex);
-		ret = muic_i2c_read_byte(pmuic->i2c, reg_base + i);
-		mutex_unlock(&pmuic->muic_mutex);
-		if (ret < 0) {
-			pr_err("%s:%s err read %d\n", MUIC_DEV_NAME, __func__,
-					reg_base);
-			goto err;
-		}
-		pr_info(" [%02x] : %02x\n", reg_base, ret);
-
-		sprintf(reg_dump_buf + strlen(reg_dump_buf),
-			" [%02x] : %02x\n", reg_base + i++, ret);
-	}
-
-err:
-	return count;
-}
-#endif
-
 #if defined(CONFIG_USB_HOST_NOTIFY)
 static ssize_t muic_show_otg_test(struct device *dev,
 					   struct device_attribute *pattr,
@@ -468,16 +377,68 @@ static ssize_t muic_set_apo_factory(struct device *dev,
 	return count;
 }
 
+#if defined(CONFIG_MUIC_UNIVERSAL_SM5705_AFC) || defined(CONFIG_MUIC_HV)
+static ssize_t muic_show_afc_disable(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	muic_data_t *pmuic = dev_get_drvdata(dev);
+	struct muic_platform_data *pdata = pmuic->pdata;
+
+	if (pdata->afc_disable) {
+		pr_info("%s:%s AFC DISABLE\n", MUIC_DEV_NAME, __func__);
+		return sprintf(buf, "1\n");
+	}
+
+	pr_info("%s:%s AFC ENABLE", MUIC_DEV_NAME, __func__);
+	return sprintf(buf, "0\n");
+}
+
+static ssize_t muic_set_afc_disable(struct device *dev,
+				    struct device_attribute *attr,
+				    const char *buf, size_t count)
+{
+	muic_data_t *pmuic = dev_get_drvdata(dev);
+	struct muic_platform_data *pdata = pmuic->pdata;
+	bool curr_val = pdata->afc_disable;
+	int param_val, ret = 0;
+
+	/* Disable AFC */
+	if (!strncasecmp(buf, "1", 1))
+		pdata->afc_disable = true;
+	/* Enable AFC */
+	else if (!strncasecmp(buf, "0", 1))
+		pdata->afc_disable = false;
+	else {
+		pr_warn("%s:%s invalid value\n", MUIC_DEV_NAME, __func__);
+		return count;
+	}
+
+	param_val = pdata->afc_disable ? '1' : '0';
+
+#ifdef CM_OFFSET
+	if ((ret = sec_set_param(CM_OFFSET + 1, (char)param_val)) < 0) {
+		pr_err("%s:set_param failed - %02x:%02x(%d)\n", __func__,
+				param_val, curr_val, ret);
+		pdata->afc_disable = curr_val;
+		return ret;
+	}
+#else
+	pr_err("%s:set_param is NOT supported! - %02x:%02x(%d)\n", __func__,
+				param_val, curr_val, ret);
+#endif
+	pr_info("%s:%s afc_disable:%d (AFC %s)\n", MUIC_DEV_NAME, __func__,
+		pdata->afc_disable, pdata->afc_disable ? "Disabled": "Enabled");
+
+	return count;
+}
+#endif
+
 static DEVICE_ATTR(uart_en, 0664, muic_show_uart_en, muic_set_uart_en);
 static DEVICE_ATTR(uart_sel, 0664, muic_show_uart_sel,
 		muic_set_uart_sel);
 static DEVICE_ATTR(usb_sel, 0664,
 		muic_show_usb_sel, muic_set_usb_sel);
 static DEVICE_ATTR(adc, 0664, muic_show_adc, NULL);
-#ifdef DEBUG_MUIC
-static DEVICE_ATTR(reg_dump, 0664, muic_show_registers, NULL);
-static DEVICE_ATTR(reg_sel, 0664, muic_show_reg_sel, muic_set_reg_sel);
-#endif
 static DEVICE_ATTR(usb_state, 0664, muic_show_usb_state, NULL);
 #if defined(CONFIG_USB_HOST_NOTIFY)
 static DEVICE_ATTR(otg_test, 0664,
@@ -489,16 +450,16 @@ static DEVICE_ATTR(audio_path, 0664,
 static DEVICE_ATTR(apo_factory, 0664,
 		muic_show_apo_factory,
 		muic_set_apo_factory);
+#if defined(CONFIG_MUIC_UNIVERSAL_SM5705_AFC) || defined(CONFIG_MUIC_HV)
+static DEVICE_ATTR(afc_disable, 0664,
+		muic_show_afc_disable, muic_set_afc_disable);
+#endif
 
 static struct attribute *muic_attributes[] = {
 	&dev_attr_uart_en.attr,
 	&dev_attr_uart_sel.attr,
 	&dev_attr_usb_sel.attr,
 	&dev_attr_adc.attr,
-#ifdef DEBUG_MUIC
-	&dev_attr_reg_dump.attr,
-	&dev_attr_reg_sel.attr,
-#endif
 	&dev_attr_usb_state.attr,
 #if defined(CONFIG_USB_HOST_NOTIFY)
 	&dev_attr_otg_test.attr,
@@ -506,6 +467,9 @@ static struct attribute *muic_attributes[] = {
 	&dev_attr_attached_dev.attr,
 	&dev_attr_audio_path.attr,
 	&dev_attr_apo_factory.attr,
+#if defined(CONFIG_MUIC_UNIVERSAL_SM5705_AFC) || defined(CONFIG_MUIC_HV)
+	&dev_attr_afc_disable.attr,
+#endif
 	NULL
 };
 

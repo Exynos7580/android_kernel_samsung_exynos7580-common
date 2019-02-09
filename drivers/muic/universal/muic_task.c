@@ -121,7 +121,6 @@ static int muic_irq_handler_afc(muic_data_t *pmuic, int irq)
 	}
 	if (intr1 & MUIC_INT_DETACH_MASK) {
 		cancel_delayed_work(&pmuic->afc_retry_work);
-		cancel_delayed_work(&pmuic->afc_restart_work);
 	}
 
 	pr_info("%s:%s intr[1:0x%x, 2:0x%x, 3:0x%x]\n", pmuic->chip_name, __func__,
@@ -468,6 +467,14 @@ static int muic_probe(struct i2c_client *i2c,
 	} else {
 		pr_info("  Disable rustproof mode\n");
 		pmuic->is_rustproof = false;
+	}
+
+	if (get_afc_mode() == CH_MODE_AFC_DISABLE_VAL) {
+		pr_info("  AFC mode disabled\n");
+		pmuic->pdata->afc_disable = true;
+	} else {
+		pr_info("  AFC mode enabled\n");
+		pmuic->pdata->afc_disable = false;
 	}
 
 	/* Register chipset register map. */

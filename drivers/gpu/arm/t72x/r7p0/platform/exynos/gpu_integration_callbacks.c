@@ -88,6 +88,7 @@ void gpu_pm_record_state(void *dev, bool is_active);
 #endif
 
 extern int gpu_register_dump(void);
+extern struct kbase_device *pkbdev;
 
 void gpu_create_context(void *ctx)
 {
@@ -428,10 +429,10 @@ int gpu_vendor_dispatch(struct kbase_context *kctx, void * const args, u32 args_
 int gpu_memory_seq_show(struct seq_file *sfile, void *data)
 {
 	ssize_t ret = 0;
-#ifdef R7P0_EAC_BLOCK
 	struct list_head *entry;
 	const struct list_head *kbdev_list;
 	size_t free_size = 0;
+	size_t each_free_size = 0;
 
 	kbdev_list = kbase_dev_list_get();
 	list_for_each(entry, kbdev_list) {
@@ -442,7 +443,9 @@ int gpu_memory_seq_show(struct seq_file *sfile, void *data)
 		/* output the total memory usage and cap for this device */
 		mutex_lock(&kbdev->kctx_list_lock);
 		list_for_each_entry(element, &kbdev->kctx_list, link) {
-			free_size += atomic_read(&(element->kctx->mem_pool.cur_size));
+			spin_lock(&(element->kctx->mem_pool.pool_lock));
+			free_size += element->kctx->mem_pool.cur_size;
+			spin_unlock(&(element->kctx->mem_pool.pool_lock));
 		}
 		mutex_unlock(&kbdev->kctx_list_lock);
 		ret = seq_printf(sfile, "===========================================================\n");
@@ -468,17 +471,19 @@ int gpu_memory_seq_show(struct seq_file *sfile, void *data)
 			/* output the memory usage and cap for each kctx
 			* opened on this device */
 
-			ret = seq_printf(sfile, "  (%24s), %s-0x%p    %12u  %10u\n", \
-				element->kctx->name, \
-				"kctx", \
-				element->kctx, \
-				atomic_read(&(element->kctx->used_pages)),
-				atomic_read(&(element->kctx->mem_pool.cur_size)) );
+			spin_lock(&(element->kctx->mem_pool.pool_lock));
+			each_free_size = element->kctx->mem_pool.cur_size;
+			spin_unlock(&(element->kctx->mem_pool.pool_lock));
+			ret = seq_printf(sfile, "  (%24s), %s-0x%pK    %12u  %10zu\n", \
+					element->kctx->name, \
+					"kctx", \
+					element->kctx, \
+					atomic_read(&(element->kctx->used_pages)),
+					each_free_size );
 		}
 		mutex_unlock(&kbdev->kctx_list_lock);
 	}
 	kbase_dev_list_put(kbdev_list);
-#endif
 	return ret;
 }
 
@@ -1049,17 +1054,17 @@ static bool gpu_mem_profile_check_kctx(void *ctx)
 	kctx = (struct kbase_context *)ctx;
 	KBASE_DEBUG_ASSERT(kctx != NULL);
 
-	kbdev = kctx->kbdev;
+	kbdev = pkbdev;
 	KBASE_DEBUG_ASSERT(kbdev != NULL);
 
-	mutex_lock(&kbdev->kctx_list_lock);
 	list_for_each_entry_safe(element, tmp, &kbdev->kctx_list, link) {
 		if (element->kctx == kctx) {
-			found_element = true;
-			break;
+			if (kctx->destroying_context == false) {
+				found_element = true;
+				break;
+			}
 		}
 	}
-	mutex_unlock(&kbdev->kctx_list_lock);
 
 	return found_element;
 }

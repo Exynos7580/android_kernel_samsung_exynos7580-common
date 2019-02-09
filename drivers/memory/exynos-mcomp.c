@@ -362,7 +362,7 @@ static struct platform_driver mem_comp_driver = {
 		.name	= "exynos-mcomp",
 		.owner	= THIS_MODULE,
 		.of_match_table = mcomp_dt_match,
-	}
+	},
 };
 
 static int __init memory_compressor_init(void)

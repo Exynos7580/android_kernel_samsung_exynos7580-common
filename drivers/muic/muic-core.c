@@ -67,6 +67,27 @@ int get_switch_sel(void)
 	return switch_sel;
 }
 
+/* afc_mode:
+ *   0x31 : Disabled
+ *   0x30 : Enabled
+ */
+static int afc_mode = 0;
+static int __init set_afc_mode(char *str)
+{
+	int mode;
+	get_option(&str, &mode);
+	afc_mode = (mode & 0x0000FF00) >> 8;
+	pr_info("%s: afc_mode is 0x%02x\n", __func__, afc_mode);
+
+	return 0;
+}
+early_param("charging_mode", set_afc_mode);
+
+int get_afc_mode(void)
+{
+	return afc_mode;
+}
+
 #if defined(CONFIG_MUIC_NOTIFIER)
 static struct notifier_block dock_notifier_block;
 
@@ -346,6 +367,7 @@ static int muic_init_gpio_cb(void)
 	else
 		pdata->rustproof_on = false;
 
+	pdata->afc_disable = false;
 
 	printk(KERN_DEBUG "[muic] %s: usb_path(%s), uart_path(%s), rustproof(%c)\n",
 		__func__, usb_mode,

@@ -51,6 +51,7 @@
 enum sm5703_muic_reg_init_value {
 	REG_INTMASK1_VALUE	= (0xDC),
 	REG_INTMASK2_VALUE	= (0x00),
+	REG_INTMASK2_VBUS_VAL	= (0x81),
 	REG_TIMING1_VALUE	= (ADC_DETECT_TIME_200MS |
 				KEY_PRESS_TIME_100MS),
 };
@@ -487,7 +488,7 @@ static int sm5703_get_adc_scan_mode(struct regmap_desc *pdesc)
 	attr = MANSW2_SINGLE_MODE;
 	value = regmap_read_value(pdesc, attr);
 
-	for ( ; mode <ARRAY_SIZE(sm5703_adc_scanmode_tbl); mode++) {
+	for (; mode < ARRAY_SIZE(sm5703_adc_scanmode_tbl); mode++) {
 		pvset = &sm5703_adc_scanmode_tbl[mode];
 		if (pvset->value == value)
 			break;
@@ -541,19 +542,19 @@ static void sm5703_set_adc_scan_mode(struct regmap_desc *pdesc,
 
 		_REGMAP_TRACE(pdesc, 'w', ret, attr, value);
 
-        } while (0);
+	} while (0);
 }
 
-enum switching_mode_val{
-	_SWMODE_AUTO =1,
-	_SWMODE_MANUAL =0,
+enum switching_mode_val {
+	_SWMODE_AUTO = 1,
+	_SWMODE_MANUAL = 0,
 };
 
 static int sm5703_get_switching_mode(struct regmap_desc *pdesc)
 {
 	int attr, value, mode;
 
-	pr_info("%s\n",__func__);
+	pr_info("%s\n", __func__);
 
 	attr = CTRL_ManualSW;
 	value = regmap_read_value(pdesc, attr);
@@ -565,10 +566,10 @@ static int sm5703_get_switching_mode(struct regmap_desc *pdesc)
 
 static void sm5703_set_switching_mode(struct regmap_desc *pdesc, int mode)
 {
-        int attr, value;
+	int attr, value;
 	int ret = 0;
 
-	pr_info("%s\n",__func__);
+	pr_info("%s\n", __func__);
 
 	value = (mode == SWMODE_AUTO) ? _SWMODE_AUTO : _SWMODE_MANUAL;
 	attr = CTRL_ManualSW;
@@ -577,6 +578,68 @@ static void sm5703_set_switching_mode(struct regmap_desc *pdesc, int mode)
 		pr_err("%s REG_CTRL write fail.\n", __func__);
 	else
 		_REGMAP_TRACE(pdesc, 'w', ret, attr, value);
+}
+
+static int sm5703_reset_vbus_path(struct regmap_desc *pdesc)
+{
+	int attr, value, intmask2_val;
+	int ret = 0;
+
+	pr_info("%s\n", __func__);
+
+	intmask2_val = muic_i2c_read_byte(pdesc->muic->i2c, REG_INTMASK2);
+
+	/* disable vbus interrupt */
+	value = intmask2_val | REG_INTMASK2_VBUS_VAL;
+	attr = REG_INTMASK2 | _ATTR_OVERWRITE_M;
+	ret = regmap_write_value(pdesc, attr, value);
+	if (ret < 0) {
+		pr_err("%s REG_INTMASK2 write fail.\n", __func__);
+		goto out;
+	} else {
+		_REGMAP_TRACE(pdesc, 'w', ret, attr, value);
+	}
+
+	/* vbus open */
+	value = _V_OPEN;
+	attr = MANSW1_VBUS_SW;
+	ret = regmap_write_value(pdesc, attr, value);
+	if (ret < 0) {
+		pr_err("%s MANSW1_VBUS_SW write fail.\n", __func__);
+		goto out;
+	} else {
+		_REGMAP_TRACE(pdesc, 'w', ret, attr, value);
+	}
+
+	/* vbus set */
+	value = _V_CHARGER;
+	attr = MANSW1_VBUS_SW;
+	ret = regmap_write_value(pdesc, attr, value);
+	if (ret < 0) {
+		pr_err("%s MANSW1_VBUS_SW write fail.\n", __func__);
+		goto out;
+	} else {
+		_REGMAP_TRACE(pdesc, 'w', ret, attr, value);
+	}
+
+	/* need to add delay for checking vbus interrupt and clear vbus interrupt */
+	msleep(50);
+	value = muic_i2c_read_byte(pdesc->muic->i2c, REG_INT2);
+	pr_info("%s:%s intr2=0x%x\n", MUIC_DEV_NAME, __func__, value);
+
+	/* enable vbus interrupt */
+	value = intmask2_val;
+	attr = REG_INTMASK2 | _ATTR_OVERWRITE_M;
+	ret = regmap_write_value(pdesc, attr, value);
+	if (ret < 0) {
+		pr_err("%s REG_INTMASK2 write fail.\n", __func__);
+		goto out;
+	} else {
+		_REGMAP_TRACE(pdesc, 'w', ret, attr, value);
+	}
+
+out:
+	return ret;
 }
 
 static void sm5703_get_fromatted_dump(struct regmap_desc *pdesc, char *mesg)
@@ -630,6 +693,7 @@ static struct vendor_ops sm5703_muic_vendor_ops = {
 	.get_adc_scan_mode = sm5703_get_adc_scan_mode,
 	.set_rustproof = sm5703_set_rustproof,
 	.get_vps_data = sm5703_get_vps_data,
+	.reset_vbus_path = sm5703_reset_vbus_path,
 };
 
 static struct regmap_desc sm5703_muic_regmap_desc = {

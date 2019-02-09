@@ -41,18 +41,21 @@ void dvfs_hwcnt_attach(void *dev)
 	bitmap[MMU_L2_HWCNT_BM] = platform->hwcnt_choose_mmu_l2;
 	bitmap[JM_HWCNT_BM] = platform->hwcnt_choose_jm;
 
-	// set attach flag before enable
-	kbdev->hwcnt.is_hwcnt_attach = true;
-
 	vinstr_cli = kbasep_vinstr_attach_client_sec(kbdev->vinstr_ctx, 0, bitmap, (void *)(long)kbdev->hwcnt.hwcnt_fd);
+	if (vinstr_cli == NULL || kbdev->hwcnt.kctx == NULL)
+	{
+		GPU_LOG(DVFS_WARNING, DUMMY, 0u, 0u, "skip attach hwcnt \n");
+		return;
+	}
 	kbdev->hwcnt.kctx->vinstr_cli = vinstr_cli;
 
 	kbase_vinstr_disable(kbdev->vinstr_ctx);
+	kbase_pm_context_idle(kbdev);
+
 	kbdev->hwcnt.is_hwcnt_enable = false;
 	kbdev->hwcnt.is_hwcnt_gpr_enable = false;
 	kbdev->hwcnt.is_hwcnt_force_stop = false;
-	kbdev->hwcnt.timeout = (unsigned int)msecs_to_jiffies(100);
-	kbase_pm_context_idle(kbdev);
+	kbdev->hwcnt.is_hwcnt_attach = true;
 }
 
 void dvfs_hwcnt_update(void *dev)
@@ -127,8 +130,8 @@ void dvfs_hwcnt_enable(void *dev)
 	platform = (struct exynos_context *) kbdev->platform_context;
 	if (platform->dvs_is_enabled == false && kbdev->hwcnt.is_hwcnt_enable == false)
 	{
-		kbase_vinstr_enable(kbdev->vinstr_ctx);
-		kbdev->hwcnt.is_hwcnt_enable = true;
+		if (!kbase_vinstr_enable(kbdev->vinstr_ctx))
+			kbdev->hwcnt.is_hwcnt_enable = true;
 	}
 }
 

@@ -104,6 +104,9 @@ struct sec_spi_info {
 #define FP_SET_WAKE_UP_SIGNAL				0x17
 #endif
 
+#define FP_POWER_CONTROL_ET510				0x18
+#define FP_IOCTL_RESERVED_01				0x19
+
 #define FP_EEPROM_WREN					0x90
 #define FP_EEPROM_WRDI					0x91
 #define FP_EEPROM_RDSR					0x92
@@ -192,7 +195,7 @@ struct etspi_data {
 #endif
 	unsigned int spi_cs;	/* spi cs pin <temporary gpio setting> */
 
-	unsigned int drdy_irq_flag;	/* irq flag */
+	atomic_t drdy_irq_flag;	/* irq flag */
 	bool ldo_onoff;
 
 	/* For polling interrupt */

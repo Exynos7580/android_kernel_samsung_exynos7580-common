@@ -117,6 +117,7 @@ typedef struct _muic_data_t {
 	struct device *dev;
 	struct i2c_client *i2c; /* i2c addr: 0x4A; MUIC */
 	struct mutex muic_mutex;
+	struct mutex lock;
 
 	/* model dependant muic platform data */
 	struct muic_platform_data *pdata;
@@ -147,11 +148,12 @@ typedef struct _muic_data_t {
 	struct delayed_work	init_work;
 	struct delayed_work	usb_work;
 
-	int is_flash_on;
+	int is_afc_5v;
+	bool is_camera_on;
+	bool check_charger_lcd_on;
 	int irq_n;
 	int is_afc_device;
 	struct delayed_work	afc_retry_work;
-	struct delayed_work	afc_restart_work;
 }muic_data_t;
 
 extern struct device *switch_device;

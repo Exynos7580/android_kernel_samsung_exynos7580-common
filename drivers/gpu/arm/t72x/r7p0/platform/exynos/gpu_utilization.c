@@ -147,8 +147,7 @@ int gpu_dvfs_calculate_env_data(struct kbase_device *kbdev)
 		return 0;
 
 #ifdef MALI_SEC_HWCNT
-	if (kbdev->hwcnt.is_hwcnt_attach == true && kbdev->hwcnt.is_hwcnt_enable == true
-		&& kbdev->hwcnt.is_hwcnt_gpr_enable == false) {
+	if (kbdev->hwcnt.is_hwcnt_attach == true && kbdev->hwcnt.is_hwcnt_gpr_enable == false) {
 		polling_period = platform->hwcnt_polling_speed;
 		if (!gpu_control_is_power_on(kbdev))
 			return 0;

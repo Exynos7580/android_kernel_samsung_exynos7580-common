@@ -521,21 +521,48 @@ int gpu_dvfs_get_level(int clock)
 	return -1;
 }
 
-int gpu_dvfs_get_stock_level(int clock)
+int gpu_dvfs_get_max_freq(void)
 {
+#if defined(CONFIG_MALI_DVFS)
 	struct kbase_device *kbdev = pkbdev;
 	struct exynos_context *platform = (struct exynos_context *) kbdev->platform_context;
-	int i;
 
 	DVFS_ASSERT(platform);
 
-	if ((clock < platform->gpu_min_clock_limit) || (clock > platform->gpu_max_clock_limit))
-		return -1;
+	return platform->gpu_max_clock;
+#else
+	return -1;
+#endif
+}
 
-	for (i = 0; i < platform->table_size; i++) {
-		if (platform->table[i].clock == clock)
-			return i;
-	}
+int gpu_dvfs_get_min_freq(void)
+{
+#if defined(CONFIG_MALI_DVFS)
+	struct kbase_device *kbdev = pkbdev;
+	struct exynos_context *platform = (struct exynos_context *) kbdev->platform_context;
+
+	DVFS_ASSERT(platform);
+
+	return platform->gpu_min_clock;
+#else
+	return -1;
+#endif
+}
+
+int gpu_dvfs_get_level_clock(int clock)
+{
+	struct kbase_device *kbdev = pkbdev;
+	struct exynos_context *platform = (struct exynos_context *) kbdev->platform_context;
+	int i, min, max;
+
+	DVFS_ASSERT(platform);
+
+	min = gpu_dvfs_get_level(platform->gpu_min_clock);
+	max = gpu_dvfs_get_level(platform->gpu_max_clock);
+
+	for (i = max; i <= min; i++)
+		if (clock - (int)(platform->table[i].clock) >= 0)
+			return platform->table[i].clock;
 
 	return -1;
 }
@@ -791,11 +818,12 @@ bool gpu_dvfs_process_job(void *pkatom)
 
 	mutex_lock(&platform->gpu_process_job_lock);
 
+	job = &dvfs_job;
+
 	job_addr = get_compat_pointer(katom->kctx, (union kbase_pointer *)&katom->jc);
 	if (copy_from_user(&dvfs_job, job_addr, sizeof(gpu_dvfs_job)) != 0)
 		goto out;
 
-	job = &dvfs_job;
 	data = (gpu_dvfs_job __user *)get_compat_pointer(katom->kctx, (union kbase_pointer *)&job->data);
 
 	job->event = DVFS_JOB_EVENT_ERROR;

@@ -703,14 +703,19 @@ static int sm5705_afc_ta_attach(struct regmap_desc *pdesc)
 
 	pr_info("%s:%s AFC_TA_ATTACHED \n",MUIC_DEV_NAME, __func__);
 
+	if (pmuic->pdata->afc_disable) {
+		pr_info("%s: %s AFC is disabled by USER!\n", MUIC_DEV_NAME, __func__);
+		return 0;
+	}
+
 	// read clear : AFC_STATUS
 	value = muic_i2c_read_byte(i2c, REG_AFCSTAT);
 	if (value < 0)
 		printk(KERN_ERR "%s: err read AFC_STATUS %d\n", __func__, value);
 	pr_info("%s:%s AFC_STATUS [0x%02x]\n",MUIC_DEV_NAME, __func__, value);
 
-	if (pmuic->is_flash_on) {
-		pr_info("%s:%s FLASH On, Skip AFC\n",MUIC_DEV_NAME, __func__);
+	if (pmuic->is_afc_5v) {
+		pr_info("%s:%s should be AFC 5V, Skip AFC\n",MUIC_DEV_NAME, __func__);
 		pmuic->attached_dev = ATTACHED_DEV_AFC_CHARGER_5V_MUIC;
 		muic_notifier_attach_attached_dev(ATTACHED_DEV_AFC_CHARGER_5V_MUIC);
 		return 0;
@@ -743,12 +748,12 @@ static int sm5705_afc_ta_accept(struct regmap_desc *pdesc)
 	muic_data_t *pmuic = pdesc->muic;
 	struct i2c_client *i2c = pmuic->i2c;
 	int dev3;
-	int ret, value;
+	int value;
 
 	pr_info("%s:%s AFC_ACCEPTED \n",MUIC_DEV_NAME, __func__);
 
-	if (pmuic->is_flash_on) {
-		pr_info("%s:%s FLASH On, AFC_ACCEPTED DP_RESET\n",MUIC_DEV_NAME, __func__);
+	if (pmuic->is_afc_5v) {
+		pr_info("%s:%s should be AFC 5V, AFC_ACCEPTED DP_RESET\n",MUIC_DEV_NAME, __func__);
 		// ENAFC set '0'
 		sm5705_set_afc_ctrl_reg(pdesc, AFCCTRL_ENAFC, 0);
 		msleep(50); // 50ms delay
@@ -769,7 +774,7 @@ static int sm5705_afc_ta_accept(struct regmap_desc *pdesc)
 	if (!(value & 0x46)) {
 		pr_info("%s:%s voltage is not 9V\n",MUIC_DEV_NAME, __func__);
 		value = 0x46;
-		ret = muic_i2c_write_byte(i2c, REG_AFCTXD, value);
+		muic_i2c_write_byte(i2c, REG_AFCTXD, value);
 		pmuic->attached_dev = ATTACHED_DEV_AFC_CHARGER_PREPARE_MUIC;
 		muic_notifier_attach_attached_dev(ATTACHED_DEV_AFC_CHARGER_PREPARE_MUIC);
 	}
@@ -817,11 +822,11 @@ static int sm5705_afc_vbus_update(struct regmap_desc *pdesc)
 	pr_info("%s:%s AFC_VBUS_STATUS:0x%02x, AFC_TXD:0x%02x\n"
 			,MUIC_DEV_NAME, __func__,vbus_status, value);
 
-	if (pmuic->is_flash_on == -1) {
-		pr_info("%s:%s Ready FLASH On, Skip AFC\n",MUIC_DEV_NAME, __func__);
+	if (pmuic->is_afc_5v == -1) {
+		pr_info("%s:%s Skip AFC\n",MUIC_DEV_NAME, __func__);
 		return 0;
-	} else if (pmuic->is_flash_on) {
-		pr_info("%s:%s FLASH On, Skip AFC\n",MUIC_DEV_NAME, __func__);
+	} else if (pmuic->is_afc_5v) {
+		pr_info("%s:%s should be AFC 5V, Skip AFC\n",MUIC_DEV_NAME, __func__);
 
 		if ((vbus_status == 3) || (vbus_status == 4) || (vbus_status == 5)) {
 			// ENAFC set '0'

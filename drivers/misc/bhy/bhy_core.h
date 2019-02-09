@@ -116,7 +116,7 @@ struct __attribute__((__packed__)) fifo_frame {
 #define MAX_ACCEL_4G            32768
 
 #define MODEL_NAME		"BHA250"
-#define FIRMWARE_REVISION	16061400
+#define FIRMWARE_REVISION	16122100
 
 
 /* CRYSTAL 32000 = 1 SEC */
@@ -153,13 +153,13 @@ struct pedometer_data {
 	union {
 		struct {
 			unsigned char data_index;
-			unsigned short walk_count;
-			unsigned short run_count;
+			unsigned int walk_count;
+			unsigned int run_count;
 			unsigned char step_status;
 			unsigned int start_time;
 			unsigned int end_time;
 		} __attribute__((__packed__));
-		unsigned char data[14];
+		unsigned char data[18];
 	} __attribute__((__packed__));
 } __attribute__((__packed__));
 
@@ -215,13 +215,16 @@ struct bhy_client_data {
 	struct device *acc_device;
 	struct iio_dev *indio;
 	struct pedometer_data pedo[MAX_LOGGING_SIZE + 1];
+	/* For S-Health */
 	unsigned int total_step;
 	unsigned int last_total_step;
+	/* For Android Step */
 	unsigned int step_count;
 	unsigned int last_step_count;
 	bool late_step_report;
 	unsigned char start_index;
 	unsigned char current_index;
+
 	unsigned short acc_delay;
 	bool log_mode;
 	bool walk_mode;

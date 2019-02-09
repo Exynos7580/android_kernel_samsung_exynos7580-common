@@ -425,7 +425,7 @@ static int ltm184hl01_displayon(struct lcd_info *lcd)
 
 	dev_info(&lcd->ld->dev, "[lcd] : %s was called\n", __func__);
 
-	if (!priv->lcdConnected)
+	if (priv->lcdConnected == PANEL_DISCONNEDTED)
 		return ret;
 
 	msleep(3);
@@ -677,7 +677,7 @@ static int ltm184hl01_probe(struct dsim_device *dsim)
 
 	dev_info(&lcd->ld->dev, "[lcd] : %s was called new 0x%x %d\n", __func__ ,  lcdtype, board_rev);
 
-	priv->lcdConnected = 1;
+	priv->lcdConnected = PANEL_CONNECTED;
 	lcd->bd->props.max_brightness = EXTEND_BRIGHTNESS;
 	lcd->bd->props.brightness = UI_DEFAULT_BRIGHTNESS;
 	lcd->dsim = dsim;
@@ -688,9 +688,9 @@ static int ltm184hl01_probe(struct dsim_device *dsim)
 	lcd->current_hbm = 0;
 
 	if (lcdtype == 0x0)
-		priv->lcdConnected = 0;
+		priv->lcdConnected = PANEL_DISCONNEDTED;
 
-	if (!priv->lcdConnected) {
+	if (priv->lcdConnected == PANEL_DISCONNEDTED) {
 		dev_err(&lcd->ld->dev, "[lcd] : %s lcd was not connected\n", __func__);
 
 		gpio_request_one(backlight_on, GPIOF_OUT_INIT_LOW, "BLIC_ON");

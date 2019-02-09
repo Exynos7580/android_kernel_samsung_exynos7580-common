@@ -11,9 +11,11 @@
 #ifndef __EXYNOS_MEMOMY_COMPRESSOR_H
 #define __EXYNOS_MEMOMY_COMPRESSOR_H
 
+int memory_decomp(unsigned char *decout_data, unsigned char *comp_data,
+                                unsigned int comp_len, unsigned char* Cout_data);
 int memory_comp_start_compress(u32 disk_num, u32 nr_pages);
 void memory_comp_init(u32 nr_disk, u32 **sswap_disk, u32 **comp_buf,
-							u16 **comp_info, struct tasklet_struct *tasklet);
+				u32 **comp_info);
 #endif
 
 /* regs */
