@@ -310,6 +310,11 @@ config MACH_EXYNOS7580_UNIVERSAL
 	bool "Universal (for test only)"
 	depends on MACH_UNIVERSAL7580
 
+config MACH_EXYNOS7578_A3XELTE
+	bool "SAMSUNG Galaxy A3 (SM-A310F) Quad core"
+	select EXYNOS7580_QUAD
+	depends on MACH_UNIVERSAL7580
+
 config MACH_EXYNOS7580_A3XELTE
 	bool "SAMSUNG Galaxy A3 (SM-A310F)"
 	depends on MACH_UNIVERSAL7580

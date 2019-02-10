@@ -357,14 +357,20 @@ static void lazyplug_work_fn(struct work_struct *work)
 					idle_count++;
 
 				if (idle_count == DEF_IDLE_COUNT && persist_count == 0) {
+#ifndef CONFIG_EXYNOS7580_QUAD 
 					/* take down all cpu Cluster 1 and Cluster 2 first
-					  except for CPU 0 and 4 */
+					  except for CPU0 and CPU4 */
 					cpu_down(7);
 					cpu_down(6);
 					cpu_down(5);
 					cpu_down(3);
 					cpu_down(2);
 					cpu_down(1);
+#else
+					/* take down CPU2 and CPU3 first */
+					cpu_down(3);
+					cpu_down(2);
+#endif
 					/* take down everyone */
 					unplug_cpu(0);
 #ifdef DEBUG_LAZYPLUG
@@ -456,13 +462,19 @@ void lazyplug_enter_lazy(bool enter)
 		nr_run_profile_sel = 6; /* lazy profile */
 		lazymode = true;
 
-		/* take down all cpu except for CPU 0 and 4 */
+#ifndef CONFIG_EXYNOS7580_QUAD
+		/* take down all cpu except for CPU0 and CPU4 */
 		cpu_down_nocheck(7);
 		cpu_down_nocheck(6);
 		cpu_down_nocheck(5);
 		cpu_down_nocheck(3);
 		cpu_down_nocheck(2);
 		cpu_down_nocheck(1);
+#else
+		/* take down all cpu except for CPU0 and CPU1 */
+		cpu_down_nocheck(3);
+		cpu_down_nocheck(2);
+#endif	
 	} else if (!enter && lazymode) {
 		pr_info("lazyplug: exiting lazy mode\n");
 		nr_run_profile_sel = Lnr_run_profile_sel;

@@ -21,6 +21,10 @@ dtb-$(CONFIG_MACH_EXYNOS7580_UNIVERSAL) += exynos7580-universal7580.dtb \
 					   exynos7580-universal7580_rev05.dtb \
 					   exynos7580-universal7580_q.dtb
 
+dtb-$(CONFIG_MACH_EXYNOS7578_A3XELTE) += exynos7578-a3xelte_eur_open_00.dtb \
+					 exynos7578-a3xelte_eur_open_01.dtb \
+					 exynos7578-a3xelte_eur_open_02.dtb
+
 dtb-$(CONFIG_MACH_EXYNOS7580_A3XELTE) += exynos7580-a3xelte_eur_open_00.dtb \
 					 exynos7580-a3xelte_eur_open_01.dtb \
 					 exynos7580-a3xelte_eur_open_02.dtb
