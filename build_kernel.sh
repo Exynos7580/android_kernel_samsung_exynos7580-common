@@ -5,16 +5,16 @@ export ARCH=arm64
 THREAD=-j$(bc <<< $(grep -c ^processor /proc/cpuinfo)+2)
 
 case "$1" in
-        15)
-            VARIANT="los"
+        8)
+            VARIANT="los-16"
             ;;
 
-        16)
-            VARIANT="los16"
+        4)
+            VARIANT="los-16Q"
             ;;
 
         *)
-            VARIANT="los"
+            VARIANT="los-16"
 esac
 
 if [ ! -d $(pwd)/output ];
