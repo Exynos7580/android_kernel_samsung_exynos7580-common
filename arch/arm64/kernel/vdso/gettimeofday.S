@@ -64,9 +64,14 @@ x_tmp		.req	x8
 	 * shift.
 	 */
 	.macro	get_clock_shifted_nsec res, cycle_last, mult
-	/* Read the virtual counter. */
 	isb
+#ifdef CONFIG_ARCH_EXYNOS
+	/* Read the physical counter in only exynos */
+	mrs	x_tmp, cntpct_el0
+#else
+	/* Read the virtual counter. */
 	mrs	x_tmp, cntvct_el0
+#endif
 	/* Calculate cycle delta and convert to ns. */
 	sub	\res, x_tmp, \cycle_last
 	/* We can only guarantee 56 bits of precision. */
