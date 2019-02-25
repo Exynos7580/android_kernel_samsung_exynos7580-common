@@ -2,7 +2,7 @@
  * OS Abstraction Layer Extension - the APIs defined by the "extension" API
  * are only supported by a subset of all operating systems.
  *
- * Copyright (C) 1999-2018, Broadcom.
+ * Copyright (C) 1999-2019, Broadcom.
  *
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
@@ -25,7 +25,7 @@
  *
  * <<Broadcom-WL-IPTag/Open:>>
  *
- * $Id: osl_ext.h 627993 2016-03-29 10:07:29Z $
+ * $Id: osl_ext.h 759145 2018-04-24 05:09:37Z $
  */
 
 #ifndef _osl_ext_h_

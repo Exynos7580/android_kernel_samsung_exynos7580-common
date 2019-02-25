@@ -1,7 +1,7 @@
 /*
  * Linux Packet (skb) interface
  *
- * Copyright (C) 1999-2018, Broadcom.
+ * Copyright (C) 1999-2019, Broadcom.
  *
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
@@ -24,7 +24,7 @@
  *
  * <<Broadcom-WL-IPTag/Open:>>
  *
- * $Id: linux_pkt.c 729708 2017-11-02 05:10:59Z $
+ * $Id: linux_pkt.c 769679 2018-06-27 07:14:30Z $
  */
 
 #include <typedefs.h>
@@ -83,7 +83,7 @@ int osl_static_mem_init(osl_t *osh, void *adapter)
 				ASSERT(osh->magic == OS_HANDLE_MAGIC);
 				return -ENOMEM;
 			} else {
-				printk("alloc static buf at %p!\n", bcm_static_buf);
+				printk("succeed to alloc static buf\n");
 			}
 
 			spin_lock_init(&bcm_static_buf->static_lock);

@@ -1,7 +1,7 @@
 /*
  * pcicfg.h: PCI configuration constants and structures.
  *
- * Copyright (C) 1999-2018, Broadcom.
+ * Copyright (C) 1999-2019, Broadcom.
  *
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
@@ -24,7 +24,7 @@
  *
  * <<Broadcom-WL-IPTag/Open:>>
  *
- * $Id: pcicfg.h 722942 2017-09-22 03:49:44Z $
+ * $Id: pcicfg.h 794374 2018-12-13 05:40:58Z $
  */
 
 #ifndef	_h_pcicfg_
@@ -135,11 +135,13 @@ typedef struct _pciconfig_cap_pcie {
 
 /* PCIE Extended configuration */
 #define PCIE_ADV_CORR_ERR_MASK	0x114
+#define PCIE_ADV_CORR_ERR_MASK_OFFSET	0x14
 #define CORR_ERR_RE	(1 << 0) /* Receiver  */
-#define CORR_ERR_BT 	(1 << 6) /* Bad TLP  */
+#define CORR_ERR_BT	(1 << 6) /* Bad TLP  */
 #define CORR_ERR_BD	(1 << 7) /* Bad DLLP */
 #define CORR_ERR_RR	(1 << 8) /* REPLAY_NUM rollover */
 #define CORR_ERR_RT	(1 << 12) /* Reply timer timeout */
+#define CORR_ERR_AE	(1 << 13) /* Adviosry Non-Fital Error Mask */
 #define ALL_CORR_ERRORS (CORR_ERR_RE | CORR_ERR_BT | CORR_ERR_BD | \
 			 CORR_ERR_RR | CORR_ERR_RT)
 
@@ -246,6 +248,11 @@ typedef struct _pcie_enhanced_caphdr {
 #define PCI_PHY_DBG_CLKREG_1	0x1e14
 #define PCI_PHY_DBG_CLKREG_2	0x1e18
 #define PCI_PHY_DBG_CLKREG_3	0x1e1c
+
+/* Bit settings for PCIE_CFG_SUBSYSTEM_CONTROL register */
+#define PCIE_SSRESET_STATUS_BIT		13
+#define PCIE_SSRESET_DISABLE_BIT	14
+#define PCIE_SSRESET_DIS_ENUM_RST_BIT		15
 
 /* Bit settings for PCI_UC_ERR_STATUS register */
 #define PCI_UC_ERR_URES			(1 << 20)	/* Unsupported Request Error Status */

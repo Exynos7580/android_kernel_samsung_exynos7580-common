@@ -2,7 +2,7 @@
  * Linux-specific abstractions to gain some independence from linux kernel versions.
  * Pave over some 2.2 versus 2.4 versus 2.6 kernel differences.
  *
- * Copyright (C) 1999-2018, Broadcom.
+ * Copyright (C) 1999-2019, Broadcom.
  *
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
@@ -25,7 +25,7 @@
  *
  * <<Broadcom-WL-IPTag/Open:>>
  *
- * $Id: linuxver.h 646730 2016-06-30 13:01:49Z $
+ * $Id: linuxver.h 743417 2018-01-26 12:03:30Z $
  */
 
 #ifndef _linuxver_h_
@@ -733,8 +733,10 @@ not match our unaligned address for < 2.6.24
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
 #define RANDOM32	prandom_u32
+#define RANDOM_BYTES	prandom_bytes
 #else
 #define RANDOM32	random32
+#define RANDOM_BYTES	get_random_bytes
 #endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0) */
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))

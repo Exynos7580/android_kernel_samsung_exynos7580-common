@@ -1,7 +1,7 @@
 /*
  * Broadcom Dongle Host Driver (DHD), RTT
  *
- * Copyright (C) 1999-2018, Broadcom.
+ * Copyright (C) 1999-2019, Broadcom.
  *
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
@@ -168,6 +168,7 @@ typedef struct wifi_rate {
 
 typedef struct rtt_target_info {
 	struct ether_addr addr;
+	struct ether_addr local_addr;
 	rtt_type_t type; /* rtt_type */
 	rtt_peer_type_t peer; /* peer type */
 	wifi_channel_info_t channel; /* channel information */

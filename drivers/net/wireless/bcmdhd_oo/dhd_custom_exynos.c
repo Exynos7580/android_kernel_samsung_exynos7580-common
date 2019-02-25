@@ -1,7 +1,7 @@
 /*
  * Platform Dependent file for Samsung Exynos
  *
- * Copyright (C) 1999-2018, Broadcom.
+ * Copyright (C) 1999-2019, Broadcom.
  *
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
@@ -198,29 +198,6 @@ dhd_wlan_set_carddetect(int val)
 	return 0;
 }
 #endif /* !CONFIG_BCMDHD_PCIE */
-
-int dhd_get_system_rev(void)
-{
-	const char *wlan_node = "samsung,brcm-wlan";
-	struct device_node *root_node = NULL;
-	unsigned int base_system_rev_for_nv = 0;
-	int ret;
-
-	root_node = of_find_compatible_node(NULL, NULL, wlan_node);
-	if (!root_node) {
-		printk(KERN_ERR "couldn't get root node\n");
-		return -ENODEV;
-	}
-
-	ret = of_property_read_u32(root_node, "base_system_rev_for_nv",
-			&base_system_rev_for_nv);
-	if (ret) {
-		printk(KERN_INFO "couldn't get base_system_rev_for_nv\n");
-		return -ENODEV;
-	}
-
-	return base_system_rev_for_nv;
-}
 
 int __init
 dhd_wlan_init_gpio(void)
