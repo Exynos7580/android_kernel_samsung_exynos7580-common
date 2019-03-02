@@ -31,6 +31,9 @@
 #include <linux/kthread.h>
 #include <linux/slab.h>
 #include <linux/pm_qos.h>
+#if defined(CONFIG_POWERSUSPEND)
+#include <linux/powersuspend.h>
+#endif
 
 #if defined(CONFIG_ARM_EXYNOS_MP_CPUFREQ) || defined(CONFIG_ARM_EXYNOS_SMP_CPUFREQ)
 #include <mach/cpufreq.h>
@@ -74,6 +77,11 @@ static unsigned int default_target_loads[] = {DEFAULT_TARGET_LOAD};
 #define DEFAULT_ABOVE_HISPEED_DELAY DEFAULT_TIMER_RATE
 static unsigned int default_above_hispeed_delay[] = {
 	DEFAULT_ABOVE_HISPEED_DELAY };
+
+#if defined(CONFIG_POWERSUSPEND)
+#define DEFAULT_SCREEN_OFF_MAX 500000
+static unsigned long screen_off_max = DEFAULT_SCREEN_OFF_MAX;
+#endif
 
 struct cpufreq_interactive_tunables {
 	int usage_count;
@@ -599,6 +607,11 @@ static int cpufreq_interactive_speedchange_task(void *data)
 				if (pjcpu->target_freq > max_freq)
 					max_freq = pjcpu->target_freq;
 			}
+
+#if defined(CONFIG_POWERSUSPEND)
+			if (power_suspend_active && max_freq > screen_off_max)
+				    max_freq = screen_off_max;
+#endif
 
 			if (max_freq != pcpu->policy->cur) {
 				u64 now;
