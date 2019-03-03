@@ -98,7 +98,7 @@ struct cpufreq_interactive_tunables {
 	unsigned int *target_loads;
 	int ntarget_loads;
 	/* Sampling down factor to be applied to min_sample_time at max freq */
-	unsigned int sampling_down_factor = 1;
+	unsigned int sampling_down_factor;
 	/*
 	 * The minimum amount of time to spend at a frequency before we can ramp
 	 * down.
@@ -932,8 +932,6 @@ static ssize_t store_sampling_down_factor(struct cpufreq_interactive_tunables
 
 	return count;
 }
-
-
 
 static ssize_t show_go_hispeed_load(struct cpufreq_interactive_tunables
 		*tunables, char *buf)
