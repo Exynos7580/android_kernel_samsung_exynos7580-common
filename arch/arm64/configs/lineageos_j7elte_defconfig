@@ -3799,11 +3799,6 @@ CONFIG_EARLY_PRINTK=y
 # CONFIG_PID_IN_CONTEXTIDR is not set
 
 #
-# Samsung Rooting Restriction Feature
-#
-# CONFIG_SEC_RESTRICT_ROOTING is not set
-
-#
 # Security options
 #
 CONFIG_KEYS=y
