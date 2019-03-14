@@ -645,8 +645,10 @@ static int cpufreq_stats_create_table(struct cpufreq_policy *policy,
 		return 0;
 
 	stat = kzalloc(sizeof(struct cpufreq_stats), GFP_KERNEL);
-	if ((stat) == NULL)
+	if ((stat) == NULL) {
+		pr_err("Failed to alloc cpufreq_stats table\n");
 		return -ENOMEM;
+	}
 
 	if (prev_stat)
 		memcpy(stat, prev_stat, sizeof(*prev_stat));
@@ -658,6 +660,10 @@ static int cpufreq_stats_create_table(struct cpufreq_policy *policy,
 	}
 
 	ret = sysfs_create_group(&data->kobj, &stats_attr_group);
+	if (ret) {
+		pr_err("Failed to create cpufreq_stats sysfs\n");
+		goto error_out;
+	}
 
 	stat->cpu = cpu;
 	per_cpu(cpufreq_stats_table, cpu) = stat;
