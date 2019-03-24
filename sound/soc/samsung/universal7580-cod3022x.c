@@ -44,11 +44,11 @@
 
 #define COD3022X_BFS_48KHZ		32
 #define COD3022X_RFS_48KHZ		512
-#define COD3022X_SAMPLE_RATE_48KHZ	96000
+#define COD3022X_SAMPLE_RATE_48KHZ	48000
 
-#define COD3022X_BFS_192KHZ		192
-#define COD3022X_RFS_192KHZ		192
-#define COD3022X_SAMPLE_RATE_192KHZ	32000
+#define COD3022X_BFS_192KHZ		64
+#define COD3022X_RFS_192KHZ		128
+#define COD3022X_SAMPLE_RATE_192KHZ	192000
 
 #define JD_SELECT_3022_INTERNEL		0
 #define JD_SELECT_EXTERNEL		1
@@ -989,9 +989,9 @@ static struct snd_soc_dai_driver universal7580_ext_dai[] = {
 			.channels_min = 1,
 			.channels_max = 2,
 			.rate_min = 8000,
-			.rate_max = 96000,
+			.rate_max = 48000,
 			.rates = (SNDRV_PCM_RATE_8000 | SNDRV_PCM_RATE_16000 |
-					SNDRV_PCM_RATE_96000),
+					SNDRV_PCM_RATE_48000),
 			.formats = (SNDRV_PCM_FMTBIT_S16_LE |
 			 SNDRV_PCM_FMTBIT_S24_LE)
 		},
@@ -999,9 +999,9 @@ static struct snd_soc_dai_driver universal7580_ext_dai[] = {
 			.channels_min = 1,
 			.channels_max = 2,
 			.rate_min = 8000,
-			.rate_max = 9600,
+			.rate_max = 48000,
 			.rates = (SNDRV_PCM_RATE_8000 | SNDRV_PCM_RATE_16000 |
-					SNDRV_PCM_RATE_96000),
+					SNDRV_PCM_RATE_48000),
 			.formats = (SNDRV_PCM_FMTBIT_S16_LE |
 			 SNDRV_PCM_FMTBIT_S24_LE)
 		},
@@ -1012,9 +1012,9 @@ static struct snd_soc_dai_driver universal7580_ext_dai[] = {
 			.channels_min = 1,
 			.channels_max = 2,
 			.rate_min = 8000,
-			.rate_max = 96000,
+			.rate_max = 48000,
 			.rates = (SNDRV_PCM_RATE_8000 | SNDRV_PCM_RATE_16000 |
-					SNDRV_PCM_RATE_96000),
+					SNDRV_PCM_RATE_48000),
 			.formats = (SNDRV_PCM_FMTBIT_S16_LE |
 			 SNDRV_PCM_FMTBIT_S24_LE)
 		},
@@ -1022,9 +1022,9 @@ static struct snd_soc_dai_driver universal7580_ext_dai[] = {
 			.channels_min = 1,
 			.channels_max = 2,
 			.rate_min = 8000,
-			.rate_max = 96000,
+			.rate_max = 48000,
 			.rates = (SNDRV_PCM_RATE_8000 | SNDRV_PCM_RATE_16000 |
-					SNDRV_PCM_RATE_96000),
+					SNDRV_PCM_RATE_48000),
 			.formats = (SNDRV_PCM_FMTBIT_S16_LE |
 			 SNDRV_PCM_FMTBIT_S24_LE)
 		},
@@ -1035,9 +1035,9 @@ static struct snd_soc_dai_driver universal7580_ext_dai[] = {
 			.channels_min = 1,
 			.channels_max = 2,
 			.rate_min = 8000,
-			.rate_max = 96000,
+			.rate_max = 48000,
 			.rates = (SNDRV_PCM_RATE_8000 | SNDRV_PCM_RATE_16000 |
-					SNDRV_PCM_RATE_96000),
+					SNDRV_PCM_RATE_48000),
 			.formats = (SNDRV_PCM_FMTBIT_S16_LE |
 			 SNDRV_PCM_FMTBIT_S24_LE)
 		},
