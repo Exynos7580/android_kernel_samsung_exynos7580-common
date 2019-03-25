@@ -93,7 +93,7 @@ static unsigned int default_target_loads[] = {DEFAULT_TARGET_LOAD};
 static unsigned int default_above_hispeed_delay[] = {
 	DEFAULT_ABOVE_HISPEED_DELAY };
 #ifdef CONFIG_POWERSUSPEND
-#define DEFAULT_SCREEN_OFF_MAX 1000000
+#define DEFAULT_SCREEN_OFF_MAX 500000
 static unsigned long screen_off_max = DEFAULT_SCREEN_OFF_MAX;
 #endif
 
