@@ -1931,24 +1931,24 @@ static int __cpufreq_set_policy(struct cpufreq_policy *data,
 		if (!__cpufreq_governor(data, CPUFREQ_GOV_START))
 		    goto out;
 
-	unlock_policy_rwsem_write(policy->cpu);
-	__cpufreq_governor(data, CPUFREQ_GOV_POLICY_EXIT);
-	lock_policy_rwsem_write(policy->cpu);
-    }
+		unlock_policy_rwsem_write(policy->cpu);
+		__cpufreq_governor(data, CPUFREQ_GOV_POLICY_EXIT);
+		lock_policy_rwsem_write(policy->cpu);
+	}
 
-    /* new governor failed, so re-start old one */
-    pr_debug("starting governor %s failed\n", policy->governor->name);
-    if (old_gov) {
-	data->governor = old_gov;
-	__cpufreq_governor(data, CPUFREQ_GOV_POLICY_INIT);
-	__cpufreq_governor(data, CPUFREQ_GOV_START);
-    }
+	/* new governor failed, so re-start old one */
+	pr_debug("starting governor %s failed\n", policy->governor->name);
+	if (old_gov) {
+		data->governor = old_gov;
+		__cpufreq_governor(data, CPUFREQ_GOV_POLICY_INIT);
+		__cpufreq_governor(data, CPUFREQ_GOV_START);
+	}
 
-    return -EINVAL;
+	return -EINVAL;
 
- out:
-    pr_debug("governor: change or update limits\n");
-    return __cpufreq_governor(data, CPUFREQ_GOV_LIMITS);
+out:
+	pr_debug("governor: change or update limits\n");
+	return __cpufreq_governor(data, CPUFREQ_GOV_LIMITS);
 
 }
 
