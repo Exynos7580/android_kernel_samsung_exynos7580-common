@@ -1795,13 +1795,13 @@ static int __init cpufreq_cafactive_init(void)
 	wake_up_process(speedchange_task);
 
 #ifdef CONFIG_ARCH_EXYNOS
-#ifndef CONFIG_EXYNOS7580_QUAD
-        pm_qos_add_notifier(PM_QOS_CLUSTER1_FREQ_MIN, &cpufreq_cafactive_cluster1_min_qos_notifier);
-        pm_qos_add_notifier(PM_QOS_CLUSTER1_FREQ_MAX, &cpufreq_cafactive_cluster1_max_qos_notifier);
-#endif
 #if defined(CONFIG_ARM_EXYNOS_MP_CPUFREQ) || defined(CONFIG_ARM_EXYNOS_SMP_CPUFREQ)
         pm_qos_add_notifier(PM_QOS_CLUSTER0_FREQ_MIN, &cpufreq_cafactive_cluster0_min_qos_notifier);
         pm_qos_add_notifier(PM_QOS_CLUSTER0_FREQ_MAX, &cpufreq_cafactive_cluster0_max_qos_notifier);
+#endif
+#ifndef CONFIG_EXYNOS7580_QUAD
+        pm_qos_add_notifier(PM_QOS_CLUSTER1_FREQ_MIN, &cpufreq_cafactive_cluster1_min_qos_notifier);
+        pm_qos_add_notifier(PM_QOS_CLUSTER1_FREQ_MAX, &cpufreq_cafactive_cluster1_max_qos_notifier);
 #endif
 #endif
 
