@@ -1562,6 +1562,100 @@ static void cpufreq_cafactive_nop_timer(unsigned long data)
 }
 
 #ifdef CONFIG_ARCH_EXYNOS
+#if defined(CONFIG_ARM_EXYNOS_MP_CPUFREQ) || defined(CONFIG_ARM_EXYNOS_SMP_CPUFREQ)
+static int cpufreq_cafactive_cluster0_min_qos_handler(struct notifier_block *b,
+                                                unsigned long val, void *v)
+{
+        struct cpufreq_cafactive_cpuinfo *pcpu;
+        struct cpufreq_cafactive_tunables *tunables;
+        unsigned long flags;
+        int ret = NOTIFY_OK;
+
+        pcpu = &per_cpu(cpuinfo, 0);
+
+        mutex_lock(&gov_lock);
+        down_read(&pcpu->enable_sem);
+        if (!pcpu->governor_enabled) {
+                up_read(&pcpu->enable_sem);
+                ret = NOTIFY_BAD;
+                goto exit;
+        }
+        up_read(&pcpu->enable_sem);
+
+        if (!pcpu->policy || !pcpu->policy->governor_data ||
+                !pcpu->policy->user_policy.governor) {
+                ret = NOTIFY_BAD;
+                goto exit;
+        }
+
+        trace_cpufreq_cafactive_kfc_min_qos(0, val, pcpu->policy->cur);
+
+        if (val < pcpu->policy->cur) {
+                tunables = pcpu->policy->governor_data;
+
+                spin_lock_irqsave(&speedchange_cpumask_lock, flags);
+                cpumask_set_cpu(0, &speedchange_cpumask);
+                spin_unlock_irqrestore(&speedchange_cpumask_lock, flags);
+
+		if (speedchange_task)
+			wake_up_process_no_notif(speedchange_task);
+        }
+exit:
+        mutex_unlock(&gov_lock);
+        return ret;
+}
+
+static struct notifier_block cpufreq_cafactive_cluster0_min_qos_notifier = {
+        .notifier_call = cpufreq_cafactive_cluster0_min_qos_handler,
+};
+
+static int cpufreq_cafactive_cluster0_max_qos_handler(struct notifier_block *b,
+                                                unsigned long val, void *v)
+{
+        struct cpufreq_cafactive_cpuinfo *pcpu;
+        struct cpufreq_cafactive_tunables *tunables;
+        unsigned long flags;
+        int ret = NOTIFY_OK;
+
+        pcpu = &per_cpu(cpuinfo, 0);
+
+        mutex_lock(&gov_lock);
+        down_read(&pcpu->enable_sem);
+        if (!pcpu->governor_enabled) {
+                up_read(&pcpu->enable_sem);
+                ret = NOTIFY_BAD;
+                goto exit;
+        }
+        up_read(&pcpu->enable_sem);
+
+        if (!pcpu->policy || !pcpu->policy->governor_data ||
+                !pcpu->policy->user_policy.governor) {
+                ret = NOTIFY_BAD;
+                goto exit;
+        }
+
+        trace_cpufreq_cafactive_kfc_max_qos(0, val, pcpu->policy->cur);
+
+        if (val > pcpu->policy->cur) {
+                tunables = pcpu->policy->governor_data;
+
+                spin_lock_irqsave(&speedchange_cpumask_lock, flags);
+                cpumask_set_cpu(0, &speedchange_cpumask);
+                spin_unlock_irqrestore(&speedchange_cpumask_lock, flags);
+
+		if (speedchange_task)
+			wake_up_process_no_notif(speedchange_task);
+        }
+exit:
+        mutex_unlock(&gov_lock);
+        return ret;
+}
+
+static struct notifier_block cpufreq_cafactive_cluster0_max_qos_notifier = {
+        .notifier_call = cpufreq_cafactive_cluster0_max_qos_handler,
+};
+#endif /* CONFIG_ARM_EXYNOS_(S)MP_CPUFREQ */
+
 #ifndef CONFIG_EXYNOS7580_QUAD
 static int cpufreq_cafactive_cluster1_min_qos_handler(struct notifier_block *b,
                                                 unsigned long val, void *v)
@@ -1633,7 +1727,7 @@ static int cpufreq_cafactive_cluster1_max_qos_handler(struct notifier_block *b,
         down_read(&pcpu->enable_sem);
         if (!pcpu->governor_enabled) {
                 up_read(&pcpu->enable_sem);
-                ret =  NOTIFY_BAD;
+                ret = NOTIFY_BAD;
                 goto exit;
         }
         up_read(&pcpu->enable_sem);
@@ -1664,102 +1758,8 @@ exit:
 static struct notifier_block cpufreq_cafactive_cluster1_max_qos_notifier = {
         .notifier_call = cpufreq_cafactive_cluster1_max_qos_handler,
 };
-#endif
-#endif
-
-#if defined(CONFIG_ARM_EXYNOS_MP_CPUFREQ) || defined(CONFIG_ARM_EXYNOS_SMP_CPUFREQ)
-static int cpufreq_cafactive_cluster0_min_qos_handler(struct notifier_block *b,
-                                                unsigned long val, void *v)
-{
-        struct cpufreq_cafactive_cpuinfo *pcpu;
-        struct cpufreq_cafactive_tunables *tunables;
-        unsigned long flags;
-        int ret = NOTIFY_OK;
-
-        pcpu = &per_cpu(cpuinfo, 0);
-
-        mutex_lock(&gov_lock);
-        down_read(&pcpu->enable_sem);
-        if (!pcpu->governor_enabled) {
-                up_read(&pcpu->enable_sem);
-                ret = NOTIFY_BAD;
-                goto exit;
-        }
-        up_read(&pcpu->enable_sem);
-
-        if (!pcpu->policy || !pcpu->policy->governor_data ||
-                !pcpu->policy->user_policy.governor) {
-                ret = NOTIFY_BAD;
-                goto exit;
-        }
-
-        trace_cpufreq_cafactive_kfc_min_qos(0, val, pcpu->policy->cur);
-
-        if (val < pcpu->policy->cur) {
-                tunables = pcpu->policy->governor_data;
-
-                spin_lock_irqsave(&speedchange_cpumask_lock, flags);
-                cpumask_set_cpu(0, &speedchange_cpumask);
-                spin_unlock_irqrestore(&speedchange_cpumask_lock, flags);
-
-		if (speedchange_task)
-			wake_up_process_no_notif(speedchange_task);
-        }
-exit:
-        mutex_unlock(&gov_lock);
-        return ret;
-}
-
-static struct notifier_block cpufreq_cafactive_cluster0_min_qos_notifier = {
-        .notifier_call = cpufreq_cafactive_cluster0_min_qos_handler,
-};
-
-static int cpufreq_cafactive_cluster0_max_qos_handler(struct notifier_block *b,
-                                                unsigned long val, void *v)
-{
-        struct cpufreq_cafactive_cpuinfo *pcpu;
-        struct cpufreq_cafactive_tunables *tunables;
-        unsigned long flags;
-        int ret = NOTIFY_OK;
-
-        pcpu = &per_cpu(cpuinfo, 0);
-
-        mutex_lock(&gov_lock);
-        down_read(&pcpu->enable_sem);
-        if (!pcpu->governor_enabled) {
-                up_read(&pcpu->enable_sem);
-                ret = NOTIFY_BAD;
-                goto exit;
-        }
-        up_read(&pcpu->enable_sem);
-
-        if (!pcpu->policy ||!pcpu->policy->governor_data ||
-                !pcpu->policy->user_policy.governor) {
-                ret = NOTIFY_BAD;
-                goto exit;
-        }
-
-        trace_cpufreq_cafactive_kfc_max_qos(0, val, pcpu->policy->cur);
-
-        if (val > pcpu->policy->cur) {
-                tunables = pcpu->policy->governor_data;
-
-                spin_lock_irqsave(&speedchange_cpumask_lock, flags);
-                cpumask_set_cpu(0, &speedchange_cpumask);
-                spin_unlock_irqrestore(&speedchange_cpumask_lock, flags);
-
-		if (speedchange_task)
-			wake_up_process_no_notif(speedchange_task);
-        }
-exit:
-        mutex_unlock(&gov_lock);
-        return ret;
-}
-
-static struct notifier_block cpufreq_cafactive_cluster0_max_qos_notifier = {
-        .notifier_call = cpufreq_cafactive_cluster0_max_qos_handler,
-};
-#endif
+#endif  /* !CONFIG_EXYNOS7580_QUAD */
+#endif /* CONFIG_ARCH_EXYNOS */
 
 static int __init cpufreq_cafactive_init(void)
 {
