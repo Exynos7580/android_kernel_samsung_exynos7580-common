@@ -730,7 +730,7 @@ static void cpufreq_stats_update_policy_cpu(struct cpufreq_policy *policy)
 		kfree(old);
 
 	} else {
-		goto fail;
+		goto out;
 	}
 
 	pr_debug("Updating stats_table for new_cpu %u from last_cpu %u\n",
@@ -739,7 +739,8 @@ static void cpufreq_stats_update_policy_cpu(struct cpufreq_policy *policy)
 			policy->last_cpu);
 	per_cpu(cpufreq_stats_table, policy->last_cpu) = NULL;
 	stat->cpu = policy->cpu;
-fail:
+
+out:
 	spin_unlock_irqrestore(&cpufreq_stats_table_lock, flags);
 }
 
