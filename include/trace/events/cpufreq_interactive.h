@@ -58,7 +58,7 @@ DEFINE_EVENT(set, cpufreq_interactive_kfc_max_qos,
 	     unsigned long actualfreq),
 	TP_ARGS(cpu_id, targfreq, actualfreq)
 );
-#endif /* CONFIG_ARM_EXYNOS_MP_CPUFREQ */
+#endif /* CONFIG_ARM_EXYNOS_(S)MP_CPUFREQ */
 #endif /* CONFIG_ARCH_EXYNOS */
 
 DECLARE_EVENT_CLASS(loadeval,
