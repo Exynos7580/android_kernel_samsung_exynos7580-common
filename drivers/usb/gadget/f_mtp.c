@@ -587,9 +587,6 @@ static ssize_t mtp_read(struct file *fp, char __user *buf,
 
 	DBG(cdev, "mtp_read(%zu)\n", count);
 
-	if (dev == NULL || dev->ep_out == NULL)
-		return -ENODEV;
-
 	/* we will block until we're online */
 	DBG(cdev, "mtp_read: waiting for online state\n");
 	ret = wait_event_interruptible(dev->read_wq,
