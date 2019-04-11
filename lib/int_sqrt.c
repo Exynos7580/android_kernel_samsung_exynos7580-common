@@ -7,7 +7,6 @@
 
 #include <linux/kernel.h>
 #include <linux/export.h>
-#include <linux/bitops.h>
 
 /**
  * int_sqrt - rough approximation to sqrt
@@ -24,7 +23,11 @@ inline unsigned long int_sqrt(unsigned long x)
 	if (x <= 1)
 		return x;
 
-	place = 1UL << (__fls(x) & ~1UL);
+	place = 1UL << (BITS_PER_LONG - 2);
+
+	do{
+		place >>= 2;
+	}while(place > x);
 
 	do {
 		tmp = root + place;
