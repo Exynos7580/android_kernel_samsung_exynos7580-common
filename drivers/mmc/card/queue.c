@@ -181,7 +181,6 @@ fetch_done:
 		}
 	} while (1);
 	up(&mq->thread_sem);
-	set_wake_up_idle(false);
 
 	return 0;
 }
@@ -501,6 +500,8 @@ void mmc_cleanup_queue(struct mmc_queue *mq)
 	mqrq_prev->bounce_buf = NULL;
 
 	mq->card = NULL;
+
+	set_wake_up_idle(false);
 }
 EXPORT_SYMBOL(mmc_cleanup_queue);
 
