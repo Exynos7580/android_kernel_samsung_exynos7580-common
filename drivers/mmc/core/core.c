@@ -972,7 +972,7 @@ int mmc_interrupt_hpi(struct mmc_card *card)
 		if (!err && R1_CURRENT_STATE(status) == R1_STATE_TRAN)
 			break;
 		if (time_after(jiffies, prg_wait)) {
-			err = mmc_send_status(card, &status);
+			err = mmc_send_status(card, &status, 0);
 			if (!err && R1_CURRENT_STATE(status) != R1_STATE_TRAN)
 				err = -ETIMEDOUT;
 			else
