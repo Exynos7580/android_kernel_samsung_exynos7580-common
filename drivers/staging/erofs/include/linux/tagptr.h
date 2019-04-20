@@ -8,7 +8,11 @@
 #define _LINUX_TAGPTR_H
 
 #include <linux/types.h>
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 12, 0))
+#include <linux/bug.h>
+#else
 #include <linux/build_bug.h>
+#endif
 
 /*
  * the name of tagged pointer types are tagptr{1, 2, 3...}_t

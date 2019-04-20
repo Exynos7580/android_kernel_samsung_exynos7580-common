@@ -520,10 +520,13 @@ int __init erofs_module_init(void)
 	err = erofs_init_inode_cache();
 	if (err)
 		goto icache_err;
-
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 18, 0))
+	register_shrinker(&erofs_shrinker_info);
+#else
 	err = register_shrinker(&erofs_shrinker_info);
 	if (err)
 		goto shrinker_err;
+#endif
 
 #ifdef CONFIG_EROFS_FS_ZIP
 	err = z_erofs_init_zip_subsystem();
@@ -544,7 +547,9 @@ fs_err:
 zip_err:
 #endif
 	unregister_shrinker(&erofs_shrinker_info);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 18, 0))
 shrinker_err:
+#endif
 	erofs_exit_inode_cache();
 icache_err:
 	return err;
