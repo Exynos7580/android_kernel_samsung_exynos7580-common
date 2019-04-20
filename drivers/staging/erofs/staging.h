@@ -51,18 +51,6 @@ static inline gfp_t readahead_gfp_mask(struct address_space *x)
 }
 #endif
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 18, 13))
-#define READ_ONCE(x)		ACCESS_ONCE(x)
-#define WRITE_ONCE(x, val)	(ACCESS_ONCE(x) = (val))
-#endif
-
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 18, 40))
-static inline int lockref_put_return(struct lockref *lockref)
-{
-	return -1;
-}
-#endif
-
 #ifndef WQ_NON_REENTRANT
 #define WQ_NON_REENTRANT 0
 #endif
@@ -119,15 +107,5 @@ static inline void *kvmalloc_array(size_t n, size_t size, gfp_t flags)
 	return kvmalloc(n * size, flags);
 }
 
-#endif
-
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 15, 0))
-static inline void kvfree(const void *addr)
-{
-	if (is_vmalloc_addr(addr))
-		vfree(addr);
-	else
-		kfree(addr);
-}
 #endif
 
