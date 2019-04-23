@@ -110,19 +110,6 @@ unsigned long totalreserve_pages __read_mostly;
  */
 unsigned long dirty_balance_reserve __read_mostly;
 
-static unsigned int boot_mode = 0;
-static int __init setup_bootmode(char *str)
-{
-	printk("%s: boot_mode is %u\n", __func__, boot_mode);
-	if (get_option(&str, &boot_mode)) {
-		printk("%s: boot_mode is %u\n", __func__, boot_mode);
-		return 0;
-	}
-
-	return -EINVAL;
-}
-early_param("bootmode", setup_bootmode);
-
 int percpu_pagelist_fraction;
 gfp_t gfp_allowed_mask __read_mostly = GFP_BOOT_MASK;
 
@@ -964,11 +951,6 @@ static int fallbacks[MIGRATE_TYPES][4] = {
 	[MIGRATE_ISOLATE]     = { MIGRATE_RESERVE }, /* Never used */
 #endif
 };
-
-int *get_migratetype_fallbacks(int mtype)
-{
-	return fallbacks[mtype];
-}
 
 /*
  * Move the free pages in a range to the free lists of the requested type.
@@ -2514,9 +2496,6 @@ __alloc_pages_slowpath(gfp_t gfp_mask, unsigned int order,
 	bool sync_migration = false;
 	bool deferred_compaction = false;
 	bool contended_compaction = false;
-#ifdef CONFIG_SEC_OOM_KILLER
-	unsigned long oom_invoke_timeout = jiffies + HZ/4;
-#endif
 
 	/*
 	 * In the slowpath, we sanity check order to avoid ever trying to
@@ -2642,14 +2621,7 @@ rebalance:
 	 * running out of options and have to consider going OOM
 	 * If we are looping more than 250 ms, go to OOM
 	 */
-
-#ifdef CONFIG_SEC_OOM_KILLER
-#define SHOULD_CONSIDER_OOM (!did_some_progress || time_after(jiffies, oom_invoke_timeout)) && (boot_mode != 2)
-#else
-#define SHOULD_CONSIDER_OOM !did_some_progress && (boot_mode != 2)
-#endif
-
-	if (SHOULD_CONSIDER_OOM) {
+	if (!did_some_progress) {
 		if ((gfp_mask & __GFP_FS) && !(gfp_mask & __GFP_NORETRY)) {
 			if (oom_killer_disabled)
 				goto nopage;
@@ -2658,12 +2630,6 @@ rebalance:
 			    !(gfp_mask & __GFP_NOFAIL))
 				goto nopage;
 
-#ifdef CONFIG_SEC_OOM_KILLER
-			if (did_some_progress)
-				pr_info("time's up : calling "
-					"__alloc_pages_may_oom(o:%u, gfp:0x%x)\n",
-								order, gfp_mask);
-#endif
 			page = __alloc_pages_may_oom(gfp_mask, order,
 					zonelist, high_zoneidx,
 					nodemask, preferred_zone,
