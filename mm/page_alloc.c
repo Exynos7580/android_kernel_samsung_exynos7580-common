@@ -2654,10 +2654,6 @@ rebalance:
 				if (high_zoneidx < ZONE_NORMAL)
 					goto nopage;
 			}
-
-#ifdef CONFIG_SEC_OOM_KILLER
-			oom_invoke_timeout = jiffies + HZ/4;
-#endif
 			goto restart;
 		}
 	}
