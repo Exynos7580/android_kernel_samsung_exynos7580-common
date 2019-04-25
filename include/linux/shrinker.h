@@ -16,6 +16,8 @@ struct shrink_control {
 
 	/* How many slab objects shrinker() should scan and try to reclaim */
 	unsigned long nr_to_scan;
+
+	int priority;
 };
 
 #define SHRINK_STOP (~0UL)
