@@ -257,7 +257,11 @@ static int dma_hw_params(struct snd_pcm_substream *substream,
 		pr_debug("dma_request: ch %d, req %p, dev %p, ch_name [%s]\n",
 			prtd->params->channel, &req, rtd->cpu_dai->dev,
 			prtd->params->ch_name);
-		prtd->params->ops->config(prtd->params->ch, &config);
+
+		/* Return failure if we do not successfully configure the DMA channel */
+		if(prtd->params->ops->config(prtd->params->ch, &config) < 0) {
+			return -EINVAL;
+		}
 	}
 
 	if ((substream->stream == SNDRV_PCM_STREAM_CAPTURE) &&

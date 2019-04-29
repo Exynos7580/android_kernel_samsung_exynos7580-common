@@ -50,6 +50,12 @@ static int samsung_dmadev_config(unsigned long ch,
 	struct dma_chan *chan = (struct dma_chan *)ch;
 	struct dma_slave_config slave_config;
 
+	/* Verify the data pointers are valid to avoid a NULL ptr dereference */
+	if(!chan || !param) {
+		pr_warn("Invalid data pointers\n");
+		return -EINVAL;
+	}
+
 	if (param->direction == DMA_DEV_TO_MEM) {
 		memset(&slave_config, 0, sizeof(struct dma_slave_config));
 		slave_config.direction = param->direction;
