@@ -40,6 +40,7 @@
 #include <linux/mempool.h>
 #include <linux/slab.h>
 #include <linux/file.h>
+#include <linux/kthread.h>
 
 #ifdef CONFIG_MALI_FPGA_BUS_LOGGER
 #include <linux/bus_logger.h>
@@ -423,6 +424,7 @@ struct kbase_atom_dependency_systrace
 
 struct kbase_jd_atom {
 	struct work_struct work;
+	struct kthread_work worker;
 	ktime_t start_timestamp;
 	u64 time_spent_us; /**< Total time spent on the GPU in microseconds */
 
@@ -1460,7 +1462,9 @@ struct kbase_context {
 	struct list_head event_coalesce_list;
 	struct mutex event_mutex;
 	atomic_t event_closed;
-	struct workqueue_struct *event_workq;
+	struct kthread_worker gpu_worker;
+	struct task_struct *gpu_worker_thread;
+
 	atomic_t event_count;
 	int event_coalesce_count;
 
