@@ -175,27 +175,6 @@ static inline void inode_unlock(struct inode *inode)
 #define list_first_entry(ptr, type, member) \
 	list_entry((ptr)->next, type, member)
 
-/**
- * wq_has_sleeper - check if there are any waiting processes
- * @wq: wait queue head
- *
- * Returns true if wq has waiting processes
- *
- * Please refer to the comment for waitqueue_active.
- */
-static inline bool wq_has_sleeper(wait_queue_head_t *wq) 
-{
-	/*   
-	 * We need to be sure we are in sync with the
-	 * add_wait_queue modifications to the wait queue.
-	 *
-	 * This memory barrier should be paired with one on the
-	 * waiting side.
-	 */
-	smp_mb();
-	return waitqueue_active(wq);
-}
-
 static inline struct dentry *file_dentry(const struct file *file)
 {
 	return file->f_path.dentry;
