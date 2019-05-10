@@ -2036,7 +2036,7 @@ static void qib_6120_tidtemplate(struct qib_devdata *dd)
 	dd->tidinvalid = 0;
 }
 
-int __attribute__((weak)) qib_unordered_wc(void)
+int __weak qib_unordered_wc(void)
 {
 	return 0;
 }

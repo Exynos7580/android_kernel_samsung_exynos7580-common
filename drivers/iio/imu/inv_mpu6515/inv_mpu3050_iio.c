@@ -32,7 +32,7 @@
 
 #define MPU3050_ONE_MPU_TIME 20
 #define MPU3050_BOGUS_ADDR  0x7F
-int __attribute__((weak)) inv_register_mpu3050_slave(struct inv_mpu_state *st)
+int __weak inv_register_mpu3050_slave(struct inv_mpu_state *st)
 {
 	return 0;
 }

@@ -545,7 +545,7 @@ static inline bool is_module_text_address(unsigned long addr)
 }
 
 /* Get/put a kernel symbol (calls should be symmetric) */
-#define symbol_get(x) ({ extern typeof(x) x __attribute__((weak)); &(x); })
+#define symbol_get(x) ({ extern typeof(x) x __weak; &(x); })
 #define symbol_put(x) do { } while(0)
 #define symbol_put_addr(x) do { } while(0)
 
