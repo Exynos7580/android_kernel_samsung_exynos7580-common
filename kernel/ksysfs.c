@@ -160,8 +160,8 @@ KERNEL_ATTR_RW(rcu_expedited);
 /*
  * Make /sys/kernel/notes give the raw contents of our kernel .notes section.
  */
-extern const void __start_notes __attribute__((weak));
-extern const void __stop_notes __attribute__((weak));
+extern const void __start_notes __weak;
+extern const void __stop_notes __weak;
 #define	notes_size (&__stop_notes - &__start_notes)
 
 static ssize_t notes_read(struct file *filp, struct kobject *kobj,

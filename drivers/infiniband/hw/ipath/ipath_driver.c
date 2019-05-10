@@ -284,12 +284,12 @@ int ipath_count_units(int *npresentp, int *nupp, int *maxportsp)
  * combining is not available, performance will probably be awful.
  */
 
-int __attribute__((weak)) ipath_enable_wc(struct ipath_devdata *dd)
+int __weak ipath_enable_wc(struct ipath_devdata *dd)
 {
 	return -EOPNOTSUPP;
 }
 
-void __attribute__((weak)) ipath_disable_wc(struct ipath_devdata *dd)
+void __weak ipath_disable_wc(struct ipath_devdata *dd)
 {
 }
 

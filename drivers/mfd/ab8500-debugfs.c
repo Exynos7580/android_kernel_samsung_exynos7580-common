@@ -1578,7 +1578,7 @@ static u32 num_interrupts[AB8500_MAX_NR_IRQS];
 static u32 num_wake_interrupts[AB8500_MAX_NR_IRQS];
 static int num_interrupt_lines;
 
-bool __attribute__((weak)) suspend_test_wake_cause_interrupt_is_mine(u32 my_int)
+bool __weak suspend_test_wake_cause_interrupt_is_mine(u32 my_int)
 {
 	return false;
 }

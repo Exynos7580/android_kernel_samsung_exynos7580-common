@@ -167,7 +167,7 @@ static const struct file_operations ux500_regulator_status_fops = {
 	.owner = THIS_MODULE,
 };
 
-int __attribute__((weak)) dbx500_regulator_testcase(
+int __weak dbx500_regulator_testcase(
 	struct dbx500_regulator_info *regulator_info,
 	int num_regulators)
 {

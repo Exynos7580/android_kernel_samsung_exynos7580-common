@@ -86,7 +86,7 @@ static void set_host_vbus(struct exynos_usb_switch *usb_switch, int value)
 }
 
 struct usb_gadget *
-__attribute__((weak)) s3c_udc_get_gadget(struct device *dev)
+__weak s3c_udc_get_gadget(struct device *dev)
 {
 	return NULL;
 }

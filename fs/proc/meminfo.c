@@ -16,7 +16,7 @@
 #include <asm/pgtable.h>
 #include "internal.h"
 
-void __attribute__((weak)) arch_report_meminfo(struct seq_file *m)
+void __weak arch_report_meminfo(struct seq_file *m)
 {
 }
 

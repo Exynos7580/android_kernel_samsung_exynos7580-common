@@ -767,12 +767,12 @@ done:
  * combining is not available, performance will probably be awful.
  */
 
-int __attribute__((weak)) qib_enable_wc(struct qib_devdata *dd)
+int __weak qib_enable_wc(struct qib_devdata *dd)
 {
 	return -EOPNOTSUPP;
 }
 
-void __attribute__((weak)) qib_disable_wc(struct qib_devdata *dd)
+void __weak qib_disable_wc(struct qib_devdata *dd)
 {
 }
 
