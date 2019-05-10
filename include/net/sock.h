@@ -1982,15 +1982,14 @@ static inline bool sk_has_allocations(const struct sock *sk)
  * data on the socket.
  *
  */
-static inline bool wq_has_sleeper(struct socket_wq *wq)
+static inline bool skwq_has_sleeper(struct socket_wq *wq)
 {
 	/* We need to be sure we are in sync with the
 	 * add_wait_queue modifications to the wait queue.
 	 *
 	 * This memory barrier is paired in the sock_poll_wait.
 	 */
-	smp_mb();
-	return wq && waitqueue_active(&wq->wait);
+	return wq && wq_has_sleeper(&wq->wait);
 }
 
 /**
