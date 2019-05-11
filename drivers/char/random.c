@@ -332,7 +332,6 @@
 #include <linux/irq.h>
 #include <linux/syscalls.h>
 #include <linux/completion.h>
-#include <linux/freezer.h>
 #include <linux/uuid.h>
 #include <crypto/chacha20.h>
 
@@ -1096,6 +1095,8 @@ void add_device_randomness(const void *buf, unsigned int size)
 }
 EXPORT_SYMBOL(add_device_randomness);
 
+static struct timer_rand_state input_timer_state = INIT_TIMER_RAND_STATE;
+
 /*
  * This function adds entropy to the entropy "pool" by using timing
  * delays.  It uses the timer_rand_state structure to make an estimate
@@ -1158,7 +1159,17 @@ static void add_timer_randomness(struct timer_rand_state *state, unsigned num)
 void add_input_randomness(unsigned int type, unsigned int code,
 				 unsigned int value)
 {
-	return;
+	static unsigned char last_value;
+
+	/* ignore autorepeat and the like */
+	if (value == last_value)
+		return;
+
+	last_value = value;
+	add_timer_randomness(&input_timer_state,
+			     (type << 4) ^ code ^ (code >> 4) ^ value);
+	trace_add_input_randomness(ENTROPY_BITS(&input_pool));
+
 }
 EXPORT_SYMBOL_GPL(add_input_randomness);
 
@@ -1644,6 +1655,21 @@ int wait_for_random_bytes(void)
 EXPORT_SYMBOL(wait_for_random_bytes);
 
 /*
+ * Returns whether or not the urandom pool has been seeded and thus guaranteed
+ * to supply cryptographically secure random numbers. This applies to: the
+ * /dev/urandom device, the get_random_bytes function, and the get_random_{u32,
+ * ,u64,int,long} family of functions.
+ *
+ * Returns: true if the urandom pool has been seeded.
+ *          false if the urandom pool has not been seeded.
+ */
+bool rng_is_initialized(void)
+{
+	return crng_ready();
+}
+EXPORT_SYMBOL(rng_is_initialized);
+
+/*
  * Add a callback function that will be invoked when the nonblocking
  * pool is initialised.
  *
@@ -1797,37 +1823,6 @@ void rand_initialize_disk(struct gendisk *disk)
 }
 #endif
 
-/*
- * Attempt an emergency refill using arch_get_random_seed_long().
- *
- * As with add_interrupt_randomness() be paranoid and only
- * credit the output as 50% entropic.
- */
-static int arch_random_refill(void)
-{
-	const unsigned int nlongs = 64;	/* Arbitrary number */
-	unsigned int n = 0;
-	unsigned int i;
-	unsigned long buf[nlongs];
-
-	if (!arch_has_random_seed())
-		return 0;
-
-	for (i = 0; i < nlongs; i++) {
-		if (arch_get_random_seed_long(&buf[n]))
-			n++;
-	}
-
-	if (n) {
-		unsigned int rand_bytes = n * sizeof(unsigned long);
-
-		mix_pool_bytes(&input_pool, buf, rand_bytes);
-		credit_entropy_bits(&input_pool, rand_bytes*4);
-	}
-
-	return n;
-}
-
 static ssize_t
 _random_read(int nonblock, char __user *buf, size_t nbytes)
 {
@@ -1848,11 +1843,6 @@ _random_read(int nonblock, char __user *buf, size_t nbytes)
 			return n;
 
 		/* Pool is (near) empty.  Maybe wait and retry. */
-
-		/* First try an emergency refill */
-		if (arch_random_refill())
-			continue;
-
 		if (nonblock)
 			return -EAGAIN;
 
@@ -2363,7 +2353,7 @@ void add_hwgenerator_randomness(const char *buffer, size_t count,
 	 * We'll be woken up again once below random_write_wakeup_thresh,
 	 * or when the calling thread is about to terminate.
 	 */
-	wait_event_freezable(random_write_wait, kthread_should_stop() ||
+	wait_event_interruptible(random_write_wait, kthread_should_stop() ||
 			ENTROPY_BITS(&input_pool) <= random_write_wakeup_bits);
 	mix_pool_bytes(poolp, buffer, count);
 	credit_entropy_bits(poolp, entropy);
