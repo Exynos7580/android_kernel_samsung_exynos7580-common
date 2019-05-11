@@ -470,7 +470,7 @@ void print_tsp_event(struct ist30xx_data *data, finger_info *finger, u32 z_value
 			tsp_noti("%s%d fw:%x\n", TOUCH_DOWN_MESSAGE, finger->bit_field.id, data->fw.cur.fw_ver);
 #endif
 #ifdef CONFIG_POWERSUSPEND
-			if (data->dt2w_enable && power_suspend_active && finger->bit_field.id == 1) {
+			if (data->dt2w_enable && power_suspended && finger->bit_field.id == 1) {
 #else
 			if (data->dt2w_enable && screen_is_off && finger->bit_field.id == 1) {
 #endif

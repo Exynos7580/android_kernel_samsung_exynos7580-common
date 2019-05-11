@@ -437,10 +437,10 @@ static void __cpufreq_cafactive_timer(unsigned long data, bool is_notif)
 	delta_time = (unsigned int)(now - pcpu->cputime_speedadj_timestamp);
 	cputime_speedadj = pcpu->cputime_speedadj;
 #ifdef CONFIG_POWERSUSPEND
-	if (!power_suspend_active
+	if (!power_suspended
 		&& tunables->timer_rate != tunables->prev_timer_rate)
 		tunables->timer_rate = tunables->prev_timer_rate;
-	else if (power_suspend_active
+	else if (power_suspended
 		&& tunables->timer_rate != SCREEN_OFF_TIMER_RATE ) {
 		tunables->prev_timer_rate = tunables->timer_rate;
 		tunables->timer_rate
@@ -469,7 +469,7 @@ static void __cpufreq_cafactive_timer(unsigned long data, bool is_notif)
 
 #ifdef CONFIG_POWERSUSPEND
 	if ((cpu_load >= tunables->go_hispeed_load || tunables->boosted)
-	    && ((pcpu->policy->cpu == 0) || (pcpu->policy->cpu == 4)) && !power_suspend_active) {
+	    && ((pcpu->policy->cpu == 0) || (pcpu->policy->cpu == 4)) && !power_suspended) {
 #else
 	if ((cpu_load >= tunables->go_hispeed_load || tunables->boosted)
 	    && ((pcpu->policy->cpu == 0) || (pcpu->policy->cpu == 4))) {
@@ -667,7 +667,7 @@ static int cpufreq_cafactive_speedchange_task(void *data)
 			}
 
 #ifdef CONFIG_POWERSUSPEND
-			if (power_suspend_active)
+			if (power_suspended)
 				if (max_freq > screen_off_max)
 					max_freq = screen_off_max;
 #endif

@@ -428,10 +428,10 @@ static void cpufreq_cultivation_timer(unsigned long data)
 	atomic_notifier_call_chain(&cpufreq_govinfo_notifier_list,
 					CPUFREQ_LOAD_CHANGE, &int_info);
 
-	if (!power_suspend_active &&
+	if (!power_suspended &&
 		tunables->timer_rate != tunables->prev_timer_rate)
 		tunables->timer_rate = tunables->prev_timer_rate;
-	else if (power_suspend_active &&
+	else if (power_suspended &&
 		tunables->timer_rate != tunables->timer_rate_screenoff) {
 		tunables->prev_timer_rate = tunables->timer_rate;
 		tunables->timer_rate
@@ -625,7 +625,7 @@ static int cpufreq_cultivation_speedchange_task(void *data)
 
 			if (max_freq != pcpu->policy->cur) {
 				tunables = pcpu->policy->governor_data;
-				if (tunables->powersave_bias || power_suspend_active)
+				if (tunables->powersave_bias || power_suspended)
 					__cpufreq_driver_target(pcpu->policy,
 								max_freq,
 								CPUFREQ_RELATION_C);

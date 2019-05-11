@@ -139,7 +139,7 @@ int gpu_control_set_clock(struct kbase_device *kbdev, int clock)
 #ifdef CONFIG_POWERSUSPEND
 	if (clock < gpu_min_override)
 		clock = gpu_min_override;
-	if (!power_suspend_active || gpu_max_override_screen_off == 0) {
+	if (!power_suspended || gpu_max_override_screen_off == 0) {
 		if (clock > gpu_max_override)
 			clock = gpu_max_override;
 	} else {

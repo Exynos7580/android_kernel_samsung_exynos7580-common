@@ -70,7 +70,7 @@ static DECLARE_WORK(power_resume_work, power_resume);
 static DEFINE_SPINLOCK(state_lock);
 
 static int state; // Yank555.lu : Current powersave state (screen on / off)
-static int mode;  // Yank555.lu : Current powersave mode  (userspace / panel)
+static int mode;  // Yank555.lu : Current powersave mode  (kernel / userspace / panel / hybrid)
 
 void register_power_suspend(struct power_suspend *handler)
 {
@@ -148,7 +148,7 @@ abort_resume:
 	mutex_unlock(&power_suspend_lock);
 }
 
-bool power_suspend_active = false;
+bool power_suspended = false;
 
 void set_power_suspend_state(int new_state)
 {
@@ -159,12 +159,12 @@ void set_power_suspend_state(int new_state)
 		if (state == POWER_SUSPEND_INACTIVE && new_state == POWER_SUSPEND_ACTIVE) {
 			dprintk("[POWERSUSPEND] state activated.\n");
 			state = new_state;
-			power_suspend_active = true;
+			power_suspended = true;
 			schedule_work(&power_suspend_work);
 		} else if (state == POWER_SUSPEND_ACTIVE && new_state == POWER_SUSPEND_INACTIVE) {
 			dprintk("[POWERSUSPEND] state deactivated.\n");
 			state = new_state;
-			power_suspend_active = false;
+			power_suspended = false;
 			schedule_work(&power_resume_work);
 		}
 		spin_unlock_irqrestore(&state_lock, irqflags);
@@ -173,11 +173,18 @@ void set_power_suspend_state(int new_state)
 	}
 }
 
+void set_power_suspend_state_autosleep_hook(int new_state)
+{
+	dprintk("[POWERSUSPEND] autosleep resquests %s.\n", new_state == POWER_SUSPEND_ACTIVE ? "sleep" : "wakeup");
+	// Only allow autosleep hook changes in autosleep & hybrid mode
+	if (mode == POWER_SUSPEND_AUTOSLEEP || mode == POWER_SUSPEND_HYBRID)
+		set_power_suspend_state(new_state);
+}
 void set_power_suspend_state_panel_hook(int new_state)
 {
 	dprintk("[POWERSUSPEND] autosleep resquests %s.\n", new_state == POWER_SUSPEND_ACTIVE ? "sleep" : "wakeup");
 	// Yank555.lu : Only allow panel hook changes in panel mode
-	if (mode == POWER_SUSPEND_PANEL)
+	if (mode == POWER_SUSPEND_PANEL || mode == POWER_SUSPEND_HYBRID)
 		set_power_suspend_state(new_state);
 }
 
@@ -263,8 +270,10 @@ static ssize_t power_suspend_mode_store(struct kobject *kobj,
 				fb_register_client(&power_suspend_fb_notifier_block);
 			}
 			break;
+		case POWER_SUSPEND_AUTOSLEEP:
 		case POWER_SUSPEND_PANEL:
 		case POWER_SUSPEND_USERSPACE:
+		case POWER_SUSPEND_HYBRID:
 			if (mode == POWER_SUSPEND_FB) {
 				fb_unregister_client(&power_suspend_fb_notifier_block);
 			}
@@ -330,8 +339,10 @@ static int __init power_suspend_init(void)
 		return -ENOMEM;
 	}
 
+//	mode = POWER_SUSPEND_AUTOSLEEP;	// Yank555.lu : Default to autosleep mode
 //	mode = POWER_SUSPEND_USERSPACE;	// Yank555.lu : Default to userspace mode
 //	mode = POWER_SUSPEND_PANEL;	// Yank555.lu : Default to display panel mode
+//	mode = POWER_SUSPEND_HYBRID;	// Yank555.lu : Default to display panel / autosleep hybrid mode
 	mode = POWER_SUSPEND_FB;	// arter97 : Default to display panel mode
 	fb_register_client(&power_suspend_fb_notifier_block);
 

@@ -621,7 +621,7 @@ static int cpufreq_interactive_speedchange_task(void *data)
 			}
 
 #if defined(CONFIG_POWERSUSPEND)
-			if (power_suspend_active && max_freq > screen_off_max)
+			if (power_suspended && max_freq > screen_off_max)
 				    max_freq = screen_off_max;
 #endif
 
