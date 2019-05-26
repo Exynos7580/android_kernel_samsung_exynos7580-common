@@ -214,14 +214,6 @@ static inline void skb_scrub_packet(struct sk_buff *skb, bool xnet)
 }
 #endif
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 12, 0) || defined(ISUBUNTU1404)) && !defined(ISRHEL7)
-#include <linux/random.h>
-static inline u32 prandom_u32_max(u32 ep_ro)
-{
-	return (u32)(((u64) prandom_u32() * ep_ro) >> 32);
-}
-#endif
-
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 10, 75) && !defined(ISRHEL7)
 #ifndef U8_MAX
 #define U8_MAX ((u8)~0U)
@@ -288,36 +280,6 @@ static inline void rng_initialized_callback(struct random_ready_callback *cb)
 {
 	complete(&container_of(cb, struct rng_initializer, cb)->done);
 }
-static inline int wait_for_random_bytes(void)
-{
-	static bool rng_is_initialized = false;
-	int ret;
-	if (unlikely(!rng_is_initialized)) {
-		struct rng_initializer rng = {
-			.done = COMPLETION_INITIALIZER(rng.done),
-			.cb = { .owner = THIS_MODULE, .func = rng_initialized_callback }
-		};
-		ret = add_random_ready_callback(&rng.cb);
-		if (!ret) {
-			ret = wait_for_completion_interruptible(&rng.done);
-			if (ret) {
-				del_random_ready_callback(&rng.cb);
-				return ret;
-			}
-		} else if (ret != -EALREADY)
-			return ret;
-		rng_is_initialized = true;
-	}
-	return 0;
-}
-#elif LINUX_VERSION_CODE < KERNEL_VERSION(4, 2, 0)
-/* This is a disaster. Without this API, we really have no way of
- * knowing if it's initialized. We just return that it has and hope
- * for the best... */
-static inline int wait_for_random_bytes(void)
-{
-	return 0;
-}
 #endif
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 0) && LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0)
@@ -361,14 +323,6 @@ static inline bool rng_is_initialized(void)
 		return false;
 	}
 	return false;
-}
-#elif LINUX_VERSION_CODE < KERNEL_VERSION(4, 2, 0)
-/* This is a disaster. Without this API, we really have no way of
- * knowing if it's initialized. We just return that it has and hope
- * for the best... */
-static inline bool rng_is_initialized(void)
-{
-	return true;
 }
 #endif
 
