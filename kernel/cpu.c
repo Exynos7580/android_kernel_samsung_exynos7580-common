@@ -616,8 +616,8 @@ out:
 
 	if (!switch_err) {
 		switch_err = switch_to_fair_policy();
-		pr_debug("%s: Hotplug policy switch error for task %s (pid=%d)\n",
-			__func__, current->comm, current->pid);
+		pr_err("Hotplug policy switch err. Task %s pid=%d\n",
+					current->comm, current->pid);
 	}
 
 	return err;
