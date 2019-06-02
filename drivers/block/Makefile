@@ -16,7 +16,7 @@ obj-$(CONFIG_AMIGA_Z2RAM)	+= z2ram.o
 obj-$(CONFIG_BLK_DEV_RAM)	+= brd.o
 obj-$(CONFIG_BLK_DEV_LOOP)	+= loop.o
 obj-$(CONFIG_BLK_CPQ_DA)	+= cpqarray.o
-obj-$(CONFIG_BLK_CPQ_CISS_DA)  += cciss.o
+obj-$(CONFIG_BLK_CPQ_CISS_DA)	+= cciss.o
 obj-$(CONFIG_BLK_DEV_DAC960)	+= DAC960.o
 obj-$(CONFIG_XILINX_SYSACE)	+= xsysace.o
 obj-$(CONFIG_CDROM_PKTCDVD)	+= pktcdvd.o
@@ -27,7 +27,7 @@ obj-$(CONFIG_BLK_DEV_OSD)	+= osdblk.o
 
 obj-$(CONFIG_BLK_DEV_UMEM)	+= umem.o
 obj-$(CONFIG_BLK_DEV_NBD)	+= nbd.o
-obj-$(CONFIG_BLK_DEV_CRYPTOLOOP) += cryptoloop.o
+obj-$(CONFIG_BLK_DEV_CRYPTOLOOP)	+= cryptoloop.o
 obj-$(CONFIG_VIRTIO_BLK)	+= virtio_blk.o
 
 obj-$(CONFIG_VIODASD)		+= viodasd.o
@@ -36,11 +36,12 @@ obj-$(CONFIG_BLK_DEV_HD)	+= hd.o
 
 obj-$(CONFIG_XEN_BLKDEV_FRONTEND)	+= xen-blkfront.o
 obj-$(CONFIG_XEN_BLKDEV_BACKEND)	+= xen-blkback/
-obj-$(CONFIG_BLK_DEV_DRBD)     += drbd/
-obj-$(CONFIG_BLK_DEV_RBD)     += rbd.o
+obj-$(CONFIG_BLK_DEV_DRBD)	+= drbd/
+obj-$(CONFIG_BLK_DEV_RBD)	+= rbd.o
 obj-$(CONFIG_BLK_DEV_PCIESSD_MTIP32XX)	+= mtip32xx/
 
-obj-$(CONFIG_BLK_DEV_RSXX) += rsxx/
+obj-$(CONFIG_BLK_DEV_RSXX)	+= rsxx/
+obj-$(CONFIG_ZRAM)              += zram/
 
 nvme-y		:= nvme-core.o nvme-scsi.o
 swim_mod-y	:= swim.o swim_asm.o
