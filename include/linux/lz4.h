@@ -245,6 +245,20 @@ int LZ4_compress_fast(const char *source, char *dest, int inputSize,
 int LZ4_compress_destSize(const char *source, char *dest, int *sourceSizePtr,
 	int targetDestSize, void *wrkmem);
 
+/*
+ * lz4_compress() - For backward compatibility, see LZ4_compress_default
+ * @src: source address of the original data
+ * @src_len: size of the original data
+ * @dst: output buffer address of the compressed data. This requires 'dst'
+ *	of size LZ4_COMPRESSBOUND
+ * @dst_len: is the output size, which is returned after compress done
+ * @workmem: address of the working memory.
+ *
+ * Return: Success if return 0, Error if return < 0
+ */
+int lz4_compress(const unsigned char *src, size_t src_len, unsigned char *dst,
+	size_t *dst_len, void *wrkmem);
+
 /*-************************************************************************
  *	Decompression Functions
  **************************************************************************/
@@ -319,6 +333,34 @@ int LZ4_decompress_safe(const char *source, char *dest, int compressedSize,
  */
 int LZ4_decompress_safe_partial(const char *source, char *dest,
 	int compressedSize, int targetOutputSize, int maxDecompressedSize);
+
+/*
+ * lz4_decompress_unknownoutputsize() - For backwards compatibility,
+ *	see LZ4_decompress_safe
+ * @src: source address of the compressed data
+ * @src_len: is the input size, therefore the compressed size
+ * @dest: output buffer address of the decompressed data
+ *	which must be already allocated
+ * @dest_len: is the max size of the destination buffer, which is
+ *	returned with actual size of decompressed data after decompress done
+ *
+ * Return: Success if return 0, Error if return (< 0)
+ */
+int lz4_decompress_unknownoutputsize(const unsigned char *src, size_t src_len,
+	unsigned char *dest, size_t *dest_len);
+
+/**
+ * lz4_decompress() - For backwards cocmpatibility, see LZ4_decompress_fast
+ * @src: source address of the compressed data
+ * @src_len: is the input size, which is returned after decompress done
+ * @dest: output buffer address of the decompressed data,
+ *	which must be already allocated
+ * @actual_dest_len: is the size of uncompressed data, supposing it's known
+ *
+ * Return: Success if return 0, Error if return (< 0)
+ */
+int lz4_decompress(const unsigned char *src, size_t *src_len,
+	unsigned char *dest, size_t actual_dest_len);
 
 /*-************************************************************************
  *	LZ4 HC Compression
