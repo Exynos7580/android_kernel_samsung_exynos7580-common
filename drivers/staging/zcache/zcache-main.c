@@ -996,7 +996,7 @@ static int zcache_new_client(uint16_t cli_id)
 		goto out;
 	cli->allocated = 1;
 #ifdef CONFIG_FRONTSWAP
-	cli->zspool = zs_create_pool("zcache", ZCACHE_GFP_MASK);
+	cli->zspool = zs_create_pool("zcache", ZCACHE_GFP_MASK, NULL);
 	if (cli->zspool == NULL)
 		goto out;
 #endif
