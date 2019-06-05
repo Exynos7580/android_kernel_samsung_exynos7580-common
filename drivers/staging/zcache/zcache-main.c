@@ -31,13 +31,7 @@
 #include <linux/math64.h>
 #include <linux/crypto.h>
 #include <linux/string.h>
-#include "tmem.h"
-
 #include <linux/zsmalloc.h>
-
-#if (!defined(CONFIG_CLEANCACHE) && !defined(CONFIG_FRONTSWAP))
-#error "zcache is useless without CONFIG_CLEANCACHE or CONFIG_FRONTSWAP"
-#endif
 #ifdef CONFIG_CLEANCACHE
 #include <linux/cleancache.h>
 #endif
@@ -45,27 +39,24 @@
 #include <linux/frontswap.h>
 #endif
 
-#if 0
-/* this is more aggressive but may cause other problems? */
-#define ZCACHE_GFP_MASK	(GFP_ATOMIC | __GFP_NORETRY | __GFP_NOWARN)
-#else
+#include "tmem.h"
+
 #define ZCACHE_GFP_MASK \
-	(__GFP_FS | __GFP_NORETRY | __GFP_NOWARN | __GFP_NOMEMALLOC)
-#endif
+	(__GFP_FS | __GFP_NORETRY | __GFP_NOWARN | \
+		__GFP_NOMEMALLOC | __GFP_NO_KSWAPD | __GFP_ZERO)
 
 #define MAX_POOLS_PER_CLIENT 16
 
 #define MAX_CLIENTS 16
 #define LOCAL_CLIENT ((uint16_t)-1)
 
-#ifdef CONFIG_ZCACHE_LZ4_COMPRESS
-static const char *default_compressor = "lz4";
-#else
+#ifdef CONFIG_ZCACHE_LZO
 static const char *default_compressor = "lzo";
+#elif defined(CONFIG_ZCACHE_LZ4)
+static const char *default_compressor = "lz4";
+#elif defined(CONFIG_ZCACHE_ZSTD)
+static const char *default_compressor = "zstd";
 #endif
-
-
-MODULE_LICENSE("GPL");
 
 struct zcache_client {
 	struct tmem_pool *tmem_pools[MAX_POOLS_PER_CLIENT];
@@ -2089,4 +2080,9 @@ out:
 	return ret;
 }
 
-module_init(zcache_init)
+/* must be late so crypto has time to come up */
+late_initcall(zcache_init);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Dan Magenheimer <dan.magenheimer@oracle.com>");
+MODULE_DESCRIPTION("In-kernel compression of cleancache/frontswap pages");

@@ -1,24 +1,30 @@
 config ZCACHE
 	tristate "Dynamic compression of swap pages and clean pagecache pages"
 	depends on (CLEANCACHE || FRONTSWAP) && CRYPTO=y
-	select ZSMALLOC
 	select CRYPTO_LZO
-	select LZO_COMPRESS
-	select LZO_DECOMPRESS
+	select ZSMALLOC
 	default n
 	help
 	  Zcache doubles RAM efficiency while providing a significant
-	  performance boosts on many workloads.  Zcache uses lzo1x or lz4
-	  compression and an in-kernel implementation of transcendent
-	  memory to store clean page cache pages and swap in RAM,
-	  providing a noticeable reduction in disk I/O.
+	  performance boosts on many workloads. Zcache uses lzo1x or 
+	  lz4 or modern zstd compression and an in-kernel implementation
+	  of transcendent  memory to store clean page cache pages and
+	  swap in RAM, providing a noticeable reduction in disk I/O.
 
-config ZCACHE_LZ4_COMPRESS
-	bool "Enable LZ4 algorithm support"
+choice
+	prompt "ZCACHE compression"
 	depends on ZCACHE
-	select CRYPTO_LZ4
-	select LZ4_COMPRESS
-	select LZ4_DECOMPRESS
-	default n
-	help
-	  This option enables LZ4 compression algorithm support.
+	default ZCACHE_LZO
+
+config ZCACHE_LZO
+	bool "lzo"
+
+config ZCACHE_LZ4
+	depends on CRYPTO_LZ4
+	bool "lz4"
+
+config ZCACHE_ZSTD
+	depends on CRYPTO_ZSTD
+	bool "zstd"
+
+endchoice
