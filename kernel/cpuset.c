@@ -2297,11 +2297,13 @@ void __init cpuset_init_smp(void)
 
 void cpuset_cpus_allowed(struct task_struct *tsk, struct cpumask *pmask)
 {
-	spin_lock_irq(&callback_lock);
+	unsigned long flags;
+
+	spin_lock_irqsave(&callback_lock, flags);
 	task_lock(tsk);
 	guarantee_online_cpus(task_cs(tsk), pmask);
 	task_unlock(tsk);
-	spin_unlock_irq(&callback_lock);
+	spin_unlock_irqrestore(&callback_lock, flags);
 }
 
 void cpuset_cpus_allowed_fallback(struct task_struct *tsk)
@@ -2351,12 +2353,13 @@ void __init cpuset_init_current_mems_allowed(void)
 nodemask_t cpuset_mems_allowed(struct task_struct *tsk)
 {
 	nodemask_t mask;
+	unsigned long flags;
 
-	spin_lock_irq(&callback_lock);
+	spin_lock_irqsave(&callback_lock, flags);
 	task_lock(tsk);
 	guarantee_online_mems(task_cs(tsk), &mask);
 	task_unlock(tsk);
-	spin_unlock_irq(&callback_lock);
+	spin_unlock_irqrestore(&callback_lock, flags);
 
 	return mask;
 }
@@ -2430,6 +2433,7 @@ int __cpuset_node_allowed(int node, gfp_t gfp_mask)
 {
 	const struct cpuset *cs;	/* current cpuset ancestors */
 	int allowed;			/* is allocation in zone z allowed? */
+	unsigned long flags;
 
 	if (in_interrupt())
 		return 1;
@@ -2448,14 +2452,14 @@ int __cpuset_node_allowed(int node, gfp_t gfp_mask)
 		return 1;
 
 	/* Not hardwall and node outside mems_allowed: scan up cpusets */
-	spin_lock_irq(&callback_lock);
+	spin_lock_irqsave(&callback_lock, flags);
 
 	task_lock(current);
 	cs = nearest_hardwall_ancestor(task_cs(current));
 	allowed = node_isset(node, cs->mems_allowed);
 	task_unlock(current);
 
-	spin_unlock_irq(&callback_lock);
+	spin_unlock_irqrestore(&callback_lock, flags);
 	return allowed;
 }
 
