@@ -1,4 +1,4 @@
-/*g
+/*
  *  Generic process-grouping system.
  *
  *  Based originally on the cpuset system, extracted by Paul Menage
