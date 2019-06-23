@@ -1334,7 +1334,7 @@ static int cgroup_remount(struct super_block *sb, int *flags, char *data)
 	if (opts.release_agent) {
 		spin_lock(&release_agent_path_lock);
 		strcpy(root->release_agent_path, opts.release_agent);
-			spin_unlock(&release_agent_path_lock);
+		spin_unlock(&release_agent_path_lock);
 	}
  out_unlock:
 	kfree(opts.release_agent);
